@@ -1,0 +1,6 @@
+{
+  "name": "Chapfacture — Logiciel de facturation, devis & gestion commerciale pour PME",
+  "description": "Créez vos devis et factures en moins de 30 secondes, suivez vos paiements et relancez vos clients par WhatsApp. Le logiciel de facturation simple pour PME, commerçants, prestataires et freelances. Essai gratuit, sans carte bancaire.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
