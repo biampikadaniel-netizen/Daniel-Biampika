@@ -49,18 +49,18 @@ export function SettingsView() {
       <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         <div className="lg:col-span-8 space-y-6">
           {/* Informations Entreprise */}
-          <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-[#F5F7FA]">
-              <Building2 className="w-5 h-5 text-[#1E4F91]" />
-              <h2 className="text-base font-extrabold text-[#101828]">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#D9E7E3]">
+              <Building2 className="w-5 h-5 text-[#215C46]" />
+              <h2 className="text-base font-black text-[#101828]">
                 Informations de l&apos;entreprise
               </h2>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="sm:col-span-2 p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="sm:col-span-2 p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-xl bg-white border border-[#E2E8F0] p-1 flex items-center justify-center overflow-hidden shrink-0">
+                  <div className="w-16 h-16 rounded-xl bg-white border border-[#D9E7E3] p-1 flex items-center justify-center overflow-hidden shrink-0">
                     {settings.logoUrl ? (
                       <img src={settings.logoUrl} alt="Logo entreprise" className="max-w-full max-h-full object-contain" />
                     ) : (
@@ -75,7 +75,7 @@ export function SettingsView() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="px-3.5 py-2 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs font-bold cursor-pointer transition-colors">
+                  <label className="px-3.5 py-2 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-bold cursor-pointer transition-all shadow-xs">
                     <span>{settings.logoUrl ? 'Changer le logo' : 'Téléverser un logo'}</span>
                     <input
                       type="file"
@@ -168,10 +168,10 @@ export function SettingsView() {
           </div>
 
           {/* Personnalisation Visuelle, Signature, Cachet & Conditions */}
-          <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-[#F5F7FA]">
-              <Palette className="w-5 h-5 text-[#F47B20]" />
-              <h2 className="text-base font-extrabold text-[#101828]">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#D9E7E3]">
+              <Palette className="w-5 h-5 text-[#215C46]" />
+              <h2 className="text-base font-black text-[#101828]">
                 Personnalisation des documents (Logo, Couleurs, Signature &amp; Cachet)
               </h2>
             </div>
@@ -182,14 +182,14 @@ export function SettingsView() {
                   Couleur principale des factures &amp; devis
                 </label>
                 <div className="flex items-center gap-2.5">
-                  {['#1E4F91', '#2D5FA8', '#F47B20', '#0F172A', '#15803D'].map((color) => (
+                  {['#215C46', '#123A2C', '#0D2B21', '#1D4D3D', '#2E7D5C'].map((color) => (
                     <button
                       key={color}
                       type="button"
                       onClick={() => setSettings({ ...settings, accentColor: color })}
                       className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer ${
-                        (settings.accentColor || '#1E4F91') === color
-                          ? 'scale-110 border-[#101828]'
+                        (settings.accentColor || '#215C46') === color
+                          ? 'scale-110 border-[#101828] ring-2 ring-[#215C46]'
                           : 'border-transparent'
                       }`}
                       style={{ backgroundColor: color }}
@@ -207,7 +207,7 @@ export function SettingsView() {
                   value={settings.signatureText || ''}
                   onChange={(e) => setSettings({ ...settings, signatureText: e.target.value })}
                   placeholder="Ex: La Direction Générale — Certifié"
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
                 />
               </div>
             </div>
@@ -221,7 +221,7 @@ export function SettingsView() {
                   type="text"
                   value={settings.invoicePrefix}
                   onChange={(e) => setSettings({ ...settings, invoicePrefix: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-mono"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm font-mono focus:border-[#215C46] focus:outline-none"
                 />
               </div>
               <div>
@@ -230,7 +230,7 @@ export function SettingsView() {
                   type="text"
                   value={settings.quotePrefix}
                   onChange={(e) => setSettings({ ...settings, quotePrefix: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-mono"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm font-mono focus:border-[#215C46] focus:outline-none"
                 />
               </div>
               <div>
@@ -243,7 +243,7 @@ export function SettingsView() {
                   onChange={(e) =>
                     setSettings({ ...settings, defaultVatRate: Number(e.target.value) })
                   }
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
                 />
               </div>
             </div>
@@ -256,7 +256,7 @@ export function SettingsView() {
                 rows={2}
                 value={settings.paymentTerms}
                 onChange={(e) => setSettings({ ...settings, paymentTerms: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
               />
             </div>
 
@@ -268,16 +268,16 @@ export function SettingsView() {
                 type="text"
                 value={settings.bankDetails || ''}
                 onChange={(e) => setSettings({ ...settings, bankDetails: e.target.value })}
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
               />
             </div>
 
             <div className="pt-2">
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs sm:text-sm font-extrabold shadow-md transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs sm:text-sm font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
               >
-                <Save className="w-4 h-4" />
+                <Save className="w-4 h-4 text-[#D9E7E3]" />
                 Enregistrer la configuration FAKTELIO
               </button>
             </div>
@@ -285,15 +285,15 @@ export function SettingsView() {
         </div>
 
         {/* Live Document Preview Card */}
-        <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
+        <div className="lg:col-span-4 bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs space-y-4">
           <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#526581]">
             Aperçu en direct de vos documents
           </h3>
 
-          <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA]/50 space-y-3">
+          <div className="p-4 rounded-xl border border-[#D9E7E3] bg-[#F7FAF8] space-y-3">
             <div
               className="pb-3 border-b-2 flex items-start justify-between"
-              style={{ borderColor: settings.accentColor || '#1E4F91' }}
+              style={{ borderColor: settings.accentColor || '#215C46' }}
             >
               <div>
                 <FaktelioLogo size="sm" />
@@ -302,7 +302,7 @@ export function SettingsView() {
               </div>
               <span
                 className="px-2 py-0.5 rounded text-[10px] font-extrabold text-white"
-                style={{ backgroundColor: settings.accentColor || '#1E4F91' }}
+                style={{ backgroundColor: settings.accentColor || '#215C46' }}
               >
                 {settings.invoicePrefix}001
               </span>
@@ -314,10 +314,10 @@ export function SettingsView() {
               </p>
             </div>
 
-            <div className="p-2.5 rounded-lg border border-dashed border-[#1E4F91]/40 bg-white flex items-center gap-2">
-              <Stamp className="w-4 h-4 text-[#1E4F91]" />
+            <div className="p-2.5 rounded-lg border border-dashed border-[#215C46]/40 bg-white flex items-center gap-2">
+              <Stamp className="w-4 h-4 text-[#215C46]" />
               <div>
-                <p className="text-[9px] font-bold uppercase text-[#1E4F91]">Signature &amp; Cachet</p>
+                <p className="text-[9px] font-bold uppercase text-[#215C46]">Signature &amp; Cachet</p>
                 <p className="text-[11px] font-bold text-[#101828]">
                   {settings.signatureText || settings.name}
                 </p>

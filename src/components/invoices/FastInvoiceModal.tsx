@@ -110,9 +110,9 @@ export function FastInvoiceModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
-        <div className="px-6 py-4 bg-gradient-to-r from-[#1E4F91] to-[#2D5FA8] text-white flex items-center justify-between">
+        <div className="px-6 py-4 bg-gradient-to-r from-[#0D2B21] via-[#123A2C] to-[#215C46] text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-[#F47B20]" />
+            <Zap className="w-5 h-5 text-[#A9BDBC]" />
             <h2 className="text-base font-extrabold">
               Facture Express FAKTELIO (+30 secondes)
             </h2>
@@ -181,7 +181,7 @@ export function FastInvoiceModal({
                     },
                   ])
                 }
-                className="text-xs font-bold text-[#1E4F91] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#215C46] hover:underline inline-flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" /> Ajouter une ligne
               </button>
@@ -190,13 +190,13 @@ export function FastInvoiceModal({
             {items.map((item) => (
               <div
                 key={item.id}
-                className="p-3 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] space-y-2"
+                className="p-3 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] space-y-2"
               >
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
                   <select
                     value={item.productId || ''}
                     onChange={(e) => handleProductPick(item.id, e.target.value)}
-                    className="sm:col-span-5 px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold"
+                    className="sm:col-span-5 px-2.5 py-1.5 rounded-lg bg-white border border-[#D9E7E3] text-xs font-semibold focus:border-[#215C46] focus:outline-none"
                   >
                     <option value="">-- Catalogue --</option>
                     {products.map((p) => (
@@ -209,7 +209,7 @@ export function FastInvoiceModal({
                     type="text"
                     value={item.description}
                     onChange={(e) => updateLine(item.id, { description: e.target.value })}
-                    className="sm:col-span-7 px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold"
+                    className="sm:col-span-7 px-2.5 py-1.5 rounded-lg bg-white border border-[#D9E7E3] text-xs font-semibold focus:border-[#215C46] focus:outline-none"
                   />
                 </div>
 
@@ -220,7 +220,7 @@ export function FastInvoiceModal({
                       min={1}
                       value={item.quantity}
                       onChange={(e) => updateLine(item.id, { quantity: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-bold"
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#D9E7E3] text-xs font-bold focus:border-[#215C46] focus:outline-none"
                     />
                   </div>
                   <div className="col-span-5">
@@ -229,10 +229,10 @@ export function FastInvoiceModal({
                       min={0}
                       value={item.unitPrice}
                       onChange={(e) => updateLine(item.id, { unitPrice: Number(e.target.value) })}
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-bold"
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#D9E7E3] text-xs font-bold focus:border-[#215C46] focus:outline-none"
                     />
                   </div>
-                  <div className="col-span-3 text-right text-xs font-extrabold text-[#1E4F91]">
+                  <div className="col-span-3 text-right text-xs font-extrabold text-[#215C46]">
                     {formatFCFA(item.totalHt)}
                   </div>
                   <div className="col-span-1 text-right">
@@ -251,19 +251,19 @@ export function FastInvoiceModal({
             ))}
           </div>
 
-          <div className="p-4 rounded-xl bg-[#1E4F91]/6 border border-[#1E4F91]/15 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <label className="inline-flex items-center gap-2 text-xs font-bold text-[#101828] cursor-pointer">
+          <div className="p-4 rounded-xl bg-[#D9E7E3]/35 border border-[#215C46]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="inline-flex items-center gap-2 text-xs font-bold text-[#10241D] cursor-pointer">
               <input
                 type="checkbox"
                 checked={paidNow}
                 onChange={(e) => setPaidNow(e.target.checked)}
-                className="w-4 h-4 rounded"
+                className="w-4 h-4 rounded text-[#215C46] focus:ring-[#215C46]"
               />
               Payée immédiatement (Espèces / Mobile Money)
             </label>
             <div className="text-right">
               <span className="text-xs text-[#526581] mr-2">Total TTC :</span>
-              <span className="text-lg font-extrabold text-[#F47B20]">{formatFCFA(totalTtc)}</span>
+              <span className="text-lg font-black text-[#215C46]">{formatFCFA(totalTtc)}</span>
             </div>
           </div>
 
@@ -271,15 +271,15 @@ export function FastInvoiceModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4 text-[#D9E7E3]" />
               Générer la facture FAKTELIO
             </button>
           </div>

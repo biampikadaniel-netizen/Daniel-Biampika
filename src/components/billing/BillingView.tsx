@@ -252,8 +252,8 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
       {/* Page Header */}
       <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-2">
-            <FilePlus2 className="w-3.5 h-3.5 text-[#F47B20]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#215C46]/10 text-[#215C46] text-xs font-extrabold uppercase tracking-wider mb-2">
+            <FilePlus2 className="w-3.5 h-3.5 text-[#215C46]" />
             Studio de Facturation FAKTELIO
           </div>
           <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
@@ -298,7 +298,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
           <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
             <div className="flex items-center justify-between border-b border-[#F5F7FA] pb-3">
               <div className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-lg bg-[#1E4F91] text-white text-xs font-extrabold flex items-center justify-center">
+                <span className="w-7 h-7 rounded-lg bg-[#215C46] text-white text-xs font-extrabold flex items-center justify-center">
                   1
                 </span>
                 <h2 className="text-base font-extrabold text-[#101828]">
@@ -308,7 +308,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
               <button
                 type="button"
                 onClick={() => setIsNewClient(!isNewClient)}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F47B20] hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#215C46] hover:underline cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 {isNewClient ? 'Choisir un client existant' : '+ Créer un nouveau client'}
@@ -324,7 +324,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   <select
                     value={clientId}
                     onChange={(e) => setClientId(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#101828] focus:outline-none focus:border-[#1E4F91]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-sm font-semibold text-[#101828] focus:outline-none focus:border-[#215C46]"
                   >
                     {clients.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -389,7 +389,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   type="text"
                   value={invoiceNumber}
                   onChange={(e) => setInvoiceNumber(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#1E4F91]"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-bold text-[#215C46]"
                 />
               </div>
               <div>
@@ -427,7 +427,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
           <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F5F7FA] pb-3">
               <div className="flex items-center gap-2.5">
-                <span className="w-7 h-7 rounded-lg bg-[#F47B20] text-white text-xs font-extrabold flex items-center justify-center">
+                <span className="w-7 h-7 rounded-lg bg-[#123A2C] text-white text-xs font-extrabold flex items-center justify-center">
                   2–5
                 </span>
                 <div>
@@ -443,7 +443,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
               <button
                 type="button"
                 onClick={addLine}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1E4F91]/10 hover:bg-[#1E4F91]/15 text-[#1E4F91] text-xs font-extrabold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#215C46]/10 hover:bg-[#215C46]/20 text-[#215C46] text-xs font-extrabold transition-colors cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 Ajouter une ligne
@@ -457,7 +457,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-[#1E4F91]">
+                    <span className="text-xs font-extrabold text-[#215C46]">
                       Ligne #{idx + 1}
                     </span>
                     {items.length > 1 && (
@@ -558,7 +558,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                       <label className="block text-[11px] font-bold text-[#526581] mb-1">
                         Total Ligne HT
                       </label>
-                      <div className="w-full px-3 py-2 rounded-lg bg-[#1E4F91]/8 border border-[#1E4F91]/15 text-xs font-extrabold text-[#1E4F91]">
+                      <div className="w-full px-3 py-2 rounded-lg bg-[#215C46]/8 border border-[#215C46]/15 text-xs font-extrabold text-[#215C46]">
                         {formatFCFA(item.totalHt)}
                       </div>
                     </div>
@@ -597,7 +597,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                     type="checkbox"
                     checked={paidImmediately}
                     onChange={(e) => setPaidImmediately(e.target.checked)}
-                    className="w-4 h-4 rounded text-[#1E4F91]"
+                    className="w-4 h-4 rounded text-[#215C46]"
                   />
                   <span className="text-xs font-bold text-[#101828]">
                     Marquer comme payée comptant (encaissée immédiatement)
@@ -640,10 +640,10 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
           <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-sm space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-[#E2E8F0]">
               <span className="inline-flex items-center gap-2 text-sm font-extrabold text-[#101828]">
-                <Calculator className="w-4 h-4 text-[#1E4F91]" />
+                <Calculator className="w-4 h-4 text-[#215C46]" />
                 Calcul automatique
               </span>
-              <span className="text-xs font-bold text-[#1E4F91] bg-[#1E4F91]/10 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-bold text-[#215C46] bg-[#215C46]/10 px-2.5 py-0.5 rounded-full">
                 {items.length} article(s)
               </span>
             </div>
@@ -664,9 +664,9 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                 <span className="font-bold text-[#101828]">{formatFCFA(totalVat)}</span>
               </div>
 
-              <div className="pt-3 border-t-2 border-[#1E4F91] flex items-baseline justify-between">
+              <div className="pt-3 border-t-2 border-[#215C46] flex items-baseline justify-between">
                 <span className="text-base font-extrabold text-[#101828]">TOTAL TTC</span>
-                <span className="text-2xl font-extrabold text-[#F47B20]">
+                <span className="text-2xl font-extrabold text-[#215C46]">
                   {formatFCFA(totalTtc)}
                 </span>
               </div>
@@ -677,7 +677,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
               <button
                 type="button"
                 onClick={handleSendInvoice}
-                className="w-full py-3 px-4 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(244,123,32,0.3)] transition-all cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white text-xs sm:text-sm font-extrabold flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(33,92,70,0.3)] transition-all cursor-pointer"
               >
                 <Send className="w-4 h-4" />
                 Envoyer &amp; Valider la facture
@@ -686,7 +686,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
               <button
                 type="button"
                 onClick={handleDownloadPdf}
-                className="w-full py-2.5 px-4 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#123A2C] hover:bg-[#0D2B21] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
                 <Download className="w-4 h-4" />
                 Télécharger PDF
@@ -707,7 +707,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   onClick={handlePreview}
                   className="py-2.5 px-3 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA] hover:bg-[#E2E8F0]/60 text-[#101828] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
-                  <Eye className="w-3.5 h-3.5 text-[#1E4F91]" />
+                  <Eye className="w-3.5 h-3.5 text-[#215C46]" />
                   Prévisualiser
                 </button>
 

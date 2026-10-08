@@ -47,9 +47,9 @@ export function TeamView() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs">
-          <h2 className="text-base font-extrabold text-[#101828] mb-4 flex items-center gap-2">
-            <UserPlus className="w-4 h-4 text-[#F47B20]" />
+        <div className="lg:col-span-5 bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs">
+          <h2 className="text-base font-black text-[#101828] mb-4 flex items-center gap-2">
+            <UserPlus className="w-4 h-4 text-[#215C46]" />
             Ajouter un collaborateur
           </h2>
           <form onSubmit={handleAdd} className="space-y-4">
@@ -61,7 +61,7 @@ export function TeamView() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Ex: Marc Koné"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
               />
             </div>
             <div>
@@ -74,7 +74,7 @@ export function TeamView() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="collaborateur@entreprise.ci"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
               />
             </div>
             <div>
@@ -82,7 +82,7 @@ export function TeamView() {
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as TeamMember['role'])}
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:border-[#215C46] focus:outline-none"
               >
                 <option value="collaborator">Collaborateur (Devis, Factures, Clients)</option>
                 <option value="manager">Manager (+ Catalogue, Stock, Paiements)</option>
@@ -91,28 +91,28 @@ export function TeamView() {
             </div>
             <button
               type="submit"
-              className="w-full py-2.5 px-4 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold cursor-pointer transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
             >
               Ajouter à l&apos;équipe FAKTELIO
             </button>
           </form>
         </div>
 
-        <div className="lg:col-span-7 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs">
-          <h2 className="text-base font-extrabold text-[#101828] mb-4 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[#1E4F91]" />
+        <div className="lg:col-span-7 bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs">
+          <h2 className="text-base font-black text-[#101828] mb-4 flex items-center gap-2">
+            <Shield className="w-4 h-4 text-[#215C46]" />
             Membres actifs ({members.length})
           </h2>
           <div className="space-y-3">
             {members.map((m) => (
               <div
                 key={m.id}
-                className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex items-center justify-between"
+                className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex items-center justify-between"
               >
                 <div>
                   <p className="text-sm font-extrabold text-[#101828]">{m.name}</p>
                   <p className="text-xs text-[#526581] flex items-center gap-1 mt-0.5">
-                    <Mail className="w-3.5 h-3.5" /> {m.email}
+                    <Mail className="w-3.5 h-3.5 text-[#215C46]" /> {m.email}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -124,7 +124,7 @@ export function TeamView() {
                       loadTeam();
                     }}
                     title={m.email === user.email ? 'Votre rôle administrateur principal' : 'Modifier les permissions'}
-                    className="px-2.5 py-1 rounded-xl text-xs font-extrabold uppercase bg-[#1E4F91]/10 text-[#1E4F91] border border-[#1E4F91]/20 cursor-pointer disabled:cursor-default"
+                    className="px-2.5 py-1 rounded-xl text-xs font-extrabold uppercase bg-[#215C46]/10 text-[#215C46] border border-[#215C46]/20 cursor-pointer disabled:cursor-default"
                   >
                     <option value="collaborator">Collaborateur</option>
                     <option value="manager">Manager</option>

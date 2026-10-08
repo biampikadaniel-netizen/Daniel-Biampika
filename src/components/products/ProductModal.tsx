@@ -55,9 +55,9 @@ export function ProductModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
-        <div className="px-6 py-4 bg-[#1E4F91] text-white flex items-center justify-between">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#D9E7E3] overflow-hidden my-auto">
+        <div className="px-6 py-4 bg-gradient-to-r from-[#0D2B21] via-[#123A2C] to-[#215C46] text-white flex items-center justify-between">
           <h2 className="text-base font-extrabold">
             {product ? 'Modifier l’article du catalogue' : 'Nouvel article du catalogue'}
           </h2>
@@ -82,8 +82,8 @@ export function ProductModal({
               }}
               className={`py-2.5 px-4 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
                 type === 'product'
-                  ? 'bg-[#1E4F91] text-white border-[#1E4F91]'
-                  : 'bg-[#F5F7FA] text-[#526581] border-[#E2E8F0]'
+                  ? 'bg-[#215C46] text-white border-[#215C46] shadow-xs'
+                  : 'bg-[#F7FAF8] text-[#526581] border-[#D9E7E3] hover:text-[#10241D]'
               }`}
             >
               Produit physique (stock)
@@ -96,8 +96,8 @@ export function ProductModal({
               }}
               className={`py-2.5 px-4 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
                 type === 'service'
-                  ? 'bg-[#1E4F91] text-white border-[#1E4F91]'
-                  : 'bg-[#F5F7FA] text-[#526581] border-[#E2E8F0]'
+                  ? 'bg-[#215C46] text-white border-[#215C46] shadow-xs'
+                  : 'bg-[#F7FAF8] text-[#526581] border-[#D9E7E3] hover:text-[#10241D]'
               }`}
             >
               Prestation de service
@@ -223,17 +223,17 @@ export function ProductModal({
             </div>
           )}
 
-          <div className="pt-3 flex justify-end gap-2.5 border-t border-[#E2E8F0]">
+          <div className="pt-3 flex justify-end gap-2.5 border-t border-[#D9E7E3]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
             >
               {product ? 'Mettre à jour' : 'Enregistrer dans le catalogue'}
             </button>

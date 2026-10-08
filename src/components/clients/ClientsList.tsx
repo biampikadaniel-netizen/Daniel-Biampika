@@ -228,18 +228,18 @@ export function ClientsList() {
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => setImportModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0]/70 text-[#101828] text-xs font-bold border border-[#E2E8F0] transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D9E7E3]/50 hover:bg-[#D9E7E3] text-[#123A2C] text-xs font-bold border border-[#215C46]/20 transition-all cursor-pointer shadow-xs"
           >
-            <Upload className="w-3.5 h-3.5 text-[#1E4F91]" />
+            <Upload className="w-3.5 h-3.5 text-[#215C46]" />
             Importer
           </button>
 
           {clients.length > 0 && (
             <button
               onClick={handleExportCsv}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0]/70 text-[#101828] text-xs font-bold border border-[#E2E8F0] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#D9E7E3]/50 hover:bg-[#D9E7E3] text-[#123A2C] text-xs font-bold border border-[#215C46]/20 transition-all cursor-pointer shadow-xs"
             >
-              <Download className="w-3.5 h-3.5 text-[#1E4F91]" />
+              <Download className="w-3.5 h-3.5 text-[#215C46]" />
               Exporter ({clients.length})
             </button>
           )}
@@ -249,18 +249,18 @@ export function ClientsList() {
               setEditingClient(null);
               setModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#D9E7E3]" />
             + Nouveau client
           </button>
         </div>
       </div>
 
       {notificationMsg && (
-        <div className="p-3.5 rounded-xl bg-[#DCFCE7] border border-[#16A34A]/30 text-[#15803D] text-xs font-bold flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-[#215C46]/15 border border-[#215C46]/30 text-[#123A2C] text-xs font-bold flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-[#215C46]" />
             {notificationMsg}
           </span>
           <button onClick={() => setNotificationMsg(null)} className="text-xs underline cursor-pointer">
@@ -271,7 +271,7 @@ export function ClientsList() {
 
       {/* Search & Filters */}
       {clients.length > 0 && (
-        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-[#D9E7E3] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
@@ -279,7 +279,7 @@ export function ClientsList() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher par nom, entreprise, téléphone ou email..."
-              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-[#E2E8F0] focus:outline-none focus:border-[#1E4F91]"
+              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-[#D9E7E3] bg-[#F7FAF8]/70 focus:bg-white focus:outline-none focus:border-[#215C46] focus:ring-1 focus:ring-[#215C46]"
             />
           </div>
 
@@ -294,10 +294,10 @@ export function ClientsList() {
               <button
                 key={f.id}
                 onClick={() => setFilterType(f.id)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   filterType === f.id
-                    ? 'bg-[#1E4F91] text-white'
-                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                    ? 'bg-[#215C46] text-white shadow-xs'
+                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#10241D] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 {f.label}
@@ -323,21 +323,21 @@ export function ClientsList() {
                 setEditingClient(null);
                 setModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md cursor-pointer transition-all"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#D9E7E3]" />
               + Ajouter mon premier client
             </button>
           </div>
         ) : filteredClients.length === 0 ? (
           <div className="py-12 px-4 text-center">
-            <p className="text-sm font-bold text-[#101828]">Aucun client ne correspond à votre recherche.</p>
+            <p className="text-sm font-bold text-[#10241D]">Aucun client ne correspond à votre recherche.</p>
             <button
               onClick={() => {
                 setSearch('');
                 setFilterType('all');
               }}
-              className="mt-2 text-xs font-bold text-[#1E4F91] hover:underline cursor-pointer"
+              className="mt-2 text-xs font-bold text-[#215C46] hover:underline cursor-pointer"
             >
               Réinitialiser les filtres
             </button>
@@ -347,7 +347,7 @@ export function ClientsList() {
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F5F7FA] text-[11px] font-bold text-[#526581] uppercase tracking-wider border-b border-[#E2E8F0]">
+                <tr className="bg-[rgba(33,92,70,0.08)] text-[11px] font-bold text-[#123A2C] uppercase tracking-wider border-b border-[rgba(33,92,70,0.15)]">
                   <th className="py-3.5 px-5">Nom</th>
                   <th className="py-3.5 px-5">Téléphone</th>
                   <th className="py-3.5 px-5">Email</th>
@@ -357,19 +357,19 @@ export function ClientsList() {
                   <th className="py-3.5 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] text-sm">
+              <tbody className="divide-y divide-[rgba(33,92,70,0.08)] text-sm">
                 {filteredClients
                   .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
                   .map((client) => {
                   const stats = getClientStats(client.id);
                   return (
-                    <tr key={client.id} className="hover:bg-[#F5F7FA]/60 transition-colors">
+                    <tr key={client.id} className="hover:bg-[rgba(169,189,188,0.12)] transition-colors">
                       <td className="py-3.5 px-5">
                         <button
                           onClick={() => handleOpenFiche(client, 'info')}
                           className="text-left group cursor-pointer"
                         >
-                          <div className="font-extrabold text-[#101828] group-hover:text-[#1E4F91]">
+                          <div className="font-extrabold text-[#10241D] group-hover:text-[#215C46] transition-colors">
                             {client.name}
                           </div>
                           {client.company && (
@@ -377,18 +377,18 @@ export function ClientsList() {
                           )}
                         </button>
                       </td>
-                      <td className="py-3.5 px-5 text-xs font-semibold text-[#101828]">
+                      <td className="py-3.5 px-5 text-xs font-semibold text-[#10241D]">
                         {client.phone || '—'}
                       </td>
                       <td className="py-3.5 px-5 text-xs text-[#526581]">
                         {client.email || '—'}
                       </td>
                       <td className="py-3.5 px-5 text-center">
-                        <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#1E4F91]/10 text-[#1E4F91]">
+                        <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#215C46]/10 text-[#215C46] border border-[#215C46]/20">
                           {stats.invoicesCount}
                         </span>
                       </td>
-                      <td className="py-3.5 px-5 font-extrabold text-[#101828]">
+                      <td className="py-3.5 px-5 font-black text-[#10241D]">
                         {formatFCFA(stats.totalBilled)}
                       </td>
                       <td className="py-3.5 px-5 text-xs text-[#526581]">
@@ -399,7 +399,7 @@ export function ClientsList() {
                           <button
                             onClick={() => handleOpenFiche(client, 'info')}
                             title="Ouvrir la fiche CRM complète"
-                            className="px-2.5 py-1.5 rounded-lg bg-[#1E4F91]/10 hover:bg-[#1E4F91] text-[#1E4F91] hover:text-white text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-lg bg-[#D9E7E3]/50 hover:bg-[#215C46] text-[#215C46] hover:text-white text-xs font-bold inline-flex items-center gap-1 transition-all cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
                             Fiche
@@ -453,8 +453,8 @@ export function ClientsList() {
                     onClick={() => setCurrentPage(idx + 1)}
                     className={`w-8 h-8 rounded-lg font-bold cursor-pointer ${
                       currentPage === idx + 1
-                        ? 'bg-[#1E4F91] text-white'
-                        : 'border border-[#E2E8F0] bg-white text-[#101828] hover:bg-[#F5F7FA]'
+                        ? 'bg-[#215C46] text-white shadow-xs'
+                        : 'border border-[#D9E7E3] bg-white text-[#101828] hover:bg-[#F7FAF8]'
                     }`}
                   >
                     {idx + 1}
@@ -508,17 +508,17 @@ export function ClientsList() {
 
       {/* Fiche Client Complète */}
       {selectedClient && (
-        <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#D9E7E3] overflow-hidden my-auto">
             {/* Header */}
-            <div className="p-6 bg-[#1E4F91] text-white flex items-start justify-between gap-4">
+            <div className="p-6 bg-gradient-to-r from-[#0D2B21] via-[#123A2C] to-[#215C46] text-white flex items-start justify-between gap-4">
               <div>
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/15 text-[10px] font-extrabold uppercase tracking-wider mb-1.5">
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/15 text-[10px] font-extrabold uppercase tracking-wider mb-1.5 text-[#D9E7E3]">
                   Fiche Client CRM
                 </span>
-                <h2 className="text-xl font-extrabold">{selectedClient.name}</h2>
+                <h2 className="text-xl font-black">{selectedClient.name}</h2>
                 {selectedClient.company && (
-                  <p className="text-xs text-white/85 font-medium">{selectedClient.company}</p>
+                  <p className="text-xs text-[#D9E7E3] font-medium">{selectedClient.company}</p>
                 )}
               </div>
               <button
@@ -530,7 +530,7 @@ export function ClientsList() {
             </div>
 
             {/* 6 Tabs */}
-            <div className="px-6 pt-3 bg-[#F5F7FA] border-b border-[#E2E8F0] flex items-center gap-2 overflow-x-auto">
+            <div className="px-6 pt-3 bg-[#F7FAF8] border-b border-[#D9E7E3] flex items-center gap-2 overflow-x-auto">
               {(
                 [
                   { id: 'info', label: 'Informations', icon: User },
@@ -549,8 +549,8 @@ export function ClientsList() {
                     onClick={() => setFicheTab(tab.id)}
                     className={`px-3.5 py-2.5 text-xs font-extrabold rounded-t-xl inline-flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
                       active
-                        ? 'bg-white text-[#1E4F91] border-[#F47B20]'
-                        : 'text-[#526581] border-transparent hover:text-[#101828]'
+                        ? 'bg-white text-[#215C46] border-[#215C46]'
+                        : 'text-[#526581] border-transparent hover:text-[#10241D]'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -569,49 +569,49 @@ export function ClientsList() {
                   return (
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                        <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
                           <p className="text-[11px] font-bold text-[#526581] uppercase">Chiffre d&apos;affaires</p>
-                          <p className="text-lg font-extrabold text-[#1E4F91] mt-1">
+                          <p className="text-lg font-black text-[#215C46] mt-1">
                             {formatFCFA(st.totalBilled)}
                           </p>
                         </div>
-                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                        <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
                           <p className="text-[11px] font-bold text-[#526581] uppercase">Factures &amp; Devis</p>
-                          <p className="text-lg font-extrabold text-[#101828] mt-1">
+                          <p className="text-lg font-extrabold text-[#10241D] mt-1">
                             {st.invoicesCount} factures • {st.quotesCount} devis
                           </p>
                         </div>
-                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                        <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
                           <p className="text-[11px] font-bold text-[#526581] uppercase">Dernière activité</p>
-                          <p className="text-sm font-extrabold text-[#101828] mt-1">
+                          <p className="text-sm font-extrabold text-[#10241D] mt-1">
                             {st.lastActivity}
                           </p>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
-                        <div className="p-4 rounded-xl border border-[#E2E8F0] space-y-2">
+                        <div className="p-4 rounded-xl border border-[#D9E7E3] space-y-2">
                           <div className="flex items-center gap-2 text-[#526581]">
-                            <Phone className="w-4 h-4 text-[#1E4F91]" />
-                            <span className="font-bold text-[#101828]">{selectedClient.phone || 'Non renseigné'}</span>
+                            <Phone className="w-4 h-4 text-[#215C46]" />
+                            <span className="font-bold text-[#10241D]">{selectedClient.phone || 'Non renseigné'}</span>
                           </div>
                           <div className="flex items-center gap-2 text-[#526581]">
-                            <Mail className="w-4 h-4 text-[#1E4F91]" />
+                            <Mail className="w-4 h-4 text-[#215C46]" />
                             <span>{selectedClient.email || 'Non renseigné'}</span>
                           </div>
                           <div className="flex items-center gap-2 text-[#526581]">
-                            <MapPin className="w-4 h-4 text-[#1E4F91]" />
+                            <MapPin className="w-4 h-4 text-[#215C46]" />
                             <span>
                               {selectedClient.address ? `${selectedClient.address}, ` : ''}{selectedClient.city || 'Abidjan'} ({selectedClient.country || "Côte d'Ivoire"})
                             </span>
                           </div>
                         </div>
 
-                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                        <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
                           <p className="text-xs font-extrabold uppercase text-[#526581] mb-1">
                             Notes CRM enregistrées
                           </p>
-                          <p className="text-xs text-[#101828] leading-relaxed">
+                          <p className="text-xs text-[#10241D] leading-relaxed">
                             {selectedClient.notes || 'Aucune note particulière sur ce client.'}
                           </p>
                         </div>
@@ -633,17 +633,17 @@ export function ClientsList() {
                           {st.clientInvoices.map((inv) => (
                             <div
                               key={inv.id}
-                              className="p-3.5 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex items-center justify-between text-xs"
+                              className="p-3.5 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex items-center justify-between text-xs"
                             >
                               <div>
-                                <span className="font-extrabold text-[#1E4F91]">
+                                <span className="font-extrabold text-[#215C46]">
                                   Facture {inv.number}
                                 </span>
                                 <span className="text-[#526581] ml-2">
                                   Émise le {formatDateFr(inv.issueDate)}
                                 </span>
                               </div>
-                              <span className="font-extrabold text-[#101828]">
+                              <span className="font-extrabold text-[#10241D]">
                                 {formatFCFA(inv.totalTtc)}
                               </span>
                             </div>
@@ -651,17 +651,17 @@ export function ClientsList() {
                           {st.clientQuotes.map((quo) => (
                             <div
                               key={quo.id}
-                              className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-between text-xs"
+                              className="p-3.5 rounded-xl bg-white border border-[#D9E7E3] flex items-center justify-between text-xs"
                             >
                               <div>
-                                <span className="font-extrabold text-[#F47B20]">
+                                <span className="font-extrabold text-[#123A2C]">
                                   Devis {quo.number}
                                 </span>
                                 <span className="text-[#526581] ml-2">
                                   Émis le {formatDateFr(quo.issueDate)}
                                 </span>
                               </div>
-                              <span className="font-extrabold text-[#101828]">
+                              <span className="font-extrabold text-[#10241D]">
                                 {formatFCFA(quo.totalTtc)}
                               </span>
                             </div>
@@ -681,14 +681,14 @@ export function ClientsList() {
                         st.clientInvoices.map((inv) => (
                           <div
                             key={inv.id}
-                            className="p-3.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between text-xs"
+                            className="p-3.5 rounded-xl border border-[#D9E7E3] flex items-center justify-between text-xs"
                           >
                             <div>
-                              <p className="font-extrabold text-[#1E4F91]">{inv.number}</p>
+                              <p className="font-extrabold text-[#215C46]">{inv.number}</p>
                               <p className="text-[#526581]">Échéance : {formatDateFr(inv.dueDate)}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-extrabold text-[#101828]">{formatFCFA(inv.totalTtc)}</p>
+                              <p className="font-extrabold text-[#10241D]">{formatFCFA(inv.totalTtc)}</p>
                               <p className="text-[11px] text-[#526581]">
                                 Reste : {formatFCFA(inv.remainingAmount)}
                               </p>
@@ -709,15 +709,15 @@ export function ClientsList() {
                         st.clientQuotes.map((q) => (
                           <div
                             key={q.id}
-                            className="p-3.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between text-xs"
+                            className="p-3.5 rounded-xl border border-[#D9E7E3] flex items-center justify-between text-xs"
                           >
                             <div>
-                              <p className="font-extrabold text-[#101828]">{q.number}</p>
+                              <p className="font-extrabold text-[#10241D]">{q.number}</p>
                               <p className="text-[#526581]">Validité : {formatDateFr(q.expiryDate)}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-extrabold text-[#1E4F91]">{formatFCFA(q.totalTtc)}</p>
-                              <span className="text-[10px] font-bold uppercase text-[#F47B20]">
+                              <p className="font-black text-[#215C46]">{formatFCFA(q.totalTtc)}</p>
+                              <span className="text-[10px] font-bold uppercase text-[#123A2C]">
                                 {q.status}
                               </span>
                             </div>
@@ -737,10 +737,10 @@ export function ClientsList() {
                         st.clientPayments.map((p) => (
                           <div
                             key={p.id}
-                            className="p-3.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between text-xs"
+                            className="p-3.5 rounded-xl border border-[#D9E7E3] flex items-center justify-between text-xs"
                           >
                             <div>
-                              <p className="font-extrabold text-[#15803D]">
+                              <p className="font-extrabold text-[#215C46]">
                                 +{formatFCFA(p.amount)} ({p.invoiceNumber})
                               </p>
                               <p className="text-[#526581]">Réf : {p.reference || '—'}</p>
@@ -763,11 +763,11 @@ export function ClientsList() {
                       value={crmNoteDraft}
                       onChange={(e) => setCrmNoteDraft(e.target.value)}
                       placeholder="Ajoutez vos observations..."
-                      className="w-full p-3.5 rounded-xl border border-[#E2E8F0] text-sm text-[#101828] focus:outline-none focus:border-[#1E4F91]"
+                      className="w-full p-3.5 rounded-xl border border-[#D9E7E3] text-sm text-[#101828] focus:outline-none focus:border-[#215C46]"
                     />
                     <div className="flex items-center justify-between">
                       {noteSavedBanner ? (
-                        <span className="text-xs font-bold text-[#15803D] flex items-center gap-1">
+                        <span className="text-xs font-bold text-[#215C46] flex items-center gap-1">
                           <CheckCircle2 className="w-4 h-4" /> Notes enregistrées !
                         </span>
                       ) : (
@@ -776,7 +776,7 @@ export function ClientsList() {
                       <button
                         type="button"
                         onClick={handleSaveCrmNotes}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1E4F91] text-white text-xs font-bold cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-bold transition-all cursor-pointer shadow-xs"
                       >
                         <Save className="w-3.5 h-3.5" />
                         Enregistrer la note
@@ -792,8 +792,8 @@ export function ClientsList() {
 
       {/* Import Clients Modal */}
       {importModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#E2E8F0] p-6 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#D9E7E3] p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-extrabold text-[#101828]">
                 Importer des clients (Format CSV)
@@ -807,7 +807,7 @@ export function ClientsList() {
             </div>
             <p className="text-xs text-[#526581]">
               Collez vos lignes au format :{' '}
-              <code className="bg-[#F5F7FA] px-1.5 py-0.5 rounded font-mono text-[#1E4F91]">
+              <code className="bg-[#D9E7E3]/40 px-1.5 py-0.5 rounded font-mono text-[#215C46]">
                 Nom;Entreprise;Email;Téléphone;Adresse;Ville
               </code>
             </p>
@@ -818,19 +818,19 @@ export function ClientsList() {
                 value={csvInput}
                 onChange={(e) => setCsvInput(e.target.value)}
                 placeholder="Exemple : Jean Dupont;Dupont SARL;jean@dupont.ci;+225 07 10 20 30 40;Zone 4;Abidjan"
-                className="w-full p-3 rounded-xl border border-[#E2E8F0] text-xs font-mono text-[#101828]"
+                className="w-full p-3 rounded-xl border border-[#D9E7E3] text-xs font-mono text-[#101828] focus:border-[#215C46] focus:outline-none"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setImportModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581]"
+                  className="px-4 py-2 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8]"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#F47B20] text-white text-xs font-extrabold cursor-pointer"
+                  className="px-5 py-2 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold cursor-pointer transition-all shadow-md"
                 >
                   Importer dans FAKTELIO
                 </button>

@@ -34,16 +34,16 @@ const benefits = [
 
 export function Benefits() {
   return (
-    <section className="py-20 bg-[#F5F7FA] border-b border-[#E2E8F0]">
+    <section className="py-20 bg-[#F7FAF8] border-b border-[#D9E7E3]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-14">
-          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#215C46]/10 text-[#215C46] border border-[#D9E7E3] text-xs font-extrabold uppercase tracking-wider mb-3">
             Pourquoi choisir FAKTELIO
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10241D] tracking-tight">
             Conçu pour simplifier la gestion quotidienne de votre entreprise
           </h2>
-          <p className="text-base text-[#526581] mt-3">
+          <p className="text-base text-[#4A635A] mt-3">
             FAKTELIO remplace les carnets à souche et les tableurs complexes par un outil moderne, rapide et rassurant.
           </p>
         </div>
@@ -54,17 +54,17 @@ export function Benefits() {
             return (
               <div
                 key={i}
-                className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-[0_4px_20px_rgba(13,43,33,0.04)] hover:shadow-[0_16px_36px_rgba(33,92,70,0.12)] hover:border-[#215C46]/40 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div>
-                  <div className="w-12 h-12 rounded-xl bg-[#1E4F91]/10 text-[#1E4F91] flex items-center justify-center mb-5">
+                  <div className="w-12 h-12 rounded-xl bg-[#215C46]/10 text-[#215C46] group-hover:bg-[#215C46] group-hover:text-white flex items-center justify-center mb-5 transition-colors duration-200">
                     <Icon className="w-6 h-6" />
                   </div>
-                  <h3 className="text-lg font-extrabold text-[#101828] mb-2">{b.title}</h3>
-                  <p className="text-sm text-[#526581] leading-relaxed mb-5">{b.description}</p>
+                  <h3 className="text-lg font-extrabold text-[#10241D] mb-2">{b.title}</h3>
+                  <p className="text-sm text-[#4A635A] leading-relaxed mb-5">{b.description}</p>
                 </div>
-                <div className="pt-3 border-t border-[#F5F7FA] flex items-center gap-1.5 text-xs font-bold text-[#F47B20]">
-                  <CheckCircle2 className="w-4 h-4 text-[#16A34A]" />
+                <div className="pt-3 border-t border-[#D9E7E3]/60 flex items-center gap-1.5 text-xs font-bold text-[#215C46]">
+                  <CheckCircle2 className="w-4 h-4 text-[#215C46]" />
                   <span>{b.highlight}</span>
                 </div>
               </div>

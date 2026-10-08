@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  LayoutDashboard,
+  Home,
   FileText,
   FileCheck2,
   Users,
   Package,
   Boxes,
-  Wallet,
+  CreditCard,
   MessageCircle,
   BarChart3,
   UserPlus,
-  CreditCard,
   Settings,
   Bell,
+  Mail,
   LogOut,
   Menu,
   X,
   Zap,
-  Clock,
+  Search,
+  ChevronDown,
+  Headphones,
   Globe,
-  FilePlus2,
+  Clock,
+  Check,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation, AppRoute } from '../../context/NavigationContext';
@@ -34,16 +37,14 @@ interface NavEntry {
   badge?: string;
 }
 
-// Exact Sidebar items requested in Section 10:
-// Dashboard, Clients & CRM, Catalogue, Facturation, Devis, Factures, Paiements, Stock, WhatsApp, Analyses, Équipe, Paramètres
 const sidebarItems: NavEntry[] = [
-  { label: 'Dashboard', route: '/dashboard', icon: LayoutDashboard },
+  { label: 'Dashboard', route: '/dashboard', icon: Home },
   { label: 'Clients & CRM', route: '/clients', icon: Users },
   { label: 'Catalogue', route: '/products', icon: Package },
-  { label: 'Facturation', route: '/billing', icon: FilePlus2, badge: 'Nouveau' },
+  { label: 'Facturation', route: '/billing', icon: FileText, badge: 'Nouveau' },
   { label: 'Devis', route: '/quotes', icon: FileCheck2 },
   { label: 'Factures', route: '/invoices', icon: FileText },
-  { label: 'Paiements', route: '/payments', icon: Wallet },
+  { label: 'Paiements', route: '/payments', icon: CreditCard },
   { label: 'Stock', route: '/stock', icon: Boxes },
   { label: 'WhatsApp', route: '/reminders', icon: MessageCircle, badge: 'Relances' },
   { label: 'Analyses', route: '/reports', icon: BarChart3 },
@@ -62,13 +63,31 @@ export function DashboardLayout({
   const { route, navigate } = useNavigation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
       setNotifications(workspaceService.getNotifications(user.id));
     }
   }, [user, route]);
+
+  // Keyboard shortcut: Cmd+K or Ctrl+K focuses the search input
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   if (!user) return null;
 
@@ -83,257 +102,395 @@ export function DashboardLayout({
     setNotifications(workspaceService.getNotifications(user.id));
   };
 
+  const userInitials = user.name
+    .split(' ')
+    .filter(Boolean)
+    .map((p) => p[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'UD';
+
   return (
-    <div className="min-h-screen bg-[#F5F7FA] flex flex-col lg:flex-row">
-      {/* Mobile Sidebar Overlay */}
+    <div className="min-h-screen bg-[#F0F2F5] text-[#0E1A16] font-sans antialiased p-3 sm:p-4 lg:p-5 flex flex-col lg:flex-row gap-5 items-start">
+      {/* Mobile Drawer Backdrop */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+          className="fixed inset-0 bg-[#0E1A16]/50 backdrop-blur-xs z-40 lg:hidden transition-opacity"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Left Sidebar */}
+      {/* ==============================================================
+          SIDEBAR — EXACT PIXEL-PERFECT REPRODUCTION FROM REFERENCE IMAGE
+          Floating white rounded card with mint accents and bottom wave
+         ============================================================== */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#1E4F91] text-white flex flex-col transition-transform duration-200 lg:static lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-y-3 left-3 z-50 w-64 xl:w-72 bg-white rounded-[26px] border border-gray-100 shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col justify-between transition-transform duration-200 lg:static lg:translate-x-0 lg:min-h-[calc(100vh-2.5rem)] lg:self-stretch overflow-hidden shrink-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-[110%]'
         }`}
       >
-        {/* Brand Header */}
-        <div className="h-16 px-5 flex items-center justify-between border-b border-white/15">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-2.5 text-left cursor-pointer"
-          >
-            <FaktelioLogo variant="white" size="sm" />
-          </button>
-          <button
-            onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1.5 rounded-lg text-white/70 hover:text-white"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Fast Invoice Trigger Button */}
-        <div className="p-4 border-b border-white/10">
-          <button
-            onClick={() => {
-              setSidebarOpen(false);
-              onOpenFastInvoice();
-            }}
-            className="w-full py-2.5 px-4 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-[0_6px_16px_rgba(244,123,32,0.35)] transition-all cursor-pointer"
-          >
-            <Zap className="w-4 h-4" />
-            Facture Express (+30s)
-          </button>
-        </div>
-
-        {/* Navigation Links */}
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
-          {sidebarItems.map((item) => {
-            const Icon = item.icon;
-            const active = route === item.route;
-            return (
-              <button
-                key={item.route}
-                onClick={() => {
-                  setSidebarOpen(false);
-                  navigate(item.route);
-                }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                  active
-                    ? 'bg-white text-[#1E4F91] shadow-xs font-bold'
-                    : 'text-white/85 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <span className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${active ? 'text-[#F47B20]' : 'text-white/80'}`} />
-                  {item.label}
-                </span>
-                {item.badge && (
-                  <span
-                    className={`px-2 py-0.5 text-[10px] font-extrabold rounded-full ${
-                      active ? 'bg-[#F47B20] text-white' : 'bg-[#F47B20]/90 text-white'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Trial & Subscription Footer */}
-        <div className="p-4 border-t border-white/15 space-y-3 bg-[#163C70]/50">
-          <div className="p-3 rounded-xl bg-white/10 border border-white/15">
-            <div className="flex items-center justify-between text-[11px] font-bold mb-1">
-              <span className="flex items-center gap-1.5 text-[#F47B20]">
-                <Clock className="w-3.5 h-3.5" />
-                Essai Gratuit
-              </span>
-              <span className="text-white">{trialDaysLeft} j restants</span>
-            </div>
-            <p className="text-[11px] text-white/80 leading-snug mb-2">
-              Plan actuel : <strong className="uppercase text-white">FAKTELIO {user.plan}</strong>
-            </p>
+        <div className="flex-1 flex flex-col min-h-0 relative z-10">
+          {/* Top: Brand Logo */}
+          <div className="pt-6 px-6 pb-2 flex items-center justify-between">
             <button
-              onClick={() => navigate('/subscription')}
-              className="w-full py-1.5 px-3 rounded-lg bg-white text-[#1E4F91] hover:bg-white/90 text-[11px] font-extrabold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+              onClick={() => {
+                setSidebarOpen(false);
+                navigate('/dashboard');
+              }}
+              className="flex items-center gap-2.5 text-left cursor-pointer focus:outline-none"
             >
-              <CreditCard className="w-3.5 h-3.5 text-[#F47B20]" />
-              Gérer mon abonnement
+              <FaktelioLogo variant="admin" size="md" />
+            </button>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
 
-          <div className="flex items-center justify-between pt-1">
+          {/* Navigation Label: MENU */}
+          <div className="px-6 pt-5 pb-2">
+            <span className="text-[11px] font-black tracking-wider text-gray-400 uppercase">
+              MENU
+            </span>
+          </div>
+
+          {/* Nav Links */}
+          <nav className="flex-1 px-3 space-y-1 overflow-y-auto pr-2">
+            {sidebarItems.map((item) => {
+              const Icon = item.icon;
+              const active = route === item.route;
+              return (
+                <button
+                  key={item.route}
+                  onClick={() => {
+                    setSidebarOpen(false);
+                    navigate(item.route);
+                  }}
+                  className={`relative w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs transition-all cursor-pointer group ${
+                    active
+                      ? 'bg-[#E8F4F0] text-[#0D2B21] font-extrabold'
+                      : 'text-gray-600 hover:text-[#0D2B21] hover:bg-gray-50/80 font-semibold'
+                  }`}
+                >
+                  {/* Active Indicator on far left */}
+                  {active && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0E7051] rounded-r-full" />
+                  )}
+
+                  <span className="flex items-center gap-3">
+                    <Icon
+                      className={`w-4 h-4 transition-colors ${
+                        active
+                          ? 'text-[#0E7051]'
+                          : 'text-gray-400 group-hover:text-gray-600'
+                      }`}
+                    />
+                    <span className="truncate">{item.label}</span>
+                  </span>
+
+                  {item.badge && (
+                    <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-[#0E7051] text-white shrink-0">
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Bottom Card: "Besoin d'aide ?" & Decorative Wave */}
+        <div className="relative z-10 pt-2 pb-2">
+          <div className="mx-4 mb-3 p-3.5 rounded-2xl bg-[#F8FAF9] border border-gray-100 shadow-xs relative z-10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-white border border-gray-100/90 text-[#0E7051] flex items-center justify-center shrink-0 shadow-2xs">
+                <Headphones className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[#0E1A16] leading-tight">
+                  Besoin d&apos;aide ?
+                </p>
+                <p className="text-[10px] text-gray-400 leading-tight mt-0.5 truncate">
+                  Notre équipe est là pour vous.
+                </p>
+              </div>
+            </div>
+
             <button
-              onClick={() => navigate('/')}
-              className="inline-flex items-center gap-1.5 text-xs text-white/80 hover:text-white font-medium cursor-pointer"
+              onClick={() => setSupportModalOpen(true)}
+              className="w-full mt-3 py-2 px-3 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
             >
-              <Globe className="w-3.5 h-3.5" />
-              Site vitrine
+              Contacter le support →
             </button>
-            <button
-              onClick={() => {
-                logout();
-                navigate('/');
-              }}
-              className="inline-flex items-center gap-1.5 text-xs text-red-200 hover:text-white font-semibold cursor-pointer"
+          </div>
+
+          {/* Decorative Wave Gradient at the bottom of sidebar (matching reference image) */}
+          <div className="h-10 overflow-hidden pointer-events-none relative -mt-4 opacity-75">
+            <svg
+              viewBox="0 0 280 48"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-full h-full object-cover"
+              preserveAspectRatio="none"
             >
-              <LogOut className="w-3.5 h-3.5" />
-              Déconnexion
-            </button>
+              <path
+                d="M0 24 C 70 8, 140 36, 210 18 C 245 10, 265 16, 280 20 L 280 48 L 0 48 Z"
+                fill="#E8F4F0"
+              />
+              <path
+                d="M0 34 C 80 22, 170 42, 280 28 L 280 48 L 0 48 Z"
+                fill="#D0E8DF"
+                fillOpacity="0.4"
+              />
+            </svg>
           </div>
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <header className="h-16 bg-white border-b border-[#E2E8F0] px-4 sm:px-6 lg:px-8 flex items-center justify-between sticky top-0 z-30">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl text-[#101828] hover:bg-[#F5F7FA]"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <div>
-              <h2 className="text-sm sm:text-base font-extrabold text-[#101828] leading-tight">
-                {user.companyName}
-              </h2>
-              <p className="text-[11px] text-[#526581] hidden sm:block">
-                Plateforme FAKTELIO • Cloud synchronisé en temps réel
-              </p>
+      {/* ==============================================================
+          MAIN CONTENT COLUMN (TOP BAR + PAGE BODY)
+         ============================================================== */}
+      <div className="flex-1 flex flex-col min-w-0 w-full gap-5">
+        {/* ==============================================================
+            HEADER (TOP BAR) — FLOATING WHITE PILL CARDS
+           ============================================================== */}
+        <header className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          {/* Left / Search Pill Card */}
+          <div className="flex-1 bg-white rounded-2xl sm:rounded-full border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] px-4 py-2 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 flex-1 min-w-0">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-1.5 -ml-1 rounded-xl text-gray-600 hover:bg-gray-100 cursor-pointer shrink-0"
+                aria-label="Ouvrir le menu"
+              >
+                <Menu className="w-4 h-4" />
+              </button>
+
+              <Search className="w-4 h-4 text-gray-400 shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
+                placeholder="Rechercher une tâche, un client..."
+                className="bg-transparent border-0 outline-none text-xs sm:text-sm text-[#0E1A16] placeholder:text-gray-400 w-full focus:ring-0 leading-normal"
+              />
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-mono font-medium bg-gray-100 text-gray-400 rounded-md border border-gray-200/60 shrink-0 select-none">
+                ⌘ K
+              </kbd>
+            </div>
+
+            {/* Quick Action Icons inside Search Card */}
+            <div className="flex items-center gap-2 shrink-0 pl-2 border-l border-gray-100">
+              <button
+                onClick={() => navigate('/reminders')}
+                title="Messages & Relances"
+                className="w-9 h-9 rounded-full border border-gray-100/90 flex items-center justify-center text-gray-500 hover:text-[#0E5C44] hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                <Mail className="w-4 h-4" />
+              </button>
+
+              {/* Notification Bell */}
+              <div className="relative">
+                <button
+                  onClick={() => setNotifOpen(!notifOpen)}
+                  title="Notifications"
+                  className="w-9 h-9 rounded-full border border-gray-100/90 flex items-center justify-center text-gray-500 hover:text-[#0E5C44] hover:bg-gray-50 transition-colors relative cursor-pointer"
+                >
+                  <Bell className="w-4 h-4" />
+                  {unreadCount > 0 ? (
+                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#0E7051]" />
+                  ) : (
+                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#0E7051]" />
+                  )}
+                </button>
+
+                {/* Notifications Popup */}
+                {notifOpen && (
+                  <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-100 py-3 z-50">
+                    <div className="px-4 pb-2.5 border-b border-gray-100 flex items-center justify-between">
+                      <span className="text-xs font-black text-[#0E1A16] uppercase tracking-wider">
+                        Notifications ({unreadCount})
+                      </span>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={handleMarkRead}
+                          className="text-[11px] font-bold text-[#0E7051] hover:underline cursor-pointer"
+                        >
+                          Tout marquer comme lu
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                      {notifications.length === 0 ? (
+                        <p className="p-4 text-xs text-gray-400 text-center">
+                          Aucune notification pour le moment.
+                        </p>
+                      ) : (
+                        notifications.map((n) => (
+                          <div
+                            key={n.id}
+                            onClick={() => {
+                              setNotifOpen(false);
+                              if (n.link) navigate(n.link as AppRoute);
+                            }}
+                            className={`p-3.5 hover:bg-gray-50 transition-colors cursor-pointer ${
+                              !n.read ? 'bg-[#E8F4F0]/40' : ''
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-xs font-bold text-[#0E1A16]">{n.title}</p>
+                              {!n.read && (
+                                <span className="w-2 h-2 rounded-full bg-[#0E7051] shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+                              {n.message}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Right / User Profile Pill Card */}
+          <div className="relative shrink-0">
             <button
-              onClick={() => navigate('/billing')}
-              className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1E4F91]/10 hover:bg-[#1E4F91]/15 text-[#1E4F91] text-xs font-extrabold transition-all cursor-pointer"
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="w-full sm:w-auto bg-white rounded-2xl sm:rounded-full border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] px-3 py-1.5 flex items-center justify-between sm:justify-start gap-3 hover:border-gray-200 transition-colors cursor-pointer text-left"
             >
-              <FilePlus2 className="w-3.5 h-3.5" />
-              Facturation
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-[#0E5C44] text-white font-black text-xs flex items-center justify-center tracking-tight shrink-0 shadow-2xs">
+                  {userInitials}
+                </div>
+                <div className="min-w-0 pr-1">
+                  <p className="text-xs font-bold text-[#0E1A16] leading-tight truncate">
+                    {user.name}
+                  </p>
+                  <p className="text-[10px] text-gray-400 leading-tight capitalize">
+                    {user.role === 'admin' ? 'Admin' : user.role}
+                  </p>
+                </div>
+              </div>
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400 shrink-0" />
             </button>
 
-            <button
-              onClick={onOpenFastInvoice}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-xs transition-all cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              + Nouvelle Facture
-            </button>
-
-            {/* Notifications Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setNotifOpen(!notifOpen)}
-                className="relative p-2.5 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0]/60 text-[#101828] transition-colors cursor-pointer"
-                aria-label="Notifications"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#F47B20] text-white text-[10px] font-extrabold flex items-center justify-center">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-
-              {notifOpen && (
-                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-xl border border-[#E2E8F0] py-3 z-50">
-                  <div className="px-4 pb-2.5 border-b border-[#E2E8F0] flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-[#101828] uppercase tracking-wider">
-                      Notifications ({unreadCount})
-                    </span>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={handleMarkRead}
-                        className="text-[11px] font-bold text-[#1E4F91] hover:underline cursor-pointer"
-                      >
-                        Tout marquer comme lu
-                      </button>
-                    )}
-                  </div>
-                  <div className="max-h-80 overflow-y-auto divide-y divide-[#E2E8F0]">
-                    {notifications.length === 0 ? (
-                      <p className="p-4 text-xs text-[#526581] text-center">
-                        Aucune notification pour le moment.
-                      </p>
-                    ) : (
-                      notifications.map((n) => (
-                        <div
-                          key={n.id}
-                          onClick={() => {
-                            setNotifOpen(false);
-                            if (n.link) navigate(n.link as AppRoute);
-                          }}
-                          className={`p-3.5 hover:bg-[#F5F7FA] transition-colors cursor-pointer ${
-                            !n.read ? 'bg-[#1E4F91]/4' : ''
-                          }`}
-                        >
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-xs font-bold text-[#101828]">{n.title}</p>
-                            {!n.read && (
-                              <span className="w-2 h-2 rounded-full bg-[#F47B20] shrink-0" />
-                            )}
-                          </div>
-                          <p className="text-[11px] text-[#526581] mt-1 leading-relaxed">
-                            {n.message}
-                          </p>
-                        </div>
-                      ))
-                    )}
+            {/* Profile Dropdown */}
+            {userMenuOpen && (
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-100 py-2 z-50">
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <p className="text-xs font-bold text-[#0E1A16] truncate">{user.companyName}</p>
+                  <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
+                  <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F4F0] text-[#0E7051] text-[10px] font-bold">
+                    Plan {user.plan.toUpperCase()} • {trialDaysLeft}j essai
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* User Badge */}
-            <div className="flex items-center gap-2.5 pl-2 border-l border-[#E2E8F0]">
-              <div className="w-8 h-8 rounded-full bg-[#1E4F91] text-white text-xs font-extrabold flex items-center justify-center">
-                {user.name
-                  .split(' ')
-                  .map((p) => p[0])
-                  .join('')
-                  .slice(0, 2)
-                  .toUpperCase()}
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate('/settings');
+                    }}
+                    className="w-full px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-gray-400" />
+                    Paramètres de l&apos;entreprise
+                  </button>
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate('/subscription');
+                    }}
+                    className="w-full px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-gray-400" />
+                    Gérer mon abonnement
+                  </button>
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      navigate('/');
+                    }}
+                    className="w-full px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-gray-400" />
+                    Site vitrine public
+                  </button>
+                </div>
+
+                <div className="pt-1 border-t border-gray-100">
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      logout();
+                      navigate('/');
+                    }}
+                    className="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 flex items-center gap-2 cursor-pointer font-semibold"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-red-400" />
+                    Se déconnecter
+                  </button>
+                </div>
               </div>
-              <div className="hidden md:block text-left">
-                <p className="text-xs font-bold text-[#101828] leading-none">{user.name}</p>
-                <p className="text-[10px] text-[#526581] mt-0.5 capitalize">{user.role}</p>
-              </div>
-            </div>
+            )}
           </div>
         </header>
 
-        {/* Page Body */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
-          {children}
-        </main>
+        {/* ==============================================================
+            PAGE BODY (DashboardOverview, Billing, Invoices, etc.)
+           ============================================================== */}
+        <main className="flex-1 w-full">{children}</main>
       </div>
+
+      {/* Support / Contact Modal */}
+      {supportModalOpen && (
+        <div className="fixed inset-0 z-50 bg-[#0E1A16]/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 relative">
+            <button
+              onClick={() => setSupportModalOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="w-12 h-12 rounded-2xl bg-[#E8F4F0] text-[#0E7051] flex items-center justify-center mb-4">
+              <Headphones className="w-6 h-6" />
+            </div>
+            <h3 className="text-lg font-black text-[#0E1A16]">Support Client FAKTELIO</h3>
+            <p className="text-xs text-gray-500 mt-1 mb-5">
+              Une question ou besoin d&apos;assistance sur votre compte ? Notre équipe basée en Côte d&apos;Ivoire et en Afrique de l&apos;Ouest vous répond sous 15 minutes.
+            </p>
+            <div className="space-y-2.5">
+              <a
+                href="https://wa.me/2250700000000?text=Bonjour%20FAKTELIO,%20j'ai%20besoin%20d'aide%20sur%20mon%20compte"
+                target="_blank"
+                rel="noreferrer"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-xs"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Discuter sur WhatsApp (+225)
+              </a>
+              <button
+                onClick={() => {
+                  setSupportModalOpen(false);
+                  navigate('/reminders');
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-gray-100 hover:bg-gray-200 text-[#0E1A16] text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                Voir les modèles de relance WhatsApp
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

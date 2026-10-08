@@ -1,54 +1,150 @@
 @import "tailwindcss";
 
 :root {
-  --primary: #1E4F91;
-  --primary-secondary: #2D5FA8;
-  --primary-hover: #163C70;
-  --secondary: #F47B20;
-  --secondary-hover: #FF7A21;
-  --background: #FFFFFF;
-  --surface: #FFFFFF;
-  --surface-secondary: #F5F7FA;
-  --text: #101828;
-  --text-secondary: #526581;
-  --muted: #94a3b8;
-  --border: #e2e8f0;
-  --success: #16a34a;
-  --danger: #ef4444;
+  /* Official Oceanic Green Design Tokens */
+  --color-primary: #215C46;
+  --color-primary-dark: #123A2C;
+  --color-deep: #0D2B21;
+  --color-mint: #A9BDBC;
+  --color-light-mint: #D9E7E3;
+  --color-background: #F7FAF8;
+  --color-text: #10241D;
 
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Aliases & System Variables */
+  --primary: #215C46;
+  --primary-hover: #3F7A65;
+  --primary-dark: #123A2C;
+  --secondary: #A9BDBC;
+  --secondary-hover: #D9E7E3;
+  --deep: #0D2B21;
+  --background: #F7FAF8;
+  --surface: #FFFFFF;
+  --surface-secondary: #F0F5F3;
+  --text: #10241D;
+  --text-secondary: #4A635A;
+  --muted: #7E968E;
+  --border: #D9E7E3;
+  --border-light: rgba(217, 231, 227, 0.4);
+  --success: #215C46;
+  --danger: #DC2626;
+
+  /* Glassmorphism System Tokens */
+  --glass-bg: rgba(169, 189, 188, 0.10);
+  --glass-border: rgba(217, 231, 227, 0.22);
+  --glass-blur: 18px;
+  --glass-shadow: 0 20px 60px rgba(13, 43, 33, 0.15);
+  --glass-glow: 0 0 35px rgba(169, 189, 188, 0.25);
+
+  --font-sans: "Manrope", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Manrope", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --color-brand-50: #eef3fa;
-  --color-brand-100: #d6e2f2;
-  --color-brand-200: #adc5e5;
-  --color-brand-300: #7f9fd0;
-  --color-brand-400: #5079b5;
-  --color-brand-500: #2D5FA8;
-  --color-brand-600: #1E4F91;
-  --color-brand-700: #183f74;
-  --color-brand-800: #14335e;
-  --color-brand-900: #10284a;
-  --color-brand-950: #0a1930;
+  /* Oceanic Green Palette (replacing legacy brand blue) */
+  --color-oceanic-50: #f0f7f4;
+  --color-oceanic-100: #d9e7e3;
+  --color-oceanic-200: #c1dad3;
+  --color-oceanic-300: #a9bdbc;
+  --color-oceanic-400: #5f9780;
+  --color-oceanic-500: #3f7a65;
+  --color-oceanic-600: #215c46;
+  --color-oceanic-700: #1a4937;
+  --color-oceanic-800: #123a2c;
+  --color-oceanic-900: #0d2b21;
+  --color-oceanic-950: #071712;
 
-  --color-teal-50: #fff5ed;
-  --color-teal-100: #ffe6d4;
-  --color-teal-200: #ffc9a8;
-  --color-teal-300: #ffa571;
-  --color-teal-400: #FF7A21;
-  --color-teal-500: #F47B20;
-  --color-teal-600: #e06510;
-  --color-teal-700: #b94d0c;
-  --color-teal-800: #933d10;
-  --color-teal-900: #773411;
-  --color-teal-950: #401806;
+  /* Mint accents */
+  --color-mint-50: #f4faf8;
+  --color-mint-100: #e5f1ee;
+  --color-mint-200: #d9e7e3;
+  --color-mint-300: #c0d8d3;
+  --color-mint-400: #a9bdbc;
+  --color-mint-500: #88a6a4;
+  --color-mint-600: #688e8c;
+  --color-mint-700: #4e6f6d;
 }
 
+/* Base Body Style */
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(169, 189, 188, 0.10);
+  border: 1px solid rgba(217, 231, 227, 0.22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 20px 60px rgba(13, 43, 33, 0.15);
+}
+
+.glass-panel-dark {
+  background: rgba(13, 43, 33, 0.65);
+  border: 1px solid rgba(169, 189, 188, 0.20);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 24px 70px rgba(13, 43, 33, 0.35);
+}
+
+.glass-panel-light {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(217, 231, 227, 0.60);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 10px 40px rgba(13, 43, 33, 0.06);
+}
+
+.glass-button-primary {
+  background: linear-gradient(135deg, #215C46 0%, #3F7A65 100%);
+  color: #FFFFFF;
+  border: 1px solid rgba(217, 231, 227, 0.25);
+  box-shadow: 0 8px 24px rgba(33, 92, 70, 0.28);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-button-primary:hover {
+  background: linear-gradient(135deg, #1A4937 0%, #356B58 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(33, 92, 70, 0.38);
+}
+
+.glass-button-secondary {
+  background: rgba(169, 189, 188, 0.12);
+  color: #10241D;
+  border: 1px solid rgba(217, 231, 227, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.glass-button-secondary:hover {
+  background: rgba(169, 189, 188, 0.22);
+  border-color: #215C46;
+  color: #215C46;
+  transform: translateY(-1px);
+}
+
+/* Premium Table specifications from prompt Section 11 */
+.table-oceanic thead tr {
+  background: rgba(33, 92, 70, 0.08);
+  border-bottom: 1px solid rgba(33, 92, 70, 0.15);
+}
+
+.table-oceanic tbody tr {
+  background: transparent;
+  transition: background-color 0.15s ease;
+}
+
+.table-oceanic tbody tr:hover {
+  background-color: rgba(169, 189, 188, 0.12);
+}
+
+/* Animations */
 @keyframes fadeIn {
   0% { opacity: 0; transform: translateY(6px); }
   100% { opacity: 1; transform: translateY(0); }
@@ -64,19 +160,14 @@
   100% { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes float {
+@keyframes floatSlow {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes floatDelayed {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-8px) rotate(-1deg); }
-}
-
-@keyframes floatRight {
-  0%, 100% { transform: translateY(0) rotate(2deg); }
-  50% { transform: translateY(-12px) rotate(1deg); }
+@keyframes floatGentle {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-6px) rotate(0.5deg); }
 }
 
 .animate-blink {
@@ -92,15 +183,11 @@
 }
 
 .animate-float {
-  animation: float 6s ease-in-out infinite;
+  animation: floatSlow 6s ease-in-out infinite;
 }
 
 .animate-float-delayed {
-  animation: floatDelayed 7s ease-in-out infinite;
-}
-
-.animate-float-right {
-  animation: floatRight 6.5s ease-in-out infinite;
+  animation: floatGentle 7s ease-in-out infinite;
 }
 
 .tabular-nums {
@@ -129,8 +216,7 @@
   .animate-fadeIn,
   .animate-fadeUp,
   .animate-float,
-  .animate-float-delayed,
-  .animate-float-right {
+  .animate-float-delayed {
     animation: none !important;
   }
 }

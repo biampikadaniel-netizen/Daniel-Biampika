@@ -34,10 +34,10 @@ export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="py-20 bg-[#F5F7FA] border-b border-[#E2E8F0]">
+    <section id="faq" className="py-20 bg-[#F7FAF8] border-b border-[#D9E7E3]">
       <div className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#215C46]/10 text-[#215C46] border border-[#D9E7E3] text-xs font-extrabold uppercase tracking-wider mb-3">
             Questions fréquentes
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight">
@@ -51,22 +51,22 @@ export function FAQ() {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden transition-all"
+                className="bg-white/95 rounded-2xl border border-[#D9E7E3] overflow-hidden transition-all shadow-xs"
               >
                 <button
                   type="button"
                   onClick={() => setOpenIndex(isOpen ? null : idx)}
-                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-[#F5F7FA]/50 transition-colors cursor-pointer"
+                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-[#F7FAF8] transition-colors cursor-pointer"
                 >
-                  <span className="text-base font-extrabold text-[#101828]">{faq.question}</span>
+                  <span className="text-base font-extrabold text-[#10241D]">{faq.question}</span>
                   <ChevronDown
-                    className={`w-5 h-5 text-[#1E4F91] shrink-0 transition-transform duration-200 ${
+                    className={`w-5 h-5 text-[#215C46] shrink-0 transition-transform duration-200 ${
                       isOpen ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
                 {isOpen && (
-                  <div className="px-6 pb-5 text-sm text-[#526581] leading-relaxed border-t border-[#F5F7FA] pt-3">
+                  <div className="px-6 pb-5 text-sm text-[#4A635A] leading-relaxed border-t border-[#D9E7E3]/60 pt-3">
                     {faq.answer}
                   </div>
                 )}

@@ -89,13 +89,13 @@ export function StockList() {
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs">
             <h2 className="text-base font-extrabold text-[#101828] mb-4 flex items-center gap-2">
-              <Boxes className="w-4 h-4 text-[#F47B20]" />
+              <Boxes className="w-4 h-4 text-[#215C46]" />
               Enregistrer une Entrée / Sortie
             </h2>
 
             {products.length === 0 ? (
-              <div className="py-6 px-4 text-center bg-[#F5F7FA] rounded-xl border border-dashed border-[#CBD5E1]">
-                <Package className="w-8 h-8 text-[#94A3B8] mx-auto mb-2" />
+              <div className="py-6 px-4 text-center bg-[#F7FAF8] rounded-xl border border-dashed border-[#D9E7E3]">
+                <Package className="w-8 h-8 text-[#A9BDBC] mx-auto mb-2" />
                 <p className="text-xs font-bold text-[#101828]">
                   Aucun produit physique dans le catalogue
                 </p>
@@ -105,7 +105,7 @@ export function StockList() {
                 <button
                   type="button"
                   onClick={() => navigate('/products')}
-                  className="px-4 py-2 rounded-xl bg-[#F47B20] text-white text-xs font-bold hover:bg-[#FF7A21] cursor-pointer"
+                  className="px-4 py-2 rounded-xl bg-[#215C46] text-white text-xs font-bold hover:bg-[#123A2C] cursor-pointer shadow-xs"
                 >
                   + Ajouter un produit
                 </button>
@@ -179,7 +179,7 @@ export function StockList() {
 
                 <button
                   type="submit"
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs font-extrabold cursor-pointer"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold cursor-pointer transition-all shadow-sm"
                 >
                   Valider le mouvement de stock
                 </button>
@@ -198,7 +198,7 @@ export function StockList() {
                 return (
                   <div
                     key={p.id}
-                    className="p-3.5 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex items-center justify-between"
+                    className="p-3.5 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex items-center justify-between"
                   >
                     <div>
                       <p className="text-xs font-extrabold text-[#101828]">{p.name}</p>
@@ -208,7 +208,7 @@ export function StockList() {
                     </div>
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-extrabold ${
-                        alert ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#DCFCE7] text-[#15803D]'
+                        alert ? 'bg-[#FEE2E2] text-[#DC2626]' : 'bg-[#D9E7E3] text-[#123A2C]'
                       }`}
                     >
                       {p.stock} {p.unit}(s)
@@ -223,7 +223,7 @@ export function StockList() {
         {/* Right: Stock Movements History */}
         <div className="lg:col-span-7 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs">
           <h2 className="text-base font-extrabold text-[#101828] mb-4 flex items-center gap-2">
-            <History className="w-4 h-4 text-[#1E4F91]" />
+            <History className="w-4 h-4 text-[#215C46]" />
             Historique des entrées et sorties ({movements.length})
           </h2>
 
@@ -240,14 +240,14 @@ export function StockList() {
               {movements.map((m) => (
                 <div
                   key={m.id}
-                  className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex items-center justify-between gap-3"
+                  className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex items-center justify-between gap-3"
                 >
                   <div>
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${
                           m.type === 'in'
-                            ? 'bg-[#DCFCE7] text-[#15803D]'
+                            ? 'bg-[#215C46]/15 text-[#123A2C]'
                             : 'bg-[#FEE2E2] text-[#DC2626]'
                         }`}
                       >
@@ -258,7 +258,7 @@ export function StockList() {
                     <p className="text-xs text-[#526581] mt-1">{m.reason}</p>
                   </div>
                   <div className="text-right text-xs">
-                    <div className="font-bold text-[#1E4F91]">
+                    <div className="font-extrabold text-[#215C46]">
                       Stock : {m.previousStock} → {m.newStock}
                     </div>
                     <div className="text-[10px] text-[#526581]">

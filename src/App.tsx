@@ -36,7 +36,7 @@ import { FastInvoiceModal } from './components/invoices/FastInvoiceModal';
 
 function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#101828] selection:bg-[#1E4F91] selection:text-white">
+    <div className="min-h-screen flex flex-col bg-[#F7FAF8] text-[#10241D] selection:bg-[#215C46] selection:text-white">
       <Header />
       <main className="flex-grow">
         <Hero />

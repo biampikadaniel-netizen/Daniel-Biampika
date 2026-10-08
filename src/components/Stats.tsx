@@ -50,11 +50,11 @@ function AnimatedStatCard({
   }, [visible, targetValue]);
 
   return (
-    <div className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E2E8F0] shadow-[0_6px_24px_-6px_rgba(16,24,40,0.05)] hover:shadow-[0_14px_30px_-8px_rgba(30,79,145,0.12)] hover:-translate-y-1 transition-all duration-300 group">
-      <div className="w-12 h-12 rounded-xl bg-[#1E4F91]/8 text-[#1E4F91] group-hover:bg-[#F47B20] group-hover:text-white flex items-center justify-center mb-4 transition-colors duration-300">
+    <div className="bg-[rgba(169,189,188,0.08)] backdrop-blur-xl rounded-2xl p-6 sm:p-7 border border-[rgba(217,231,227,0.20)] shadow-[0_20px_60px_rgba(13,43,33,0.3)] hover:shadow-[0_24px_70px_rgba(33,92,70,0.35)] hover:-translate-y-1.5 transition-all duration-300 group">
+      <div className="w-12 h-12 rounded-xl bg-[#215C46]/40 text-[#D9E7E3] group-hover:bg-[#215C46] group-hover:text-white flex items-center justify-center mb-4 transition-colors duration-300 border border-[rgba(217,231,227,0.2)]">
         <Icon className="w-6 h-6" />
       </div>
-      <div className="text-3xl sm:text-4xl font-extrabold text-[#1E4F91] tracking-tight mb-1.5">
+      <div className="text-3xl sm:text-4xl font-extrabold text-[#F7FAF8] tracking-tight mb-1.5">
         {displayOverride ? (
           <span>{visible ? displayOverride : '0'}</span>
         ) : (
@@ -65,8 +65,8 @@ function AnimatedStatCard({
           </span>
         )}
       </div>
-      <p className="text-base font-bold text-[#101828]">{label}</p>
-      <p className="text-xs text-[#526581] mt-1 leading-relaxed">{sublabel}</p>
+      <p className="text-base font-bold text-[#D9E7E3]">{label}</p>
+      <p className="text-xs text-[#A9BDBC] mt-1 leading-relaxed">{sublabel}</p>
     </div>
   );
 }
@@ -98,17 +98,25 @@ export function Stats() {
   return (
     <section
       ref={sectionRef}
-      className="py-16 lg:py-20 bg-[#F5F7FA] border-y border-[#E2E8F0]"
+      className="py-16 lg:py-20 bg-[#0D2B21] text-white relative overflow-hidden border-y border-[#123A2C]"
     >
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Subtle Oceanic Glow */}
+      <div
+        className="pointer-events-none absolute -top-40 right-10 w-[600px] h-[600px] rounded-full opacity-25 blur-3xl"
+        style={{
+          background: 'radial-gradient(circle, rgba(33,92,70,0.6) 0%, rgba(169,189,188,0.2) 60%, transparent 80%)',
+        }}
+      />
+
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#215C46]/50 border border-[#A9BDBC]/30 text-[#D9E7E3] text-xs font-extrabold uppercase tracking-wider mb-3">
             Performance &amp; Simplicité FAKTELIO
           </span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#101828] tracking-tight">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#F7FAF8] tracking-tight">
             Tout ce dont vous avez besoin pour gérer votre activité
           </h2>
-          <p className="text-sm sm:text-base text-[#526581] mt-3">
+          <p className="text-sm sm:text-base text-[#A9BDBC] mt-3">
             Une plateforme pensée pour faire gagner du temps aux dirigeants, commerçants et équipes commerciales.
           </p>
         </div>

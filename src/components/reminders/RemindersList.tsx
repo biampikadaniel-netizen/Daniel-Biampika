@@ -38,13 +38,13 @@ export function RemindersList() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DCFCE7] text-[#15803D] text-xs font-extrabold uppercase tracking-wider mb-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#215C46]/10 text-[#215C46] text-xs font-black uppercase tracking-wider mb-2 border border-[#215C46]/20">
             <MessageCircle className="w-3.5 h-3.5" />
             Relances Automatiques WhatsApp
           </span>
-          <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
+          <h1 className="text-2xl font-black text-[#10241D] tracking-tight">
             Relances Clients sur WhatsApp
           </h1>
           <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
@@ -54,9 +54,11 @@ export function RemindersList() {
       </div>
 
       {unpaidInvoices.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 border border-[#E2E8F0] text-center">
-          <CheckCircle2 className="w-12 h-12 text-[#16A34A] mx-auto mb-3" />
-          <h2 className="text-lg font-extrabold text-[#101828]">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-12 border border-[#D9E7E3] text-center">
+          <div className="w-14 h-14 rounded-2xl bg-[#D9E7E3]/50 flex items-center justify-center mx-auto mb-3 border border-[#215C46]/20">
+            <CheckCircle2 className="w-7 h-7 text-[#215C46]" />
+          </div>
+          <h2 className="text-lg font-black text-[#10241D]">
             {invoices.length === 0 ? 'Aucune facture impayée à relancer' : 'Toutes vos factures sont réglées !'}
           </h2>
           <p className="text-sm text-[#526581] max-w-md mx-auto mt-1">
@@ -73,24 +75,24 @@ export function RemindersList() {
             return (
               <div
                 key={inv.id}
-                className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col justify-between space-y-4"
+                className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs flex flex-col justify-between space-y-4 hover:border-[#215C46]/40 transition-all"
               >
                 <div>
                   <div className="flex items-start justify-between gap-3 mb-4">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-base font-extrabold text-[#1E4F91]">{inv.number}</span>
+                        <span className="text-base font-black text-[#215C46]">{inv.number}</span>
                         {isLate ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#FEE2E2] text-[#DC2626]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#FEE2E2] text-[#DC2626] border border-[#FCA5A5]/40">
                             <AlertTriangle className="w-3 h-3" /> EN RETARD
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#FEF3C7] text-[#B45309]">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#D9E7E3] text-[#123A2C] border border-[#215C46]/20">
                             <Clock className="w-3 h-3" /> EN ATTENTE
                           </span>
                         )}
                       </div>
-                      <p className="text-sm font-extrabold text-[#101828] mt-1">{inv.clientName}</p>
+                      <p className="text-sm font-extrabold text-[#10241D] mt-1">{inv.clientName}</p>
                       <p className="text-xs text-[#526581]">
                         {inv.clientCompany ? `${inv.clientCompany} • ` : ''}
                         {inv.clientPhone || 'Téléphone non renseigné'}
@@ -101,7 +103,7 @@ export function RemindersList() {
                       <span className="text-[11px] font-bold text-[#526581] uppercase block">
                         Reste à payer
                       </span>
-                      <span className="text-lg font-extrabold text-[#F47B20]">
+                      <span className="text-lg font-black text-[#215C46]">
                         {formatFCFA(inv.remainingAmount)}
                       </span>
                       <span className="text-[11px] text-[#526581] block">
@@ -111,10 +113,10 @@ export function RemindersList() {
                   </div>
 
                   {/* Pre-filled WhatsApp Message Preview */}
-                  <div className="p-4 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-xs text-[#101828] space-y-1.5">
-                    <div className="flex items-center justify-between text-[10px] font-extrabold uppercase text-[#15803D] pb-1 border-b border-[#BBF7D0]">
+                  <div className="p-4 rounded-xl bg-[#D9E7E3]/30 border border-[#215C46]/20 text-xs text-[#10241D] space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-extrabold uppercase text-[#215C46] pb-1 border-b border-[#215C46]/15">
                       <span>Message WhatsApp pré-rempli par FAKTELIO</span>
-                      <span>Prêt à envoyer</span>
+                      <span className="text-[#123A2C]">Prêt à envoyer</span>
                     </div>
                     <p>
                       Bonjour <strong>{inv.clientName}</strong>,
@@ -124,26 +126,26 @@ export function RemindersList() {
                       <strong>{formatFCFA(inv.remainingAmount)}</strong> (échéance le{' '}
                       <strong>{formatDateFr(inv.dueDate)}</strong>) est en attente de règlement.
                     </p>
-                    <p className="text-[#1E4F91] underline break-all">
+                    <p className="text-[#215C46] underline break-all font-semibold">
                       Document : {docLink}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#F5F7FA]">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#D9E7E3]">
                   <button
                     type="button"
                     onClick={() => handleCopyMessage(inv)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0] text-xs font-bold text-[#101828] transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#F7FAF8] hover:bg-[#D9E7E3]/50 text-xs font-bold text-[#10241D] border border-[#D9E7E3] transition-colors cursor-pointer"
                   >
                     {copiedId === inv.id ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-[#16A34A]" />
+                        <Check className="w-3.5 h-3.5 text-[#215C46]" />
                         Message copié !
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5" />
+                        <Copy className="w-3.5 h-3.5 text-[#526581]" />
                         Copier le texte
                       </>
                     )}
@@ -152,7 +154,7 @@ export function RemindersList() {
                   <button
                     type="button"
                     onClick={() => handleSendWhatsApp(inv)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-extrabold shadow-xs transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer transform hover:-translate-y-0.5"
                   >
                     <MessageCircle className="w-4 h-4" />
                     Relancer sur WhatsApp

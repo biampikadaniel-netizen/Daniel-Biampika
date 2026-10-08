@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, LayoutDashboard, ArrowRight } from 'lucide-react';
+import { Menu, X, LayoutDashboard, ArrowRight, Sparkles } from 'lucide-react';
 import { NavItem } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '../context/NavigationContext';
@@ -36,8 +36,8 @@ export function Header() {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 backdrop-blur-md border-b border-[#E2E8F0] shadow-[0_4px_20px_-4px_rgba(16,24,40,0.06)] py-3'
-          : 'bg-white/90 backdrop-blur-sm border-b border-transparent py-4'
+          ? 'bg-[#F7FAF8]/85 backdrop-blur-md border-b border-[rgba(217,231,227,0.6)] shadow-[0_4px_25px_rgba(13,43,33,0.06)] py-3'
+          : 'bg-[#F7FAF8]/90 backdrop-blur-sm border-b border-transparent py-4'
       }`}
     >
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
@@ -56,7 +56,7 @@ export function Header() {
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-semibold text-[#526581] hover:text-[#1E4F91] transition-colors duration-200 py-1"
+              className="text-sm font-semibold text-[#4A635A] hover:text-[#215C46] transition-colors duration-200 py-1"
             >
               {item.label}
             </a>
@@ -68,31 +68,32 @@ export function Header() {
           {user ? (
             <button
               onClick={() => navigate('/dashboard')}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-[#1E4F91] hover:bg-[#163C70] rounded-xl shadow-sm transition-all duration-200 cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] rounded-xl shadow-[0_6px_20px_rgba(33,92,70,0.25)] hover:shadow-[0_10px_28px_rgba(33,92,70,0.35)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
             >
-              <LayoutDashboard className="w-4 h-4" />
+              <LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />
               Mon Espace ({user.name.split(' ')[0]})
             </button>
           ) : (
             <>
               <button
                 onClick={handleDemoAccess}
-                className="px-3.5 py-2 text-xs font-bold text-[#1E4F91] bg-[#1E4F91]/8 hover:bg-[#1E4F91]/15 rounded-lg transition-colors duration-200 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#215C46] bg-[#A9BDBC]/15 hover:bg-[#A9BDBC]/30 border border-[#D9E7E3] rounded-lg transition-all duration-200 cursor-pointer"
               >
+                <Sparkles className="w-3.5 h-3.5 text-[#215C46]" />
                 Démo directe
               </button>
               <button
                 onClick={() => navigate('/login')}
-                className="px-4 py-2.5 text-sm font-semibold text-[#101828] hover:text-[#1E4F91] transition-colors duration-200 cursor-pointer"
+                className="px-4 py-2.5 text-sm font-semibold text-[#10241D] hover:text-[#215C46] transition-colors duration-200 cursor-pointer"
               >
                 Connexion
               </button>
               <button
                 onClick={() => navigate('/register')}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-[#F47B20] hover:bg-[#FF7A21] rounded-xl shadow-[0_6px_16px_rgba(244,123,32,0.28)] hover:shadow-[0_10px_22px_rgba(244,123,32,0.38)] hover:-translate-y-0.5 transition-all duration-250 cursor-pointer"
+                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] rounded-xl shadow-[0_8px_24px_rgba(33,92,70,0.25)] hover:shadow-[0_12px_30px_rgba(33,92,70,0.35)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-250 cursor-pointer group"
               >
                 Créer mon compte
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-4 h-4 text-[#D9E7E3] transition-transform duration-200 group-hover:translate-x-0.5" />
               </button>
             </>
           )}
@@ -103,7 +104,7 @@ export function Header() {
           {!user && (
             <button
               onClick={() => navigate('/register')}
-              className="inline-flex md:hidden items-center justify-center px-3.5 py-2 text-xs font-bold text-white bg-[#F47B20] hover:bg-[#FF7A21] rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
+              className="inline-flex md:hidden items-center justify-center px-3.5 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
             >
               Créer mon compte
             </button>
@@ -111,7 +112,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex items-center justify-center p-2.5 rounded-xl text-[#101828] hover:text-[#1E4F91] hover:bg-[#F5F7FA] transition-colors focus:outline-none"
+            className="inline-flex items-center justify-center p-2.5 rounded-xl text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/15 transition-colors focus:outline-none"
             aria-expanded={mobileMenuOpen}
             aria-label="Menu principal"
           >
@@ -122,29 +123,30 @@ export function Header() {
 
       {/* Mobile Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-b border-[#E2E8F0] px-4 pt-3 pb-6 space-y-3 shadow-xl animate-fade-in-up">
+        <div className="lg:hidden bg-[#F7FAF8] border-b border-[#D9E7E3] px-4 pt-3 pb-6 space-y-3 shadow-xl animate-fade-in-up">
           <nav className="flex flex-col space-y-1">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3.5 py-2.5 rounded-xl text-base font-semibold text-[#101828] hover:text-[#1E4F91] hover:bg-[#F5F7FA] transition-colors"
+                className="px-3.5 py-2.5 rounded-xl text-base font-semibold text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/10 transition-colors"
               >
                 {item.label}
               </a>
             ))}
           </nav>
-          <div className="pt-3 border-t border-[#E2E8F0] flex flex-col gap-2.5">
+          <div className="pt-3 border-t border-[#D9E7E3] flex flex-col gap-2.5">
             {user ? (
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
                   navigate('/dashboard');
                 }}
-                className="w-full py-3 text-center text-sm font-bold text-white bg-[#1E4F91] rounded-xl shadow-md"
+                className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] flex items-center justify-center gap-2 shadow-sm"
               >
-                Accéder à mon Dashboard FAKTELIO
+                <LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />
+                Accéder au Dashboard
               </button>
             ) : (
               <>
@@ -153,16 +155,17 @@ export function Header() {
                     setMobileMenuOpen(false);
                     handleDemoAccess();
                   }}
-                  className="w-full py-2.5 text-center text-sm font-bold text-[#1E4F91] bg-[#1E4F91]/10 rounded-xl"
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-[#215C46] bg-[#A9BDBC]/15 border border-[#D9E7E3] flex items-center justify-center gap-1.5"
                 >
-                  Explorer la Démo Interactive
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Tester la démo instantanée
                 </button>
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigate('/login');
                   }}
-                  className="w-full py-2.5 text-center text-sm font-semibold text-[#101828] border border-[#E2E8F0] rounded-xl hover:bg-[#F5F7FA]"
+                  className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/10 text-center"
                 >
                   Connexion
                 </button>
@@ -171,9 +174,10 @@ export function Header() {
                     setMobileMenuOpen(false);
                     navigate('/register');
                   }}
-                  className="w-full py-3 text-center text-sm font-bold text-white bg-[#F47B20] hover:bg-[#FF7A21] rounded-xl shadow-md transition-all duration-200"
+                  className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] shadow-md flex items-center justify-center gap-2"
                 >
-                  Créer mon compte gratuitement →
+                  Créer mon compte gratuitement
+                  <ArrowRight className="w-4 h-4 text-[#D9E7E3]" />
                 </button>
               </>
             )}

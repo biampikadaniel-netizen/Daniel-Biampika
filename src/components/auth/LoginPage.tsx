@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Lock, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Lock, Mail, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { FaktelioLogo } from '../common/FaktelioLogo';
@@ -32,11 +32,11 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F7FA] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#F7FAF8] flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
         <button
           onClick={() => navigate('/')}
-          className="inline-flex items-center gap-2 text-sm font-semibold text-[#526581] hover:text-[#1E4F91] mb-6 transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-[#4A635A] hover:text-[#215C46] mb-6 transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           Retour à l&apos;accueil FAKTELIO
@@ -45,34 +45,34 @@ export function LoginPage() {
         <div className="flex items-center gap-2.5 mb-3">
           <FaktelioLogo size="lg" />
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#101828] tracking-tight">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-[#10241D] tracking-tight">
           Connexion à votre espace FAKTELIO
         </h1>
-        <p className="mt-1.5 text-sm text-[#526581]">
+        <p className="mt-1.5 text-sm text-[#4A635A]">
           Gérez vos devis, factures, clients, stocks et paiements en temps réel.
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white py-8 px-6 shadow-[0_12px_40px_-8px_rgba(16,24,40,0.08)] rounded-2xl border border-[#E2E8F0] sm:px-10">
+        <div className="bg-white/95 backdrop-blur-xl py-8 px-6 shadow-[0_12px_40px_rgba(13,43,33,0.08)] rounded-2xl border border-[#D9E7E3] sm:px-10">
           {/* Instant Demo Access Banner */}
-          <div className="mb-6 p-4 rounded-xl bg-[#1E4F91]/6 border border-[#1E4F91]/15 flex flex-col gap-2.5">
+          <div className="mb-6 p-4 rounded-xl bg-[#215C46]/6 border border-[#215C46]/18 flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#1E4F91] uppercase tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-[#F47B20]" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-[#215C46] uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5 text-[#215C46]" />
                 Accès Démo Immédiat
               </span>
-              <span className="text-[11px] font-semibold text-[#15803D] bg-[#DCFCE7] px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-semibold text-[#123A2C] bg-[#D9E7E3] px-2 py-0.5 rounded-full">
                 Données pré-remplies
               </span>
             </div>
-            <p className="text-xs text-[#526581] leading-relaxed">
+            <p className="text-xs text-[#4A635A] leading-relaxed">
               Testez toutes les fonctionnalités FAKTELIO (Facturation, Devis → Facture, Stock, Relances WhatsApp, PDF) en 1 clic.
             </p>
             <button
               type="button"
               onClick={handleQuickDemo}
-              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#1E4F91] hover:bg-[#163C70] transition-colors shadow-xs cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#215C46] hover:bg-[#1A4937] transition-colors shadow-xs cursor-pointer"
             >
               Ouvrir le compte Démo FAKTELIO en 1 clic →
             </button>
@@ -86,66 +86,57 @@ export function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#101828] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#10241D] uppercase tracking-wider mb-1.5">
                 Adresse Email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-[#4A635A] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nom@entreprise.com"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#E2E8F0] focus:outline-none focus:border-[#1E4F91] text-[#101828]"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#D9E7E3] focus:outline-none focus:border-[#215C46] text-[#10241D]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#101828] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#10241D] uppercase tracking-wider mb-1.5">
                 Mot de passe
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#4A635A] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#E2E8F0] focus:outline-none focus:border-[#1E4F91] text-[#101828]"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#D9E7E3] focus:outline-none focus:border-[#215C46] text-[#10241D]"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 px-5 rounded-xl text-sm font-bold text-white bg-[#F47B20] hover:bg-[#FF7A21] shadow-[0_6px_18px_rgba(244,123,32,0.28)] transition-all cursor-pointer"
+              className="w-full py-3 px-5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] shadow-[0_8px_24px_rgba(33,92,70,0.28)] hover:shadow-[0_12px_30px_rgba(33,92,70,0.38)] hover:-translate-y-0.5 transition-all cursor-pointer"
             >
               Se connecter à FAKTELIO
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-[#E2E8F0] text-center">
-            <p className="text-xs text-[#526581]">
+          <div className="mt-6 pt-6 border-t border-[#D9E7E3] text-center">
+            <p className="text-xs text-[#4A635A]">
               Pas encore de compte FAKTELIO ?{' '}
               <button
                 onClick={() => navigate('/register')}
-                className="font-bold text-[#1E4F91] hover:underline cursor-pointer"
+                className="font-bold text-[#215C46] hover:underline cursor-pointer"
               >
                 Créer mon compte gratuitement (14 jours d&apos;essai)
               </button>
             </p>
-          </div>
-
-          <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-[#526581]">
-            <span className="inline-flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#16A34A]" /> Sans carte bancaire
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#16A34A]" /> Support 7j/7
-            </span>
           </div>
         </div>
       </div>

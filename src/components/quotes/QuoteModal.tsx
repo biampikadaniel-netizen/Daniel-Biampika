@@ -135,10 +135,10 @@ export function QuoteModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
-        <div className="px-6 py-4 bg-[#1E4F91] text-white flex items-center justify-between">
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-[#D9E7E3] overflow-hidden my-auto">
+        <div className="px-6 py-4 bg-[#0D2B21] text-white flex items-center justify-between border-b border-[#123A2C]">
           <h2 className="text-base font-extrabold">Nouveau Devis FAKTELIO</h2>
-          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/15 cursor-pointer">
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/15 cursor-pointer text-[#A9BDBC] hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -241,7 +241,7 @@ export function QuoteModal({
                     },
                   ])
                 }
-                className="text-xs font-bold text-[#1E4F91] inline-flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#215C46] inline-flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" /> Ajouter une ligne
               </button>
@@ -311,8 +311,8 @@ export function QuoteModal({
                     </select>
                   </div>
                   <div className="col-span-2 text-right">
-                    <label className="text-[10px] text-[#526581] block">Total HT</label>
-                    <div className="text-xs font-extrabold text-[#1E4F91] py-1">
+                    <label className="text-[10px] text-[#4A635A] block">Total HT</label>
+                    <div className="text-xs font-extrabold text-[#215C46] py-1">
                       {formatFCFA(item.totalHt)}
                     </div>
                   </div>
@@ -332,24 +332,24 @@ export function QuoteModal({
             ))}
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] space-y-1 text-xs">
-            <div className="flex justify-between text-[#526581]">
+          <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] space-y-1 text-xs">
+            <div className="flex justify-between text-[#4A635A]">
               <span>Sous-total HT :</span>
-              <strong className="text-[#101828]">{formatFCFA(subtotalHt)}</strong>
+              <strong className="text-[#10241D]">{formatFCFA(subtotalHt)}</strong>
             </div>
             {cleanDiscount > 0 && (
-              <div className="flex justify-between text-[#15803D]">
+              <div className="flex justify-between text-[#215C46]">
                 <span>Remise ({cleanDiscount}%) :</span>
                 <strong>-{formatFCFA(discountAmt)}</strong>
               </div>
             )}
-            <div className="flex justify-between text-[#526581]">
+            <div className="flex justify-between text-[#4A635A]">
               <span>TVA ({settings.defaultVatRate}%) :</span>
-              <strong className="text-[#101828]">{formatFCFA(totalVat)}</strong>
+              <strong className="text-[#10241D]">{formatFCFA(totalVat)}</strong>
             </div>
-            <div className="flex justify-between pt-1 border-t border-[#E2E8F0] text-sm">
-              <span className="font-extrabold text-[#101828]">Total Devis TTC :</span>
-              <strong className="text-[#1E4F91] font-extrabold text-base">{formatFCFA(totalTtc)}</strong>
+            <div className="flex justify-between pt-1 border-t border-[#D9E7E3] text-sm">
+              <span className="font-extrabold text-[#10241D]">Total Devis TTC :</span>
+              <strong className="text-[#215C46] font-extrabold text-base">{formatFCFA(totalTtc)}</strong>
             </div>
           </div>
 
@@ -357,13 +357,13 @@ export function QuoteModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white text-xs font-extrabold shadow-sm cursor-pointer"
             >
               Créer le devis
             </button>

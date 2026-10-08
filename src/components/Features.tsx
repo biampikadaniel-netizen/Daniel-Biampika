@@ -25,7 +25,7 @@ interface FeatureItem {
   route: AppRoute;
   ctaLabel: string;
   icon: React.ComponentType<{ className?: string }>;
-  accent: 'blue' | 'orange' | 'green';
+  accent: 'primary' | 'mint' | 'deep';
   whatsappSample?: {
     clientName: string;
     invoiceNumber: string;
@@ -48,7 +48,7 @@ const featuresList: FeatureItem[] = [
     route: '/billing',
     ctaLabel: 'Créer une facture',
     icon: FileText,
-    accent: 'blue',
+    accent: 'primary',
   },
   {
     number: '02',
@@ -62,7 +62,7 @@ const featuresList: FeatureItem[] = [
     route: '/quotes',
     ctaLabel: 'Tester la conversion Devis → Facture',
     icon: ArrowRightLeft,
-    accent: 'orange',
+    accent: 'mint',
   },
   {
     number: '03',
@@ -76,7 +76,7 @@ const featuresList: FeatureItem[] = [
     route: '/clients',
     ctaLabel: 'Ouvrir le CRM Clients',
     icon: Users,
-    accent: 'blue',
+    accent: 'deep',
   },
   {
     number: '04',
@@ -90,7 +90,7 @@ const featuresList: FeatureItem[] = [
     route: '/products',
     ctaLabel: 'Gérer le catalogue',
     icon: Package,
-    accent: 'blue',
+    accent: 'primary',
   },
   {
     number: '05',
@@ -104,7 +104,7 @@ const featuresList: FeatureItem[] = [
     route: '/stock',
     ctaLabel: 'Contrôler les stocks',
     icon: Boxes,
-    accent: 'orange',
+    accent: 'mint',
   },
   {
     number: '06',
@@ -118,7 +118,7 @@ const featuresList: FeatureItem[] = [
     route: '/payments',
     ctaLabel: 'Suivre les paiements',
     icon: Wallet,
-    accent: 'green',
+    accent: 'primary',
   },
   {
     number: '07',
@@ -132,7 +132,7 @@ const featuresList: FeatureItem[] = [
     route: '/reminders',
     ctaLabel: 'Relancer sur WhatsApp',
     icon: MessageCircle,
-    accent: 'green',
+    accent: 'primary',
     whatsappSample: {
       clientName: 'Clinique Perle (Clarisse N’Guessan)',
       invoiceNumber: 'FAC-2026-004',
@@ -153,7 +153,7 @@ const featuresList: FeatureItem[] = [
     route: '/dashboard',
     ctaLabel: 'Voir le tableau de bord',
     icon: LayoutDashboard,
-    accent: 'blue',
+    accent: 'deep',
   },
   {
     number: '09',
@@ -167,7 +167,7 @@ const featuresList: FeatureItem[] = [
     route: '/settings',
     ctaLabel: 'Personnaliser mes documents',
     icon: Palette,
-    accent: 'orange',
+    accent: 'mint',
   },
   {
     number: '10',
@@ -181,7 +181,7 @@ const featuresList: FeatureItem[] = [
     route: '/reports',
     ctaLabel: 'Explorer les analyses',
     icon: BarChart3,
-    accent: 'blue',
+    accent: 'primary',
   },
 ];
 
@@ -204,20 +204,20 @@ export function Features() {
   };
 
   return (
-    <section id="fonctionnalites" className="py-20 lg:py-28 bg-white">
+    <section id="fonctionnalites" className="py-20 lg:py-28 bg-[#F7FAF8]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1E4F91]/8 border border-[#1E4F91]/15 mb-4">
-            <span className="w-2 h-2 rounded-full bg-[#F47B20]" />
-            <span className="text-xs font-extrabold uppercase tracking-wider text-[#1E4F91]">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#215C46]/10 border border-[#D9E7E3] mb-4">
+            <span className="w-2 h-2 rounded-full bg-[#215C46]" />
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#215C46]">
               10 Modules Connectés FAKTELIO
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#101828] tracking-tight leading-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#10241D] tracking-tight leading-tight mb-4">
             Toutes les fonctionnalités pour facturer, encaisser et développer votre entreprise
           </h2>
-          <p className="text-base sm:text-lg text-[#526581]">
+          <p className="text-base sm:text-lg text-[#4A635A]">
             Chaque carte ci-dessous correspond à un module réel et interactif de votre plateforme FAKTELIO. Cliquez sur n&apos;importe quelle fonctionnalité pour l&apos;utiliser directement.
           </p>
         </div>
@@ -229,19 +229,19 @@ export function Features() {
             const isWhatsAppCard = Boolean(feature.whatsappSample);
 
             const badgeColors =
-              feature.accent === 'orange'
-                ? 'bg-[#F47B20]/10 text-[#F47B20]'
-                : feature.accent === 'green'
-                ? 'bg-[#16A34A]/10 text-[#16A34A]'
-                : 'bg-[#1E4F91]/10 text-[#1E4F91]';
+              feature.accent === 'mint'
+                ? 'bg-[#A9BDBC]/25 text-[#123A2C]'
+                : feature.accent === 'deep'
+                ? 'bg-[#123A2C]/10 text-[#123A2C]'
+                : 'bg-[#215C46]/10 text-[#215C46]';
 
             return (
               <div
                 key={feature.number}
-                className={`group rounded-2xl p-6 sm:p-7 border transition-all duration-300 flex flex-col justify-between ${
+                className={`group rounded-2xl p-6 sm:p-7 border transition-all duration-300 flex flex-col justify-between backdrop-blur-md ${
                   isWhatsAppCard
-                    ? 'md:col-span-2 lg:col-span-2 bg-gradient-to-br from-white via-white to-[#F0FDF4] border-[#BBF7D0] shadow-[0_10px_30px_-10px_rgba(22,163,74,0.14)]'
-                    : 'bg-white border-[#E2E8F0] shadow-[0_4px_20px_-4px_rgba(16,24,40,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(30,79,145,0.14)] hover:border-[#1E4F91]/30 hover:-translate-y-1'
+                    ? 'md:col-span-2 lg:col-span-2 bg-gradient-to-br from-white via-white to-[#F0F7F4] border-[#D9E7E3] shadow-[0_10px_35px_rgba(33,92,70,0.10)]'
+                    : 'bg-white/95 border-[#D9E7E3] shadow-[0_4px_20px_rgba(13,43,33,0.04)] hover:shadow-[0_16px_40px_rgba(33,92,70,0.12)] hover:border-[#215C46]/40 hover:-translate-y-1'
                 }`}
               >
                 <div>
@@ -250,24 +250,24 @@ export function Features() {
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${badgeColors}`}>
                       <Icon className="w-6 h-6" />
                     </div>
-                    <span className="text-xs font-extrabold tracking-widest text-[#526581]/60 bg-[#F5F7FA] px-3 py-1 rounded-full border border-[#E2E8F0]">
+                    <span className="text-xs font-extrabold tracking-widest text-[#4A635A] bg-[#F7FAF8] px-3 py-1 rounded-full border border-[#D9E7E3]">
                       FONCTIONNALITÉ {feature.number}
                     </span>
                   </div>
 
                   {/* Title & Subtitle */}
-                  <h3 className="text-xl font-extrabold text-[#101828] mb-2 group-hover:text-[#1E4F91] transition-colors">
+                  <h3 className="text-xl font-extrabold text-[#10241D] mb-2 group-hover:text-[#215C46] transition-colors">
                     {feature.title}
                   </h3>
-                  <p className="text-sm text-[#526581] leading-relaxed mb-5">
+                  <p className="text-sm text-[#4A635A] leading-relaxed mb-5">
                     {feature.subtitle}
                   </p>
 
                   {/* Bullet points */}
                   <ul className="space-y-2.5 mb-6">
                     {feature.bullets.map((bullet, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#101828]">
-                        <span className="w-4 h-4 rounded-full bg-[#16A34A]/15 text-[#16A34A] flex items-center justify-center shrink-0 mt-0.5">
+                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#10241D]">
+                        <span className="w-4 h-4 rounded-full bg-[#215C46]/15 text-[#215C46] flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3 h-3 stroke-[2.5]" />
                         </span>
                         <span>{bullet}</span>
@@ -277,47 +277,47 @@ export function Features() {
 
                   {/* Special Interactive WhatsApp Preview Block inside Feature 7 */}
                   {feature.whatsappSample && (
-                    <div className="mb-6 rounded-xl bg-white border border-[#DCFCE7] p-4 shadow-xs">
+                    <div className="mb-6 rounded-xl bg-white border border-[#D9E7E3] p-4 shadow-xs">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#15803D]">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#215C46]">
                           Aperçu automatique du message WhatsApp
                         </span>
                         <button
                           type="button"
                           onClick={() => setWhatsappPreviewOpen(!whatsappPreviewOpen)}
-                          className="text-[11px] font-bold text-[#1E4F91] hover:underline cursor-pointer"
+                          className="text-[11px] font-bold text-[#215C46] hover:underline cursor-pointer"
                         >
                           {whatsappPreviewOpen ? 'Masquer détails' : 'Voir le modèle complet'}
                         </button>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mb-3 bg-[#F5F7FA] p-2.5 rounded-lg">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mb-3 bg-[#F7FAF8] p-2.5 rounded-lg border border-[#D9E7E3]/60">
                         <div>
-                          <span className="text-[10px] text-[#526581] block">Client</span>
-                          <strong className="text-[#101828]">Clinique Perle</strong>
+                          <span className="text-[10px] text-[#4A635A] block">Client</span>
+                          <strong className="text-[#10241D]">Clinique Perle</strong>
                         </div>
                         <div>
-                          <span className="text-[10px] text-[#526581] block">N° Facture</span>
-                          <strong className="text-[#1E4F91]">{feature.whatsappSample.invoiceNumber}</strong>
+                          <span className="text-[10px] text-[#4A635A] block">N° Facture</span>
+                          <strong className="text-[#215C46]">{feature.whatsappSample.invoiceNumber}</strong>
                         </div>
                         <div>
-                          <span className="text-[10px] text-[#526581] block">Montant</span>
-                          <strong className="text-[#F47B20]">{feature.whatsappSample.amount}</strong>
+                          <span className="text-[10px] text-[#4A635A] block">Montant</span>
+                          <strong className="text-[#123A2C]">{feature.whatsappSample.amount}</strong>
                         </div>
                         <div>
-                          <span className="text-[10px] text-[#526581] block">Échéance</span>
-                          <strong className="text-[#101828]">{feature.whatsappSample.dueDate}</strong>
+                          <span className="text-[10px] text-[#4A635A] block">Échéance</span>
+                          <strong className="text-[#10241D]">{feature.whatsappSample.dueDate}</strong>
                         </div>
                       </div>
                       {whatsappPreviewOpen && (
-                        <div className="text-xs text-[#101828] bg-[#DCFCE7]/40 p-3 rounded-lg border border-[#BBF7D0] mb-3 font-mono leading-relaxed">
-                          &ldquo;Bonjour Clarisse N’Guessan, votre facture <strong>FAC-2026-004</strong> d&apos;un montant de <strong>672 600 FCFA</strong> arrivée à échéance le <strong>10/09/2026</strong> est disponible ici : <span className="underline text-[#1E4F91]">https://app.faktelio.com/doc/FAC-2026-004</span>&rdquo;
+                        <div className="text-xs text-[#10241D] bg-[#F7FAF8] p-3 rounded-lg border border-[#D9E7E3] mb-3 font-mono leading-relaxed">
+                          &ldquo;Bonjour Clarisse N’Guessan, votre facture <strong>FAC-2026-004</strong> d&apos;un montant de <strong>672 600 FCFA</strong> arrivée à échéance le <strong>10/09/2026</strong> est disponible ici : <span className="underline text-[#215C46]">https://app.faktelio.com/doc/FAC-2026-004</span>&rdquo;
                         </div>
                       )}
                       <div className="flex flex-wrap items-center gap-2.5">
                         <button
                           type="button"
                           onClick={triggerWhatsAppDemo}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
                         >
                           <MessageCircle className="w-4 h-4" />
                           Relancer sur WhatsApp
@@ -326,7 +326,7 @@ export function Features() {
                         <button
                           type="button"
                           onClick={() => handleOpenFeature('/reminders')}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1E4F91]/10 hover:bg-[#1E4F91]/15 text-[#1E4F91] text-xs font-bold transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#215C46]/10 hover:bg-[#215C46]/20 text-[#215C46] text-xs font-bold transition-colors cursor-pointer"
                         >
                           Ouvrir le module Relances →
                         </button>
@@ -336,16 +336,16 @@ export function Features() {
                 </div>
 
                 {/* Bottom Action Link */}
-                <div className="pt-4 border-t border-[#F5F7FA] flex items-center justify-between">
+                <div className="pt-4 border-t border-[#D9E7E3]/60 flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => handleOpenFeature(feature.route)}
-                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#1E4F91] group-hover:text-[#F47B20] transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#215C46] group-hover:text-[#123A2C] transition-colors cursor-pointer"
                   >
                     <span>{feature.ctaLabel}</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </button>
-                  <span className="text-[11px] font-semibold text-[#526581]">FAKTELIO SaaS</span>
+                  <span className="text-[11px] font-semibold text-[#4A635A]">FAKTELIO SaaS</span>
                 </div>
               </div>
             );

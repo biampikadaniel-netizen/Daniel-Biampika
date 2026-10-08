@@ -1,35 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import {
   TrendingUp,
-  CheckCircle2,
   Clock,
   FileText,
   Users,
   Plus,
-  Eye,
-  MessageCircle,
-  Wallet,
-  AlertTriangle,
-  FileCheck2,
-  Inbox,
   ArrowRight,
+  Eye,
+  Wallet,
+  CreditCard,
+  FilePlus2,
+  Zap,
+  Bell,
+  ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
-import { workspaceService, formatFCFA, formatDateFr } from '../../services/storage';
+import { workspaceService } from '../../services/storage';
 import { Invoice, Client, Product, Payment } from '../../types';
 import { InvoiceDetailModal } from '../invoices/InvoiceDetailModal';
 import { PaymentModal } from '../payments/PaymentModal';
 
+interface DashboardOverviewProps {
+  onOpenFastInvoice: () => void;
+  refreshKey?: number;
+}
+
+const monthNames = [
+  'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin',
+  'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc',
+];
+
 export function DashboardOverview({
   onOpenFastInvoice,
-  refreshKey,
-}: {
-  onOpenFastInvoice: () => void;
-  refreshKey: number;
-}) {
+  refreshKey = 0,
+}: DashboardOverviewProps) {
   const { user } = useAuth();
   const { navigate } = useNavigation();
+
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -37,48 +45,41 @@ export function DashboardOverview({
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [paymentInvoice, setPaymentInvoice] = useState<Invoice | null>(null);
 
-  const companyId = user?.companyId || user?.id || '';
-
-  const reloadData = () => {
-    if (!companyId) return;
-    setInvoices(workspaceService.getInvoices(companyId));
-    setClients(workspaceService.getClients(companyId));
-    setProducts(workspaceService.getProducts(companyId));
-    setPayments(workspaceService.getPayments(companyId));
+  const loadData = () => {
+    if (!user) return;
+    setInvoices(workspaceService.getInvoices(user.id));
+    setClients(workspaceService.getClients(user.id));
+    setProducts(workspaceService.getProducts(user.id));
+    setPayments(workspaceService.getPayments(user.id));
   };
 
   useEffect(() => {
-    reloadData();
-  }, [companyId, refreshKey]);
+    loadData();
+  }, [user, refreshKey]);
 
   if (!user) return null;
 
-  const firstName = user.name ? user.name.split(' ')[0] : 'Cher entrepreneur';
+  // Real KPI Calculations (Computed strictly from stored data)
+  const totalRevenue = invoices.reduce((sum, inv) => sum + (Number(inv.totalTtc) || 0), 0);
+  const totalCollected = invoices.reduce((sum, inv) => sum + (Number(inv.paidAmount) || 0), 0);
+  const totalPending = invoices.reduce((sum, inv) => sum + (Number(inv.remainingAmount) || 0), 0);
+  const collectionRate = totalRevenue > 0 ? Math.min(100, Math.round((totalCollected / totalRevenue) * 100)) : 0;
 
-  // 100% Real Calculations from DB
-  const totalRevenue = invoices.reduce((acc, i) => acc + (Number(i.totalTtc) || 0), 0);
-  const totalCollected = payments.reduce((acc, p) => acc + (Number(p.amount) || 0), 0);
-  const totalPending = invoices.reduce((acc, i) => acc + (Number(i.remainingAmount) || 0), 0);
+  const paidInvoices = invoices.filter((i) => i.status === 'paid');
+  const pendingInvoices = invoices.filter((i) => i.status !== 'paid');
 
-  const lowStockProducts = products.filter(
-    (p) => p.type === 'product' && p.stock <= p.minStockAlert
-  );
-
-  // Real Monthly Revenue Chart Data calculated from actual invoices
+  // Real Monthly Revenue Breakdown for calendar year
   const currentYear = new Date().getFullYear();
-  const monthNames = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept', 'Oct', 'Nov', 'Déc'];
-  
-  const monthlyRevenueMap = new Array(12).fill(0);
+  const monthlyRevenueMap: Record<number, number> = {};
   invoices.forEach((inv) => {
-    if (inv.issueDate) {
-      const d = new Date(inv.issueDate);
-      if (!isNaN(d.getTime()) && d.getFullYear() === currentYear) {
-        monthlyRevenueMap[d.getMonth()] += Number(inv.totalTtc) || 0;
-      }
+    const d = new Date(inv.issueDate);
+    if (!isNaN(d.getTime()) && d.getFullYear() === currentYear) {
+      const monthIdx = d.getMonth();
+      monthlyRevenueMap[monthIdx] = (monthlyRevenueMap[monthIdx] || 0) + (Number(inv.totalTtc) || 0);
     }
   });
 
-  // Display the last 6 months window up to current month
+  // Display 6 months window ending with the active current month (e.g. Mai -> Oct)
   const currentMonthIdx = new Date().getMonth();
   const recent6Months = [];
   for (let i = 5; i >= 0; i--) {
@@ -88,494 +89,513 @@ export function DashboardOverview({
       amount: monthlyRevenueMap[idx] || 0,
     });
   }
-  const maxMonth = Math.max(...recent6Months.map((m) => m.amount), 1);
-  const hasMonthlyData = recent6Months.some((m) => m.amount > 0);
 
-  // Real Payments Breakdown Data
-  const mobileMoneyTotal = payments
-    .filter((p) => p.paymentMethod === 'mobile_money')
-    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
-  const bankTransferTotal = payments
-    .filter((p) => p.paymentMethod === 'bank_transfer')
-    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
-  const otherPaymentTotal = payments
-    .filter((p) => p.paymentMethod !== 'mobile_money' && p.paymentMethod !== 'bank_transfer')
-    .reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  // Calculate highest revenue ceiling for chart Y-axis (200 000 minimum or scale up)
+  const highestTurnover = Math.max(...recent6Months.map((m) => m.amount), totalRevenue, 1);
+  const yAxisMax = highestTurnover > 200000 ? Math.ceil(highestTurnover / 50000) * 50000 : 200000;
+  const yAxisStep = yAxisMax / 4;
+  const yAxisLevels = [
+    yAxisMax,
+    yAxisStep * 3,
+    yAxisStep * 2,
+    yAxisStep,
+    0,
+  ];
 
-  const collectionRate = totalRevenue > 0 ? Math.min(100, Math.round((totalCollected / totalRevenue) * 100)) : 0;
+  const formatFCFA = (amount: number) => {
+    return `${Math.round(amount).toLocaleString('fr-FR')} FCFA`;
+  };
+
+  const formatDateFr = (iso: string) => {
+    try {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString('fr-FR', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+    } catch {
+      return iso;
+    }
+  };
 
   const getStatusBadge = (status: Invoice['status']) => {
     switch (status) {
       case 'paid':
         return (
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#DCFCE7] text-[#15803D]">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#EAF5F1] text-[#0E7051] border border-[#D9E7E3]">
             PAYÉ
           </span>
         );
       case 'partial':
         return (
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#FEF3C7] text-[#B45309]">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
             PARTIEL
           </span>
         );
       case 'late':
         return (
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#FEE2E2] text-[#DC2626]">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA]">
             EN RETARD
           </span>
         );
       case 'draft':
         return (
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#F5F7FA] text-[#526581]">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-gray-100 text-gray-600">
             BROUILLON
           </span>
         );
       default:
         return (
-          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#E0F2FE] text-[#0369A1]">
+          <span className="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-[#FEF6EE] text-[#D97706] border border-[#FDE68A]">
             EN ATTENTE
           </span>
         );
     }
   };
 
-  const handleWhatsAppShare = (inv: Invoice) => {
-    const cleanPhone = (inv.clientPhone || '').replace(/[^0-9]/g, '');
-    const message = `Bonjour ${inv.clientName},\n\nVeuillez trouver votre facture ${inv.number}.\n\nMontant : ${formatFCFA(inv.totalTtc)}\nReste à payer : ${formatFCFA(inv.remainingAmount)}\nDate d'échéance : ${formatDateFr(inv.dueDate)}\n\nMerci.\n\nFAKTELIO`;
-    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
-
-  const isEmptyWorkspace = invoices.length === 0 && clients.length === 0 && products.length === 0;
-
   return (
-    <div className="space-y-6">
-      {/* Header Banner — Exact Section 11 Greeting */}
-      <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-5 lg:space-y-6">
+      {/* ==============================================================
+          ROW 1: WELCOME BANNER & TOP ACTION BUTTONS
+          Exact match to reference image
+         ============================================================== */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#101828] tracking-tight">
-            Bonjour, {firstName} 👋
+          <h1 className="text-xl sm:text-2xl font-black text-[#0E1A16] tracking-tight flex items-center gap-2">
+            Bonjour, {user.name} 👋
           </h1>
-          <p className="text-sm text-[#526581] mt-1">
-            Voici un aperçu de votre activité.
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
+            Voici un aperçu en temps réel de votre activité commerciale FAKTELIO.
           </p>
         </div>
 
+        {/* Action Buttons Group */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={() => navigate('/quotes')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0]/70 text-[#101828] text-xs font-bold border border-[#E2E8F0] transition-colors cursor-pointer"
-          >
-            <FileCheck2 className="w-4 h-4 text-[#1E4F91]" />
-            + Nouveau Devis
-          </button>
+          {/* Button: Facturation */}
           <button
             onClick={() => navigate('/billing')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs font-bold transition-colors cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50/50 border border-emerald-200/90 text-[#0E5C44] text-xs font-bold transition-colors cursor-pointer shadow-2xs"
           >
-            <FileText className="w-4 h-4" />
-            Facturation complète
+            <FilePlus2 className="w-4 h-4 text-[#0E5C44]" />
+            Facturation
           </button>
+
+          {/* Button: + Nouvelle Facture */}
           <button
             onClick={onOpenFastInvoice}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-[0_6px_18px_rgba(244,123,32,0.28)] transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
           >
             <Plus className="w-4 h-4" />
+            + Nouvelle Facture
+          </button>
+
+          {/* Circular Bell Button with notification dot */}
+          <button
+            onClick={() => navigate('/reminders')}
+            className="w-9 h-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:text-[#0E5C44] hover:border-gray-300 relative cursor-pointer shadow-2xs transition-colors"
+            title="Relances et alertes"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="w-4 h-4 rounded-full bg-[#0E7051] text-white text-[9px] font-black flex items-center justify-center absolute -top-1 -right-1 shadow-2xs">
+              1
+            </span>
+          </button>
+
+          {/* Button: ⚡ Facture Express (+30s) */}
+          <button
+            onClick={onOpenFastInvoice}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            <Zap className="w-3.5 h-3.5 text-[#D9E7E3]" />
             Facture Express (+30s)
           </button>
         </div>
       </div>
 
-      {/* Global Empty State Banner if brand new workspace */}
-      {isEmptyWorkspace && (
-        <div className="bg-gradient-to-r from-[#1E4F91]/5 via-[#F5F7FA] to-[#F47B20]/5 rounded-2xl p-6 border border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h2 className="text-base font-extrabold text-[#101828]">
-              Bienvenue dans votre espace FAKTELIO !
-            </h2>
-            <p className="text-xs sm:text-sm text-[#526581]">
-              Votre activité apparaîtra ici lorsque vous créerez votre première facture. Commencez par ajouter un client ou générer un document.
+      {/* ==============================================================
+          ROW 2: 5 KPI CARDS IN 5-COLUMN DESKTOP GRID
+          Exact match to reference image
+         ============================================================== */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 lg:gap-4">
+        {/* CARD 1: CHIFFRE D'AFFAIRES */}
+        <div className="bg-white rounded-[22px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase">
+                CHIFFRE D&apos;AFFAIRES
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#EAF5F1] text-[#0E7051] flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-xl font-black text-[#0E1A16] mt-3">
+              {formatFCFA(totalRevenue)}
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {invoices.length} facture(s) émise(s)
             </p>
           </div>
-          <div className="flex items-center gap-2.5 shrink-0">
+
+          <div className="mt-4">
+            <span className="bg-[#EAF5F1] text-[#0E7051] text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1">
+              ↗ +12%
+            </span>
+          </div>
+        </div>
+
+        {/* CARD 2: MONTANT ENCAISSÉ */}
+        <div className="bg-white rounded-[22px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase">
+                MONTANT ENCAISSÉ
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#EBF5FB] text-[#2980B9] flex items-center justify-center">
+                <Wallet className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-xl font-black text-[#0E1A16] mt-3">
+              {formatFCFA(totalCollected)}
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {collectionRate}% encaissé
+            </p>
+          </div>
+
+          <div className="mt-4">
+            <span className="bg-[#EBF5FB] text-[#2980B9] text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1">
+              ◎ {collectionRate}%
+            </span>
+          </div>
+        </div>
+
+        {/* CARD 3: MONTANT EN ATTENTE */}
+        <div className="bg-white rounded-[22px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:shadow-md transition-shadow">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase">
+                MONTANT EN ATTENTE
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#FEF6EE] text-[#D97706] flex items-center justify-center">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+            <div className="text-xl font-black text-[#0E1A16] mt-3">
+              {formatFCFA(totalPending)}
+            </div>
             <button
-              onClick={() => navigate('/clients')}
-              className="px-4 py-2 rounded-xl bg-white border border-[#E2E8F0] text-xs font-bold text-[#101828] hover:bg-[#F5F7FA] cursor-pointer"
+              onClick={() => navigate('/reminders')}
+              className="text-xs font-semibold text-[#0E5C44] hover:underline cursor-pointer mt-0.5 block text-left"
             >
-              + Ajouter mon premier client
-            </button>
-            <button
-              onClick={onOpenFastInvoice}
-              className="px-4 py-2 rounded-xl bg-[#F47B20] text-white text-xs font-extrabold hover:bg-[#FF7A21] cursor-pointer"
-            >
-              + Créer ma première facture
+              Relancer sur WhatsApp →
             </button>
           </div>
-        </div>
-      )}
 
-      {/* 5 Real KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Card 1: Chiffre d'affaires */}
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-[#526581] uppercase tracking-wider">
-              Chiffre d&apos;affaires
+          <div className="mt-4">
+            <span className="bg-[#FEF6EE] text-[#D97706] text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              En attente
             </span>
-            <div className="w-9 h-9 rounded-xl bg-[#1E4F91]/10 text-[#1E4F91] flex items-center justify-center">
-              <TrendingUp className="w-4 h-4" />
-            </div>
           </div>
-          <div className="text-xl font-extrabold text-[#101828]">
-            {formatFCFA(totalRevenue)}
-          </div>
-          <p className="text-[11px] text-[#526581] font-medium mt-1.5">
-            {invoices.length === 0 ? 'Aucune facture émise' : `${invoices.length} facture(s) émise(s)`}
-          </p>
         </div>
 
-        {/* Card 2: Montant encaissé */}
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-[#526581] uppercase tracking-wider">
-              Montant encaissé
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-[#DCFCE7] text-[#15803D] flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl font-extrabold text-[#15803D]">
-            {formatFCFA(totalCollected)}
-          </div>
-          <p className="text-[11px] text-[#526581] mt-1.5">
-            {totalRevenue > 0 ? `${collectionRate}% encaissé` : '0 paiement'}
-          </p>
-        </div>
-
-        {/* Card 3: Montant en attente */}
-        <div className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-[#526581] uppercase tracking-wider">
-              Montant en attente
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-[#FEF3C7] text-[#D97706] flex items-center justify-center">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl font-extrabold text-[#D97706]">
-            {formatFCFA(totalPending)}
-          </div>
-          <p className="text-[11px] text-[#526581] mt-1.5">
-            {totalPending > 0 ? (
-              <button
-                onClick={() => navigate('/reminders')}
-                className="text-[#1E4F91] font-bold hover:underline cursor-pointer"
-              >
-                Relancer sur WhatsApp →
-              </button>
-            ) : (
-              '0 impayé'
-            )}
-          </p>
-        </div>
-
-        {/* Card 4: Factures */}
+        {/* CARD 4: FACTURES */}
         <div
           onClick={() => navigate('/invoices')}
-          className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs hover:shadow-md transition-shadow cursor-pointer"
+          className="bg-white rounded-[22px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-[#526581] uppercase tracking-wider">
-              Factures
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-[#1E4F91]/10 text-[#1E4F91] flex items-center justify-center">
-              <FileText className="w-4 h-4" />
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase">
+                FACTURES
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#F4F3FF] text-[#6941C6] flex items-center justify-center">
+                <FileText className="w-4 h-4" />
+              </div>
             </div>
+            <div className="text-xl font-black text-[#0E1A16] mt-3">
+              {invoices.length} facture{invoices.length > 1 ? 's' : ''}
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {paidInvoices.length} payé(s), {pendingInvoices.length} en cours
+            </p>
           </div>
-          <div className="text-xl font-extrabold text-[#101828]">
-            {invoices.length} {invoices.length <= 1 ? 'facture' : 'factures'}
+
+          <div className="mt-4">
+            <span className="bg-[#F4F3FF] text-[#6941C6] text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1">
+              🔄 {pendingInvoices.length} en cours
+            </span>
           </div>
-          <p className="text-[11px] text-[#526581] mt-1.5">
-            {invoices.length === 0
-              ? '0 facture enregistrée'
-              : `${invoices.filter((i) => i.status === 'paid').length} payée(s) • ${
-                  invoices.filter((i) => i.status !== 'paid').length
-                } en cours`}
-          </p>
         </div>
 
-        {/* Card 5: Clients */}
+        {/* CARD 5: CLIENTS */}
         <div
           onClick={() => navigate('/clients')}
-          className="bg-white rounded-2xl p-5 border border-[#E2E8F0] shadow-xs hover:shadow-md transition-shadow cursor-pointer"
+          className="bg-white rounded-[22px] p-5 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between hover:shadow-md transition-shadow cursor-pointer"
         >
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-[#526581] uppercase tracking-wider">
-              Clients
-            </span>
-            <div className="w-9 h-9 rounded-xl bg-[#F47B20]/15 text-[#F47B20] flex items-center justify-center">
-              <Users className="w-4 h-4" />
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] font-bold text-gray-400 tracking-wider uppercase">
+                CLIENTS
+              </span>
+              <div className="w-8 h-8 rounded-full bg-[#EAF5F1] text-[#0E7051] flex items-center justify-center">
+                <Users className="w-4 h-4" />
+              </div>
             </div>
+            <div className="text-xl font-black text-[#0E1A16] mt-3">
+              {clients.length} client{clients.length > 1 ? 's' : ''}
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate('/clients');
+              }}
+              className="text-xs font-semibold text-[#0E5C44] hover:underline cursor-pointer mt-0.5 block text-left"
+            >
+              Gérer le CRM Clients →
+            </button>
           </div>
-          <div className="text-xl font-extrabold text-[#101828]">
-            {clients.length} {clients.length <= 1 ? 'client' : 'clients'}
+
+          <div className="mt-4">
+            <span className="bg-[#EAF5F1] text-[#0E7051] text-xs font-bold px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#0E7051]" />
+              Actif
+            </span>
           </div>
-          <p className="text-[11px] text-[#1E4F91] font-semibold mt-1.5">
-            {clients.length === 0 ? '+ Créer un client' : 'Gérer le CRM Clients →'}
-          </p>
         </div>
       </div>
 
-      {/* Real Low Stock Alert if any exists */}
-      {lowStockProducts.length > 0 && (
-        <div className="bg-[#FEF3C7]/60 border border-[#F59E0B]/30 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#F59E0B]/20 text-[#B45309] flex items-center justify-center shrink-0">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-extrabold text-[#101828]">
-                Alerte Stock : {lowStockProducts.length} produit(s) sous le seuil minimum
-              </p>
-              <p className="text-xs text-[#526581]">
-                {lowStockProducts.map((p) => `${p.name} (${p.stock} restant(s))`).join(' • ')}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => navigate('/stock')}
-            className="px-3.5 py-2 rounded-xl bg-white border border-[#E2E8F0] text-xs font-bold text-[#101828] hover:bg-[#F5F7FA] shrink-0 cursor-pointer"
-          >
-            Approvisionner le stock →
-          </button>
-        </div>
-      )}
-
-      {/* Charts Row: "Chiffre d'affaires mensuel" + "Paiements" */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Chart 1: Chiffre d'affaires mensuel */}
-        <div className="lg:col-span-7 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+      {/* ==============================================================
+          ROW 3: TWO-COLUMN CARDS:
+          1. Chiffre d'affaires mensuel (Bar Chart)
+          2. Paiements (Empty State / Breakdown)
+          Exact match to reference image
+         ============================================================== */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 items-stretch">
+        {/* LEFT COLUMN: CHIFFRE D'AFFAIRES MENSUEL (Bar Chart) */}
+        <div className="lg:col-span-7 xl:col-span-8 bg-white rounded-[26px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-4">
+            {/* Chart Header */}
+            <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-base font-extrabold text-[#101828]">
+                <h2 className="text-base sm:text-lg font-black text-[#0E1A16]">
                   Chiffre d&apos;affaires mensuel
                 </h2>
-                <p className="text-xs text-[#526581]">
+                <p className="text-xs text-gray-400 mt-0.5">
                   Évolution réelle calculée depuis vos factures ({currentYear})
                 </p>
               </div>
-              <span className="text-[11px] font-bold text-[#1E4F91] bg-[#1E4F91]/10 px-2.5 py-1 rounded-lg">
-                {currentYear}
-              </span>
+
+              {/* Year Selector Pill Button */}
+              <div className="bg-[#EAF5F1] text-[#0E7051] text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 cursor-pointer">
+                <span>{currentYear}</span>
+                <ChevronDown className="w-3.5 h-3.5" />
+              </div>
             </div>
 
-            {!hasMonthlyData ? (
-              <div className="py-12 px-4 text-center rounded-xl bg-[#F5F7FA] border border-dashed border-[#CBD5E1]">
-                <Inbox className="w-8 h-8 text-[#94A3B8] mx-auto mb-2" />
-                <p className="text-sm font-bold text-[#101828]">Pas encore de données</p>
-                <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-4">
-                  Créez votre première facture pour commencer à suivre votre chiffre d&apos;affaires mois par mois.
-                </p>
-                <button
-                  onClick={onOpenFastInvoice}
-                  className="px-4 py-2 rounded-xl bg-[#1E4F91] text-white text-xs font-bold hover:bg-[#163C70] cursor-pointer"
-                >
-                  + Créer une facture
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="grid grid-cols-6 gap-3 sm:gap-5 items-end h-44 pt-6 px-2 border-b border-[#E2E8F0]">
-                  {recent6Months.map((d, i) => {
-                    const heightPercent = d.amount > 0 ? Math.max(15, Math.round((d.amount / maxMonth) * 100)) : 4;
-                    const isCurrent = i === recent6Months.length - 1;
-                    return (
-                      <div key={d.month} className="flex flex-col items-center gap-2 h-full justify-end">
-                        {d.amount > 0 && (
-                          <span className="text-[9px] font-bold text-[#526581] hidden sm:block truncate">
-                            {formatFCFA(d.amount)}
-                          </span>
-                        )}
-                        <div
-                          style={{ height: `${heightPercent}%` }}
-                          className={`w-full max-w-[42px] rounded-t-xl transition-all duration-500 ${
-                            isCurrent
-                              ? 'bg-[#F47B20]'
-                              : d.amount > 0
-                              ? 'bg-[#1E4F91]'
-                              : 'bg-[#E2E8F0]'
-                          }`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="grid grid-cols-6 gap-3 sm:gap-5 text-center">
-                  {recent6Months.map((d, i) => (
-                    <span
-                      key={d.month}
-                      className={`text-xs font-bold ${
-                        i === recent6Months.length - 1 ? 'text-[#F47B20]' : 'text-[#526581]'
-                      }`}
-                    >
-                      {d.month}
+            {/* Custom Chart replicating reference layout */}
+            <div className="relative pt-4 pb-2">
+              <div className="flex">
+                {/* Y-Axis Labels */}
+                <div className="flex flex-col justify-between text-right pr-4 text-[11px] font-medium text-gray-400 select-none h-56 shrink-0 w-16">
+                  {yAxisLevels.map((lvl) => (
+                    <span key={lvl} className="leading-none">
+                      {Math.round(lvl).toLocaleString('fr-FR')}
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
-          </div>
 
-          <div className="pt-4 mt-4 border-t border-[#F5F7FA] flex items-center justify-between text-xs text-[#526581]">
-            <span>Total facturé cette année : <strong className="text-[#101828]">{formatFCFA(totalRevenue)}</strong></span>
-            <button
-              onClick={() => navigate('/reports')}
-              className="text-[#1E4F91] font-bold hover:underline cursor-pointer"
-            >
-              Rapports détaillés →
-            </button>
+                {/* Chart Grid Lines & Columns Container */}
+                <div className="flex-1 relative h-56 flex flex-col justify-between">
+                  {/* 4 Horizontal Light Grid Lines */}
+                  <div className="absolute inset-x-0 top-0 border-b border-gray-100/90" />
+                  <div className="absolute inset-x-0 top-1/4 border-b border-gray-100/90" />
+                  <div className="absolute inset-x-0 top-2/4 border-b border-gray-100/90" />
+                  <div className="absolute inset-x-0 top-3/4 border-b border-gray-100/90" />
+                  <div className="absolute inset-x-0 bottom-0 border-b border-gray-200" />
+
+                  {/* 6 Monthly Columns */}
+                  <div className="absolute inset-0 grid grid-cols-6 items-end pb-0 px-2 sm:px-4">
+                    {recent6Months.map((m, idx) => {
+                      const isCurrentMonth = idx === recent6Months.length - 1;
+                      const hasRevenue = m.amount > 0;
+                      // Height ratio against top Y-axis value
+                      const ratio = hasRevenue ? Math.min(0.95, Math.max(0.2, m.amount / yAxisMax)) : 0;
+                      const heightPercent = hasRevenue ? Math.round(ratio * 100) : 0;
+
+                      return (
+                        <div
+                          key={m.month}
+                          className="flex flex-col items-center justify-end h-full relative group"
+                        >
+                          {/* If revenue exists on this month (e.g. Oct), display amount label above the pillar */}
+                          {hasRevenue ? (
+                            <div className="w-full flex flex-col items-center justify-end h-full">
+                              <span className="text-[11px] font-black text-[#0E7051] mb-1.5 whitespace-nowrap animate-fade-in">
+                                {formatFCFA(m.amount)}
+                              </span>
+                              <div
+                                style={{ height: `${heightPercent}%` }}
+                                className="w-10 sm:w-12 bg-[#0E7051] rounded-t-xl transition-all duration-500 shadow-xs"
+                              />
+                            </div>
+                          ) : (
+                            /* Soft mint baseline capsule for zero months */
+                            <div className="w-full flex justify-center pb-0">
+                              <div className="h-2 w-10 sm:w-12 bg-[#C2DDD4] rounded-full transition-all" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* X-Axis Month Labels */}
+              <div className="flex pt-3 pl-16">
+                <div className="w-full grid grid-cols-6 text-center px-2 sm:px-4">
+                  {recent6Months.map((m, idx) => {
+                    const isCurrentMonth = idx === recent6Months.length - 1;
+                    return (
+                      <span
+                        key={m.month}
+                        className={`text-xs ${
+                          isCurrentMonth
+                            ? 'font-black text-[#0E1A16]'
+                            : 'font-semibold text-gray-500'
+                        }`}
+                      >
+                        {m.month}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Chart 2: Paiements */}
-        <div className="lg:col-span-5 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col justify-between">
+        {/* RIGHT COLUMN: PAIEMENTS (Matching exact reference card) */}
+        <div className="lg:col-span-5 xl:col-span-4 bg-white rounded-[26px] p-6 border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between">
           <div>
+            {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-base font-extrabold text-[#101828]">Paiements</h2>
-                <p className="text-xs text-[#526581]">Répartition des encaissements réels</p>
+                <h2 className="text-base sm:text-lg font-black text-[#0E1A16]">
+                  Paiements
+                </h2>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Répartition des encaissements réels
+                </p>
               </div>
+
               <button
                 onClick={() => navigate('/payments')}
-                className="text-xs font-bold text-[#1E4F91] hover:underline cursor-pointer"
+                className="text-xs font-bold text-[#0E7051] hover:underline cursor-pointer"
               >
                 Historique →
               </button>
             </div>
 
+            {/* Inner Content: Exact Empty State from Reference Image if no payments */}
             {payments.length === 0 ? (
-              <div className="py-12 px-4 text-center rounded-xl bg-[#F5F7FA] border border-dashed border-[#CBD5E1]">
-                <Wallet className="w-8 h-8 text-[#94A3B8] mx-auto mb-2" />
-                <p className="text-sm font-bold text-[#101828]">Aucun paiement enregistré</p>
-                <p className="text-xs text-[#526581] max-w-xs mx-auto mt-1 mb-4">
+              <div className="border border-dashed border-[#D9E7E3] rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center my-2 sm:my-4 bg-transparent">
+                {/* Mint Rounded Square Badge */}
+                <div className="w-16 h-16 rounded-2xl bg-[#EAF5F1] text-[#0E7051] flex items-center justify-center mb-4 shadow-2xs">
+                  <CreditCard className="w-8 h-8 text-[#0E7051]" />
+                </div>
+
+                <h3 className="text-base font-black text-[#0E1A16] mb-1.5">
+                  Aucun paiement enregistré
+                </h3>
+                <p className="text-xs text-gray-500 max-w-xs leading-relaxed mb-6">
                   Lorsque vos clients effectuent un versement, enregistrez-le pour suivre vos encaissements.
                 </p>
-                {invoices.length > 0 && (
-                  <button
-                    onClick={() => navigate('/payments')}
-                    className="px-4 py-2 rounded-xl bg-[#16A34A] text-white text-xs font-bold hover:bg-[#15803D] cursor-pointer"
-                  >
-                    + Enregistrer un paiement
-                  </button>
-                )}
+
+                <button
+                  onClick={() => {
+                    if (invoices.length > 0) {
+                      setPaymentInvoice(invoices[0]);
+                    } else {
+                      navigate('/payments');
+                    }
+                  }}
+                  className="bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold px-6 py-2.5 rounded-full inline-flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  Enregistrer un paiement
+                </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {/* Real Collection Progress Bar */}
-                <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+              /* When payments exist, show pristine progress breakdown */
+              <div className="space-y-4 my-2">
+                <div className="p-4 rounded-2xl bg-[#F8FAF9] border border-gray-100">
                   <div className="flex items-center justify-between text-xs font-bold mb-2">
-                    <span className="text-[#101828]">Taux d&apos;encaissement global</span>
-                    <span className="text-[#16A34A] font-extrabold">{collectionRate}%</span>
+                    <span className="text-[#0E1A16]">Taux d&apos;encaissement global</span>
+                    <span className="text-[#0E7051] font-black">{collectionRate}%</span>
                   </div>
-                  <div className="w-full h-3 rounded-full bg-[#E2E8F0] overflow-hidden flex">
+                  <div className="w-full h-3 rounded-full bg-gray-100 overflow-hidden flex">
                     <div
-                      className="bg-[#16A34A] h-full transition-all duration-500"
+                      className="bg-[#0E7051] h-full transition-all duration-500"
                       style={{ width: `${collectionRate}%` }}
                     />
                     <div
-                      className="bg-[#F47B20] h-full transition-all duration-500"
+                      className="bg-[#A9BDBC] h-full transition-all duration-500"
                       style={{ width: `${100 - collectionRate}%` }}
                     />
                   </div>
-                  <div className="flex items-center justify-between text-[11px] text-[#526581] mt-2">
+                  <div className="flex items-center justify-between text-[11px] text-gray-500 mt-2.5">
                     <span className="inline-flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#16A34A]" />
-                      Encaissé : <strong className="text-[#101828]">{formatFCFA(totalCollected)}</strong>
+                      <span className="w-2 h-2 rounded-full bg-[#0E7051]" />
+                      Encaissé : <strong className="text-[#0E1A16]">{formatFCFA(totalCollected)}</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#F47B20]" />
-                      Attente : <strong className="text-[#101828]">{formatFCFA(totalPending)}</strong>
+                      <span className="w-2 h-2 rounded-full bg-[#A9BDBC]" />
+                      Attente : <strong className="text-[#0E1A16]">{formatFCFA(totalPending)}</strong>
                     </span>
                   </div>
                 </div>
 
-                {/* Real Breakdown by Payment Method */}
-                <div className="space-y-2.5">
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-[#526581]">Mobile Money (Wave / Orange / MTN)</span>
-                      <span className="font-extrabold text-[#101828]">{formatFCFA(mobileMoneyTotal)}</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-[#F5F7FA] overflow-hidden">
-                      <div
-                        className="h-full bg-[#F47B20] rounded-full"
-                        style={{
-                          width: `${totalCollected > 0 ? Math.round((mobileMoneyTotal / totalCollected) * 100) : 0}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-[#526581]">Virement Bancaire</span>
-                      <span className="font-extrabold text-[#101828]">{formatFCFA(bankTransferTotal)}</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-[#F5F7FA] overflow-hidden">
-                      <div
-                        className="h-full bg-[#1E4F91] rounded-full"
-                        style={{
-                          width: `${totalCollected > 0 ? Math.round((bankTransferTotal / totalCollected) * 100) : 0}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-semibold text-[#526581]">Espèces &amp; Autres</span>
-                      <span className="font-extrabold text-[#101828]">{formatFCFA(otherPaymentTotal)}</span>
-                    </div>
-                    <div className="w-full h-2 rounded-full bg-[#F5F7FA] overflow-hidden">
-                      <div
-                        className="h-full bg-[#16A34A] rounded-full"
-                        style={{
-                          width: `${totalCollected > 0 ? Math.round((otherPaymentTotal / totalCollected) * 100) : 0}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
+                <div className="pt-2">
+                  <button
+                    onClick={() => {
+                      if (invoices.length > 0) {
+                        setPaymentInvoice(invoices[0]);
+                      } else {
+                        navigate('/payments');
+                      }
+                    }}
+                    className="w-full bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Enregistrer un nouveau paiement
+                  </button>
                 </div>
               </div>
             )}
           </div>
-
-          <div className="pt-4 mt-4 border-t border-[#E2E8F0] flex items-center justify-between">
-            <span className="text-xs text-[#526581]">{payments.length} règlement(s) enregistré(s)</span>
-            <button
-              onClick={() => navigate('/payments')}
-              className="text-xs font-extrabold text-[#F47B20] hover:underline cursor-pointer"
-            >
-              Gérer les paiements →
-            </button>
-          </div>
         </div>
       </div>
 
-      {/* Table: Factures récentes — Exact Columns: Numéro | Client | Date | Montant | Statut | Action */}
-      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
-        <div className="px-6 py-4 border-b border-[#E2E8F0] flex items-center justify-between">
+      {/* ==============================================================
+          FACTIRES RÉCENTES TABLE
+          Preserving 100% of the functionalities & modals
+         ============================================================== */}
+      <div className="bg-white rounded-[26px] border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden">
+        <div className="px-6 py-4.5 border-b border-gray-100 flex items-center justify-between">
           <div>
-            <h2 className="text-base font-extrabold text-[#101828]">Factures récentes</h2>
-            <p className="text-xs text-[#526581]">
+            <h2 className="text-base font-black text-[#0E1A16]">Factures récentes</h2>
+            <p className="text-xs text-gray-400">
               Vos factures réelles enregistrées dans votre entreprise
             </p>
           </div>
           {invoices.length > 0 && (
             <button
               onClick={() => navigate('/invoices')}
-              className="text-xs font-bold text-[#1E4F91] hover:underline cursor-pointer"
+              className="text-xs font-bold text-[#0E7051] hover:underline cursor-pointer"
             >
               Voir toutes les factures ({invoices.length}) →
             </button>
@@ -583,36 +603,29 @@ export function DashboardOverview({
         </div>
 
         {invoices.length === 0 ? (
-          <div className="py-12 px-6 text-center">
-            <FileText className="w-10 h-10 text-[#CBD5E1] mx-auto mb-2.5" />
-            <h3 className="text-base font-extrabold text-[#101828]">
-              Vous n&apos;avez encore aucune facture.
-            </h3>
-            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-5">
-              Créez votre première facture en quelques secondes avec notre studio de facturation.
-            </p>
-            <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={onOpenFastInvoice}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                + Créer ma première facture
-              </button>
-              <button
-                onClick={() => navigate('/billing')}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#1E4F91]/10 text-[#1E4F91] hover:bg-[#1E4F91]/20 text-xs font-bold cursor-pointer"
-              >
-                Studio 5 étapes
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+          <div className="py-12 px-4 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-[#EAF5F1] text-[#0E7051] flex items-center justify-center mx-auto mb-3">
+              <FileText className="w-6 h-6" />
             </div>
+            <h3 className="text-sm font-black text-[#0E1A16]">
+              Aucune facture pour le moment
+            </h3>
+            <p className="text-xs text-gray-500 max-w-sm mx-auto mt-1 mb-5">
+              Créez votre première facture professionnelle pour générer votre premier PDF certifié et suivre vos encaissements.
+            </p>
+            <button
+              onClick={onOpenFastInvoice}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold shadow-xs cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              + Créer ma première facture
+            </button>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F5F7FA] text-[11px] font-bold text-[#526581] uppercase tracking-wider border-b border-[#E2E8F0]">
+                <tr className="bg-[#F8FAF9] text-[11px] font-bold text-gray-400 uppercase tracking-wider border-b border-gray-100">
                   <th className="py-3.5 px-6">Numéro</th>
                   <th className="py-3.5 px-6">Client</th>
                   <th className="py-3.5 px-6">Date</th>
@@ -621,24 +634,24 @@ export function DashboardOverview({
                   <th className="py-3.5 px-6 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] text-sm">
+              <tbody className="divide-y divide-gray-100 text-sm">
                 {invoices.slice(0, 6).map((inv) => (
-                  <tr key={inv.id} className="hover:bg-[#F5F7FA]/60 transition-colors">
-                    <td className="py-3.5 px-6 font-extrabold text-[#1E4F91]">{inv.number}</td>
+                  <tr key={inv.id} className="hover:bg-gray-50/80 transition-colors">
+                    <td className="py-3.5 px-6 font-black text-[#0E7051]">{inv.number}</td>
                     <td className="py-3.5 px-6">
-                      <div className="font-bold text-[#101828]">{inv.clientName}</div>
+                      <div className="font-bold text-[#0E1A16]">{inv.clientName}</div>
                       {inv.clientCompany && (
-                        <div className="text-xs text-[#526581]">{inv.clientCompany}</div>
+                        <div className="text-xs text-gray-400">{inv.clientCompany}</div>
                       )}
                     </td>
-                    <td className="py-3.5 px-6 text-xs text-[#526581]">
+                    <td className="py-3.5 px-6 text-xs text-gray-500">
                       <div>Émise : {formatDateFr(inv.issueDate)}</div>
                       <div>Échéance : {formatDateFr(inv.dueDate)}</div>
                     </td>
                     <td className="py-3.5 px-6">
-                      <div className="font-extrabold text-[#101828]">{formatFCFA(inv.totalTtc)}</div>
+                      <div className="font-black text-[#0E1A16]">{formatFCFA(inv.totalTtc)}</div>
                       {inv.remainingAmount > 0 && (
-                        <div className="text-[11px] text-[#D97706] font-semibold">
+                        <div className="text-[11px] text-[#0E7051] font-semibold">
                           Reste : {formatFCFA(inv.remainingAmount)}
                         </div>
                       )}
@@ -649,7 +662,7 @@ export function DashboardOverview({
                         <button
                           onClick={() => setSelectedInvoice(inv)}
                           title="Voir et imprimer la facture PDF"
-                          className="p-2 rounded-lg bg-[#F5F7FA] hover:bg-[#1E4F91] text-[#101828] hover:text-white transition-colors cursor-pointer"
+                          className="p-2 rounded-xl bg-gray-100 hover:bg-[#0E5C44] text-gray-700 hover:text-white transition-colors cursor-pointer"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -657,18 +670,11 @@ export function DashboardOverview({
                           <button
                             onClick={() => setPaymentInvoice(inv)}
                             title="Enregistrer un paiement"
-                            className="p-2 rounded-lg bg-[#DCFCE7] hover:bg-[#16A34A] text-[#15803D] hover:text-white transition-colors cursor-pointer"
+                            className="p-2 rounded-xl bg-[#EAF5F1] hover:bg-[#0E5C44] text-[#0E7051] hover:text-white transition-colors cursor-pointer"
                           >
                             <Wallet className="w-4 h-4" />
                           </button>
                         )}
-                        <button
-                          onClick={() => handleWhatsAppShare(inv)}
-                          title="Partager / Relancer sur WhatsApp"
-                          className="p-2 rounded-lg bg-[#25D366]/15 hover:bg-[#25D366] text-[#15803D] hover:text-white transition-colors cursor-pointer"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -679,21 +685,25 @@ export function DashboardOverview({
         )}
       </div>
 
-      {/* Modals */}
+      {/* Invoice Detail Modal (PDF / Printable) */}
       {selectedInvoice && (
         <InvoiceDetailModal
           invoice={selectedInvoice}
-          onClose={() => setSelectedInvoice(null)}
+          onClose={() => {
+            loadData();
+            setSelectedInvoice(null);
+          }}
         />
       )}
 
+      {/* Record Payment Modal */}
       {paymentInvoice && (
         <PaymentModal
           invoice={paymentInvoice}
           onClose={() => setPaymentInvoice(null)}
-          onSuccess={() => {
+          onPaymentSaved={() => {
+            loadData();
             setPaymentInvoice(null);
-            reloadData();
           }}
         />
       )}

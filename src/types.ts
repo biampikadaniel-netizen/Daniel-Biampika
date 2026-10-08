@@ -69,7 +69,7 @@ export interface CompanySettings {
   companyId: string;
   name: string;
   logoUrl?: string;
-  accentColor?: string; // e.g., '#1E4F91' or '#F47B20'
+  accentColor?: string; // e.g., '#215C46' (Oceanic Green) or '#123A2C'
   address: string;
   city: string;
   country: string;

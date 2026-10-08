@@ -51,9 +51,9 @@ export function ClientModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
-        <div className="px-6 py-4 bg-[#1E4F91] text-white flex items-center justify-between">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#D9E7E3] overflow-hidden my-auto">
+        <div className="px-6 py-4 bg-gradient-to-r from-[#0D2B21] via-[#123A2C] to-[#215C46] text-white flex items-center justify-between">
           <h2 className="text-base font-extrabold">
             {client ? 'Modifier la fiche client' : 'Nouveau client CRM'}
           </h2>
@@ -71,7 +71,7 @@ export function ClientModal({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">Nom complet *</label>
+              <label className="block text-xs font-bold text-[#10241D] mb-1">Nom complet *</label>
               <input
                 type="text"
                 required
@@ -81,24 +81,24 @@ export function ClientModal({
                   setError('');
                 }}
                 placeholder="Ex: Kouamé N'Dri"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#1E4F91]"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">Entreprise</label>
+              <label className="block text-xs font-bold text-[#10241D] mb-1">Entreprise</label>
               <input
                 type="text"
                 value={company}
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="Ex: Société Ivoire SARL"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#1E4F91]"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">
+              <label className="block text-xs font-bold text-[#10241D] mb-1">
                 Téléphone (WhatsApp)
               </label>
               <input
@@ -106,62 +106,62 @@ export function ClientModal({
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Ex: +225 07 00 00 00 00"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#1E4F91]"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">Adresse email</label>
+              <label className="block text-xs font-bold text-[#10241D] mb-1">Adresse email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="contact@client.com"
-                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm focus:outline-none focus:border-[#1E4F91]"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">Adresse</label>
+              <label className="block text-xs font-bold text-[#10241D] mb-1">Adresse</label>
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
                 placeholder="Ex: Zone 4 Rue du Canal"
-                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">Ville</label>
+              <label className="block text-xs font-bold text-[#10241D] mb-1">Ville</label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 placeholder="Ex: Abidjan"
-                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-[#101828] mb-1">Pays</label>
+              <label className="block text-xs font-bold text-[#10241D] mb-1">Pays</label>
               <input
                 type="text"
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
                 placeholder="Ex: Côte d'Ivoire"
-                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                className="w-full px-3 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#101828] mb-1">Notes CRM</label>
+            <label className="block text-xs font-bold text-[#10241D] mb-1">Notes CRM</label>
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Habitudes de paiement, conditions négociées, interlocuteur..."
-              className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+              className="w-full px-3.5 py-2 rounded-xl border border-[#D9E7E3] text-sm focus:outline-none focus:border-[#215C46]"
             />
           </div>
 
@@ -169,13 +169,13 @@ export function ClientModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
             >
               {client ? 'Enregistrer les modifications' : 'Créer le client'}
             </button>

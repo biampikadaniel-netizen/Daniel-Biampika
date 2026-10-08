@@ -18,7 +18,7 @@ interface FaktelioPlan {
 const plans: FaktelioPlan[] = [
   {
     id: 'basique',
-    name: ' Gratuit / Découverte',
+    name: 'Gratuit / Découverte',
     subtitle: 'Idéal pour démarrer et tester FAKTELIO sans engagement.',
     monthlyPrice: 0,
     annualPrice: 0,
@@ -82,26 +82,26 @@ export function Pricing() {
   };
 
   return (
-    <section id="tarifs" className="py-20 lg:py-28 bg-white border-b border-[#E2E8F0]">
+    <section id="tarifs" className="py-20 lg:py-28 bg-[#F7FAF8] border-b border-[#D9E7E3]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#215C46]/10 text-[#215C46] border border-[#D9E7E3] text-xs font-extrabold uppercase tracking-wider mb-3">
             Tarifs transparents
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10241D] tracking-tight mb-4">
             Commencez à 0 FCFA et évoluez selon vos besoins
           </h2>
-          <p className="text-base text-[#526581] mb-8">
+          <p className="text-base text-[#4A635A] mb-8">
             Aucun frais caché. Sans carte bancaire à l&apos;inscription. Paiement flexible par Mobile Money (Wave, Orange Money, MTN) ou carte bancaire.
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-[#F5F7FA] border border-[#E2E8F0]">
+          <div className="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-white border border-[#D9E7E3] shadow-xs">
             <button
               type="button"
               onClick={() => setAnnual(false)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                !annual ? 'bg-white text-[#101828] shadow-xs' : 'text-[#526581] hover:text-[#101828]'
+                !annual ? 'bg-[#215C46] text-white shadow-xs' : 'text-[#4A635A] hover:text-[#10241D]'
               }`}
             >
               Facturation mensuelle
@@ -110,11 +110,11 @@ export function Pricing() {
               type="button"
               onClick={() => setAnnual(true)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                annual ? 'bg-[#1E4F91] text-white shadow-xs' : 'text-[#526581] hover:text-[#101828]'
+                annual ? 'bg-[#215C46] text-white shadow-xs' : 'text-[#4A635A] hover:text-[#10241D]'
               }`}
             >
               <span>Facturation annuelle</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F47B20] text-white">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#A9BDBC] text-[#0D2B21]">
                 -20%
               </span>
             </button>
@@ -128,10 +128,10 @@ export function Pricing() {
             return (
               <div
                 key={plan.id}
-                className={`rounded-2xl p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
+                className={`rounded-2xl p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 backdrop-blur-md ${
                   plan.popular
-                    ? 'bg-white border-2 border-[#F47B20] shadow-[0_20px_50px_-12px_rgba(244,123,32,0.18)] relative lg:-translate-y-2'
-                    : 'bg-white border border-[#E2E8F0] shadow-xs hover:shadow-md'
+                    ? 'bg-white border-2 border-[#215C46] shadow-[0_20px_50px_rgba(33,92,70,0.18)] relative lg:-translate-y-2'
+                    : 'bg-white/95 border border-[#D9E7E3] shadow-xs hover:shadow-[0_14px_35px_rgba(33,92,70,0.1)]'
                 }`}
               >
                 <div>
@@ -139,26 +139,26 @@ export function Pricing() {
                     <span
                       className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                         plan.popular
-                          ? 'bg-[#F47B20] text-white'
-                          : 'bg-[#1E4F91]/10 text-[#1E4F91]'
+                          ? 'bg-[#215C46] text-white'
+                          : 'bg-[#215C46]/10 text-[#215C46]'
                       }`}
                     >
                       {plan.badge}
                     </span>
-                    {plan.popular && <Sparkles className="w-5 h-5 text-[#F47B20]" />}
+                    {plan.popular && <Sparkles className="w-5 h-5 text-[#215C46]" />}
                   </div>
 
-                  <h3 className="text-2xl font-extrabold text-[#101828]">{plan.name}</h3>
-                  <p className="text-xs sm:text-sm text-[#526581] mt-1.5 mb-6">{plan.subtitle}</p>
+                  <h3 className="text-2xl font-extrabold text-[#10241D]">{plan.name}</h3>
+                  <p className="text-xs sm:text-sm text-[#4A635A] mt-1.5 mb-6">{plan.subtitle}</p>
 
-                  <div className="pb-6 mb-6 border-b border-[#E2E8F0]">
+                  <div className="pb-6 mb-6 border-b border-[#D9E7E3]">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl sm:text-4xl font-extrabold text-[#101828]">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-[#10241D]">
                         {price === 0 ? '0 FCFA' : `${price.toLocaleString('fr-FR')} FCFA`}
                       </span>
-                      <span className="text-xs font-semibold text-[#526581]">/ mois</span>
+                      <span className="text-xs font-semibold text-[#4A635A]">/ mois</span>
                     </div>
-                    <p className="text-xs text-[#526581] mt-1">
+                    <p className="text-xs text-[#4A635A] mt-1">
                       {price === 0
                         ? 'Gratuit sans limite de durée pour débuter'
                         : annual
@@ -169,8 +169,8 @@ export function Pricing() {
 
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-sm text-[#101828]">
-                        <span className="w-5 h-5 rounded-full bg-[#16A34A]/15 text-[#16A34A] flex items-center justify-center shrink-0 mt-0.5">
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-[#10241D]">
+                        <span className="w-5 h-5 rounded-full bg-[#215C46]/15 text-[#215C46] flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                         </span>
                         <span>{feat}</span>
@@ -184,12 +184,12 @@ export function Pricing() {
                   onClick={() => handleSelectPlan(plan.id)}
                   className={`w-full py-3.5 px-5 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
                     plan.popular
-                      ? 'bg-[#F47B20] hover:bg-[#FF7A21] text-white shadow-[0_8px_20px_rgba(244,123,32,0.3)] hover:-translate-y-0.5'
-                      : 'bg-[#1E4F91] hover:bg-[#163C70] text-white'
+                      ? 'bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white shadow-[0_8px_24px_rgba(33,92,70,0.3)] hover:-translate-y-0.5'
+                      : 'bg-[#123A2C] hover:bg-[#0D2B21] text-white shadow-xs'
                   }`}
                 >
                   <span>{plan.ctaLabel}</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-[#D9E7E3]" />
                 </button>
               </div>
             );

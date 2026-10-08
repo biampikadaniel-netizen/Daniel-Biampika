@@ -16,7 +16,7 @@ export function InvoiceDetailModal({
   if (!user) return null;
 
   const settings = workspaceService.getSettings(user.id);
-  const accentColor = settings.accentColor || '#1E4F91';
+  const accentColor = settings.accentColor || '#215C46';
 
   const handlePrint = () => {
     window.print();
@@ -34,14 +34,14 @@ export function InvoiceDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#D9E7E3] overflow-hidden my-auto max-h-[92vh] flex flex-col">
         {/* Modal Action Bar (Hidden in Print) */}
-        <div className="px-6 py-4 bg-[#F5F7FA] border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 print:hidden">
+        <div className="px-6 py-4 bg-[#F7FAF8] border-b border-[#D9E7E3] flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="flex items-center gap-2.5">
-            <span className="text-sm font-extrabold text-[#101828]">
+            <span className="text-sm font-extrabold text-[#10241D]">
               Aperçu Facture {invoice.number}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#1E4F91]/10 text-[#1E4F91]">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#215C46]/10 text-[#215C46]">
               Document Certifié FAKTELIO
             </span>
           </div>
@@ -56,7 +56,7 @@ export function InvoiceDetailModal({
             </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs font-bold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-bold transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               Télécharger PDF / Imprimer
@@ -126,7 +126,7 @@ export function InvoiceDetailModal({
               </p>
               <p className="text-sm font-extrabold text-[#101828]">{invoice.clientName}</p>
               {invoice.clientCompany && (
-                <p className="text-xs font-semibold text-[#1E4F91]">{invoice.clientCompany}</p>
+                <p className="text-xs font-semibold text-[#215C46]">{invoice.clientCompany}</p>
               )}
               {invoice.clientAddress && (
                 <p className="text-xs text-[#526581] mt-1">{invoice.clientAddress}</p>
@@ -139,22 +139,22 @@ export function InvoiceDetailModal({
               )}
             </div>
 
-            <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex flex-col justify-between">
+            <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-[#526581]">Statut du règlement</span>
                 {invoice.remainingAmount === 0 ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#DCFCE7] text-[#15803D]">
-                    <CheckCircle2 className="w-3.5 h-3.5" /> PAYÉE
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#215C46]/15 text-[#123A2C]">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#215C46]" /> PAYÉE
                   </span>
                 ) : (
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEF3C7] text-[#B45309]">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#D9E7E3] text-[#123A2C]">
                     RESTE À PAYER
                   </span>
                 )}
               </div>
-              <div className="mt-3 pt-3 border-t border-[#E2E8F0] flex items-baseline justify-between">
+              <div className="mt-3 pt-3 border-t border-[#D9E7E3] flex items-baseline justify-between">
                 <span className="text-xs text-[#526581]">Solde restant :</span>
-                <span className="text-lg font-extrabold text-[#F47B20]">
+                <span className="text-lg font-black text-[#215C46]">
                   {formatFCFA(invoice.remainingAmount)}
                 </span>
               </div>
@@ -162,7 +162,7 @@ export function InvoiceDetailModal({
           </div>
 
           {/* Line Items Table */}
-          <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
+          <div className="border border-[#D9E7E3] rounded-xl overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr
@@ -215,13 +215,13 @@ export function InvoiceDetailModal({
 
               {/* Official Signature / Cachet Box */}
               <div className="pt-3">
-                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-[#1E4F91]/40 bg-[#F5F7FA]">
-                  <Stamp className="w-4 h-4 text-[#1E4F91]" />
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-[#215C46]/40 bg-[#D9E7E3]/25">
+                  <Stamp className="w-4 h-4 text-[#215C46]" />
                   <div>
-                    <p className="text-[10px] font-extrabold uppercase text-[#1E4F91]">
+                    <p className="text-[10px] font-extrabold uppercase text-[#215C46]">
                       Cachet &amp; Signature Entreprise
                     </p>
-                    <p className="text-xs font-bold text-[#101828]">
+                    <p className="text-xs font-bold text-[#10241D]">
                       {settings.signatureText || settings.name}
                     </p>
                   </div>
@@ -229,13 +229,13 @@ export function InvoiceDetailModal({
               </div>
             </div>
 
-            <div className="bg-[#F5F7FA] p-5 rounded-xl border border-[#E2E8F0] space-y-2.5 text-sm">
+            <div className="bg-[#F7FAF8] p-5 rounded-xl border border-[#D9E7E3] space-y-2.5 text-sm">
               <div className="flex justify-between text-[#526581]">
                 <span>Sous-total HT</span>
-                <span className="font-bold text-[#101828]">{formatFCFA(invoice.subtotalHt)}</span>
+                <span className="font-bold text-[#10241D]">{formatFCFA(invoice.subtotalHt)}</span>
               </div>
               {invoice.discountRate > 0 && (
-                <div className="flex justify-between text-[#15803D]">
+                <div className="flex justify-between text-[#215C46]">
                   <span>Remise ({invoice.discountRate}%)</span>
                   <span>
                     -{formatFCFA(Math.round((invoice.subtotalHt * invoice.discountRate) / 100))}
@@ -244,17 +244,17 @@ export function InvoiceDetailModal({
               )}
               <div className="flex justify-between text-[#526581]">
                 <span>Total TVA</span>
-                <span className="font-bold text-[#101828]">{formatFCFA(invoice.totalVat)}</span>
+                <span className="font-bold text-[#10241D]">{formatFCFA(invoice.totalVat)}</span>
               </div>
-              <div className="pt-2.5 border-t border-[#E2E8F0] flex justify-between text-base font-extrabold text-[#1E4F91]">
+              <div className="pt-2.5 border-t border-[#D9E7E3] flex justify-between text-base font-black text-[#215C46]">
                 <span>TOTAL TTC</span>
                 <span>{formatFCFA(invoice.totalTtc)}</span>
               </div>
-              <div className="flex justify-between text-xs text-[#15803D] font-bold">
+              <div className="flex justify-between text-xs text-[#215C46] font-bold">
                 <span>Montant déjà payé</span>
                 <span>{formatFCFA(invoice.paidAmount)}</span>
               </div>
-              <div className="pt-2 border-t border-[#E2E8F0] flex justify-between text-sm font-extrabold text-[#F47B20]">
+              <div className="pt-2 border-t border-[#D9E7E3] flex justify-between text-sm font-extrabold text-[#123A2C]">
                 <span>Net à payer</span>
                 <span>{formatFCFA(invoice.remainingAmount)}</span>
               </div>

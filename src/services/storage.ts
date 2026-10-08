@@ -198,7 +198,7 @@ export const authService = {
     const initialSettings: CompanySettings = {
       companyId,
       name: companyName,
-      accentColor: '#1E4F91',
+      accentColor: '#215C46',
       address: '',
       city: 'Abidjan',
       country: "Côte d'Ivoire",
@@ -270,20 +270,66 @@ export const authService = {
   },
 
   loginDemo(): User {
-    // Demo login creates a clean isolated test workspace with 0 fake data
     const demoEmail = 'demo@faktelio.com';
     const existing = this.login(demoEmail, 'demo');
-    if (existing.user) return existing.user;
-
-    const registered = this.register({
+    const user = existing.user || this.register({
       name: 'Utilisateur Démo',
       email: demoEmail,
       password: 'demo',
-      companyName: 'Mon Entreprise',
-      phone: '',
+      companyName: 'FAKTELIO SARL',
+      phone: '+225 07 00 00 00',
       plan: 'startup',
-    });
-    return registered.user!;
+    }).user!;
+
+    // If demo workspace has 0 invoices, seed the initial reference invoice (177 000 FCFA)
+    const currentInvoices = workspaceService.getInvoices(user.id);
+    if (currentInvoices.length === 0) {
+      const client = workspaceService.saveClient(user.id, {
+        name: 'Société Ivoire Distribution',
+        company: 'Ivoire Distribution SA',
+        email: 'contact@ivoiredistrib.ci',
+        phone: '+225 07 89 45 12',
+        address: 'Boulevard Valéry Giscard d’Estaing, Marcory',
+        city: 'Abidjan',
+        country: "Côte d'Ivoire",
+      });
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const dueStr = new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0];
+
+      workspaceService.saveInvoice(user.id, {
+        number: 'FAC-2026-0001',
+        clientId: client.id,
+        clientName: client.name,
+        clientEmail: client.email,
+        clientPhone: client.phone,
+        clientCompany: client.company,
+        clientAddress: client.address,
+        issueDate: todayStr,
+        dueDate: dueStr,
+        items: [
+          {
+            id: uid('item'),
+            description: 'Pack Gestion Commerciale & Facturation FAKTELIO Pro',
+            quantity: 1,
+            unitPrice: 150000,
+            vatRate: 18,
+            totalHt: 150000,
+          },
+        ],
+        subtotalHt: 150000,
+        totalVat: 27000,
+        discountRate: 0,
+        totalTtc: 177000,
+        paidAmount: 0,
+        remainingAmount: 177000,
+        status: 'sent',
+        notes: 'Paiement à réception par virement ou Wave Business.',
+        terms: 'Paiement à 15 jours. Merci de votre confiance.',
+      });
+    }
+
+    return user;
   },
 
   updateUser(updated: Partial<User>): User | null {
@@ -320,7 +366,7 @@ export const workspaceService = {
     const fallback: CompanySettings = {
       companyId: cId,
       name: 'Mon Entreprise',
-      accentColor: '#1E4F91',
+      accentColor: '#215C46',
       address: '',
       city: 'Abidjan',
       country: "Côte d'Ivoire",

@@ -91,17 +91,17 @@ export function ProductsList() {
             setEditingProduct(null);
             setModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 text-[#D9E7E3]" />
           + Ajouter au catalogue
         </button>
       </div>
 
       {notificationMsg && (
-        <div className="p-3.5 rounded-xl bg-[#DCFCE7] border border-[#16A34A]/30 text-[#15803D] text-xs font-bold flex items-center justify-between">
+        <div className="p-3.5 rounded-xl bg-[#215C46]/15 border border-[#215C46]/30 text-[#123A2C] text-xs font-bold flex items-center justify-between">
           <span className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-[#215C46]" />
             {notificationMsg}
           </span>
           <button onClick={() => setNotificationMsg(null)} className="text-xs underline cursor-pointer">
@@ -112,7 +112,7 @@ export function ProductsList() {
 
       {/* Tabs & Search */}
       {products.length > 0 && (
-        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs space-y-3">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-[#D9E7E3] shadow-xs space-y-3">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <button
@@ -120,20 +120,20 @@ export function ProductsList() {
                   setActiveTab('all');
                   setSelectedCategory('Toutes');
                 }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'all'
-                    ? 'bg-[#1E4F91] text-white'
-                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                    ? 'bg-[#215C46] text-white shadow-xs'
+                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 Tout ({products.length})
               </button>
               <button
                 onClick={() => setActiveTab('product')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                   activeTab === 'product'
-                    ? 'bg-[#1E4F91] text-white'
-                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                    ? 'bg-[#215C46] text-white shadow-xs'
+                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 <Package className="w-3.5 h-3.5" />
@@ -141,10 +141,10 @@ export function ProductsList() {
               </button>
               <button
                 onClick={() => setActiveTab('service')}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                   activeTab === 'service'
-                    ? 'bg-[#1E4F91] text-white'
-                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                    ? 'bg-[#215C46] text-white shadow-xs'
+                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
@@ -153,10 +153,10 @@ export function ProductsList() {
               {categories.length > 0 && (
                 <button
                   onClick={() => setActiveTab('categories')}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                     activeTab === 'categories'
-                      ? 'bg-[#F47B20] text-white'
-                      : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                      ? 'bg-[#123A2C] text-white shadow-xs'
+                      : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                   }`}
                 >
                   <Tag className="w-3.5 h-3.5" />
@@ -172,22 +172,22 @@ export function ProductsList() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher nom, référence..."
-                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-[#E2E8F0] focus:outline-none focus:border-[#1E4F91]"
+                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-[#D9E7E3] bg-[#F7FAF8]/70 focus:bg-white focus:outline-none focus:border-[#215C46] focus:ring-1 focus:ring-[#215C46]"
               />
             </div>
           </div>
 
           {categories.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#F5F7FA]">
+            <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#D9E7E3]">
               <span className="text-[11px] font-bold text-[#526581] uppercase">Filtrer par catégorie :</span>
               {['Toutes', ...categories].map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     selectedCategory === cat
-                      ? 'bg-[#1E4F91]/15 text-[#1E4F91] font-bold'
-                      : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                      ? 'bg-[#215C46]/15 text-[#215C46] font-bold border border-[#215C46]/20'
+                      : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                   }`}
                 >
                   {cat}
@@ -214,9 +214,9 @@ export function ProductsList() {
                 setEditingProduct(null);
                 setModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md cursor-pointer transition-all"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#D9E7E3]" />
               + Ajouter un produit
             </button>
           </div>
@@ -229,7 +229,7 @@ export function ProductsList() {
                 setActiveTab('all');
                 setSelectedCategory('Toutes');
               }}
-              className="mt-2 text-xs font-bold text-[#1E4F91] hover:underline cursor-pointer"
+              className="mt-2 text-xs font-bold text-[#215C46] hover:underline cursor-pointer"
             >
               Réinitialiser les filtres
             </button>
@@ -238,7 +238,7 @@ export function ProductsList() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-[#F5F7FA] text-[11px] font-bold text-[#526581] uppercase tracking-wider border-b border-[#E2E8F0]">
+                <tr className="bg-[rgba(33,92,70,0.08)] text-[11px] font-bold text-[#123A2C] uppercase tracking-wider border-b border-[rgba(33,92,70,0.15)]">
                   <th className="py-3.5 px-5">Référence</th>
                   <th className="py-3.5 px-5">Nom &amp; Description</th>
                   <th className="py-3.5 px-5">Catégorie</th>
@@ -248,13 +248,13 @@ export function ProductsList() {
                   <th className="py-3.5 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#E2E8F0] text-sm">
+              <tbody className="divide-y divide-[rgba(33,92,70,0.08)] text-sm">
                 {filtered.map((item) => {
                   const isLowStock = item.type === 'product' && item.stock <= item.minStockAlert;
                   return (
-                    <tr key={item.id} className="hover:bg-[#F5F7FA]/60 transition-colors">
+                    <tr key={item.id} className="hover:bg-[rgba(169,189,188,0.12)] transition-colors">
                       <td className="py-3.5 px-5">
-                        <span className="font-mono text-xs font-extrabold text-[#1E4F91] bg-[#1E4F91]/8 px-2.5 py-1 rounded-lg">
+                        <span className="font-mono text-xs font-black text-[#215C46] bg-[#215C46]/10 border border-[#215C46]/20 px-2.5 py-1 rounded-lg">
                           {item.reference}
                         </span>
                       </td>
@@ -267,11 +267,11 @@ export function ProductsList() {
                         )}
                       </td>
                       <td className="py-3.5 px-5">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#F5F7FA] text-[#526581] border border-[#E2E8F0]">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#F7FAF8] text-[#526581] border border-[#D9E7E3]">
                           {item.category || (item.type === 'service' ? 'Prestation' : 'Marchandise')}
                         </span>
                       </td>
-                      <td className="py-3.5 px-5 font-extrabold text-[#101828]">
+                      <td className="py-3.5 px-5 font-black text-[#101828]">
                         {formatFCFA(item.unitPrice)}
                         <span className="text-[11px] font-normal text-[#526581]"> / {item.unit}</span>
                       </td>
@@ -289,7 +289,7 @@ export function ProductsList() {
                               className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold ${
                                 isLowStock
                                   ? 'bg-[#FEE2E2] text-[#DC2626]'
-                                  : 'bg-[#DCFCE7] text-[#15803D]'
+                                  : 'bg-[#D9E7E3] text-[#123A2C]'
                               }`}
                             >
                               {item.stock} en stock
@@ -311,14 +311,14 @@ export function ProductsList() {
                               setModalOpen(true);
                             }}
                             title="Modifier"
-                            className="p-2 rounded-lg bg-[#F5F7FA] hover:bg-[#1E4F91] text-[#101828] hover:text-white transition-colors cursor-pointer"
+                            className="p-2 rounded-lg bg-[#D9E7E3]/40 hover:bg-[#215C46] text-[#101828] hover:text-white transition-colors cursor-pointer"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDuplicate(item)}
                             title="Dupliquer"
-                            className="p-2 rounded-lg bg-[#F5F7FA] hover:bg-[#F47B20] text-[#101828] hover:text-white transition-colors cursor-pointer"
+                            className="p-2 rounded-lg bg-[#D9E7E3]/40 hover:bg-[#123A2C] text-[#101828] hover:text-white transition-colors cursor-pointer"
                           >
                             <Copy className="w-3.5 h-3.5" />
                           </button>
