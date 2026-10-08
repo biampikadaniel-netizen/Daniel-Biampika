@@ -1,48 +1,91 @@
+import React from 'react';
+import { UserCheck, FileSpreadsheet, Send, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '../context/NavigationContext';
+
+const steps = [
+  {
+    step: 'Étape 1',
+    icon: UserCheck,
+    title: 'Sélectionnez ou créez votre client',
+    description:
+      'Choisissez un client existant dans votre CRM FAKTELIO ou ajoutez ses coordonnées en quelques secondes.',
+  },
+  {
+    step: 'Étape 2',
+    icon: FileSpreadsheet,
+    title: 'Ajoutez vos produits ou prestations',
+    description:
+      'Sélectionnez vos articles du catalogue. Les prix, quantités, remises et la TVA se calculent automatiquement.',
+  },
+  {
+    step: 'Étape 3',
+    icon: Send,
+    title: 'Téléchargez le PDF ou partagez sur WhatsApp',
+    description:
+      'Votre facture professionnelle est prête. Téléchargez le PDF, envoyez-la sur WhatsApp et suivez son paiement.',
+  },
+];
+
 export function HowItWorks() {
+  const { user, loginDemo } = useAuth();
+  const { navigate } = useNavigation();
+
+  const handleStart = () => {
+    if (user) {
+      navigate('/billing');
+    } else {
+      loginDemo();
+      navigate('/billing');
+    }
+  };
+
   return (
-    <section className="py-14 sm:py-20">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
-            Simple &amp; Rapide
+    <section className="py-20 bg-white border-b border-[#E2E8F0]">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-14">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#F47B20]/10 text-[#F47B20] text-xs font-extrabold uppercase tracking-wider mb-3">
+            Prise en main immédiate
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Comment ça fonctionne ?</h2>
-          <p className="mt-4 text-slate-600">3 étapes simples pour facturer comme un pro, dès aujourd'hui.</p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight">
+            Comment fonctionne FAKTELIO en 3 étapes simples
+          </h2>
+          <p className="text-base text-[#526581] mt-3">
+            Aucune compétence comptable requise. Tout est pensé pour aller droit au but.
+          </p>
         </div>
 
-        <div className="reveal mt-12 grid gap-8 md:grid-cols-3">
-          {/* Step 1 */}
-          <div className="relative rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-sm font-extrabold text-white">
-              1
-            </span>
-            <h3 className="mt-4 text-lg font-bold text-slate-900">Créez votre document</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              Sélectionnez un client, ajoutez vos prestations ou produits. Les totaux et la TVA se calculent tout seuls.
-            </p>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {steps.map((s, idx) => {
+            const Icon = s.icon;
+            return (
+              <div
+                key={idx}
+                className="relative bg-[#F5F7FA] rounded-2xl p-7 border border-[#E2E8F0] hover:border-[#1E4F91]/30 transition-all duration-300"
+              >
+                <div className="flex items-center justify-between mb-5">
+                  <span className="px-3 py-1 rounded-full bg-[#1E4F91] text-white text-xs font-extrabold">
+                    {s.step}
+                  </span>
+                  <div className="w-11 h-11 rounded-xl bg-white border border-[#E2E8F0] text-[#F47B20] flex items-center justify-center shadow-2xs">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-extrabold text-[#101828] mb-2">{s.title}</h3>
+                <p className="text-sm text-[#526581] leading-relaxed">{s.description}</p>
+              </div>
+            );
+          })}
+        </div>
 
-          {/* Step 2 */}
-          <div className="relative rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-sm font-extrabold text-white">
-              2
-            </span>
-            <h3 className="mt-4 text-lg font-bold text-slate-900">Partagez en 1 clic</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              Envoyez un lien propre et professionnel à votre client par WhatsApp, par email ou téléchargez le PDF.
-            </p>
-          </div>
-
-          {/* Step 3 */}
-          <div className="relative rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-sm font-extrabold text-white">
-              3
-            </span>
-            <h3 className="mt-4 text-lg font-bold text-slate-900">Suivez &amp; encaissez</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">
-              Voyez qui a payé, qui est en retard, et relancez en un clic sans friction.
-            </p>
-          </div>
+        <div className="text-center">
+          <button
+            onClick={handleStart}
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-sm font-bold shadow-md transition-all cursor-pointer"
+          >
+            Créer ma première facture maintenant
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </section>

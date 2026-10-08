@@ -1,236 +1,212 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Wallet, CheckCircle2, Clock, AlertTriangle, Plus } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { paymentsStorage, invoicesStorage } from '../../services/storage';
-import type { Payment, Invoice } from '../../types';
-import {
-  CreditCard,
-  Plus,
-  Search,
-  CheckCircle2,
-  Trash2,
-  Calendar,
-  Smartphone,
-  Banknote,
-  Building,
-  Eye,
-} from 'lucide-react';
+import { workspaceService, formatFCFA, formatDateFr } from '../../services/storage';
+import { Payment, Invoice } from '../../types';
+import { PaymentModal } from './PaymentModal';
 
-interface PaymentsListProps {
-  onOpenRecordPayment: () => void;
-  onViewInvoice: (invoice: Invoice) => void;
-}
+export function PaymentsList() {
+  const { user } = useAuth();
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [selectedInvoiceForPayment, setSelectedInvoiceForPayment] = useState<Invoice | null>(null);
 
-export function PaymentsList({ onOpenRecordPayment, onViewInvoice }: PaymentsListProps) {
-  const { currentUser, refreshUser } = useAuth();
-  const [methodFilter, setMethodFilter] = useState<string>('all');
-  const [search, setSearch] = useState('');
-
-  if (!currentUser) return null;
-
-  const payments = paymentsStorage.getAll(currentUser.id);
-  const invoices = invoicesStorage.getAll(currentUser.id);
-
-  const filtered = payments.filter((p) => {
-    if (methodFilter !== 'all' && p.paymentMethod !== methodFilter) return false;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      const matchClient = (p.clientName || '').toLowerCase().includes(q);
-      const matchInv = (p.invoiceNumber || '').toLowerCase().includes(q);
-      const matchRef = (p.reference || '').toLowerCase().includes(q);
-      if (!matchClient && !matchInv && !matchRef) return false;
-    }
-    return true;
-  });
-
-  const totalCollected = payments.reduce((sum, p) => sum + p.amount, 0);
-
-  const handleDelete = (id: string) => {
-    if (window.confirm('Voulez-vous annuler cet encaissement ? Le solde de la facture sera réajusté.')) {
-      paymentsStorage.delete(currentUser.id, id);
-      refreshUser();
-    }
+  const loadData = () => {
+    if (!user) return;
+    setPayments(workspaceService.getPayments(user.id));
+    setInvoices(workspaceService.getInvoices(user.id));
   };
 
-  const getMethodBadge = (m: string) => {
-    switch (m) {
-      case 'mobile_money':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-            <Smartphone className="w-3 h-3" /> Mobile Money
-          </span>
-        );
-      case 'cash':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
-            <Banknote className="w-3 h-3" /> Espèces
-          </span>
-        );
-      case 'bank_transfer':
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
-            <Building className="w-3 h-3" /> Virement
-          </span>
-        );
-      default:
-        return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700">
-            <CreditCard className="w-3 h-3" /> Carte / Autre
-          </span>
-        );
-    }
+  useEffect(() => {
+    loadData();
+  }, [user]);
+
+  if (!user) return null;
+
+  const unpaidInvoices = invoices.filter((i) => i.remainingAmount > 0 && i.status !== 'draft');
+
+  const methodLabels: Record<Payment['paymentMethod'], string> = {
+    mobile_money: 'Mobile Money (Wave / Orange / MTN)',
+    bank_transfer: 'Virement Bancaire',
+    cash: 'Espèces',
+    card: 'Carte Bancaire',
+    other: 'Autre',
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Paiements</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Journal de tous les encaissements perçus par Mobile Money, virement et espèces.
+          <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
+            Suivi des Paiements &amp; Encaissements FAKTELIO
+          </h1>
+          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+            Suivez l&apos;état de chaque facture : Payé, Partiellement payé, Impayé ou En attente.
           </p>
         </div>
 
-        <button
-          onClick={onOpenRecordPayment}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 transition-transform hover:-translate-y-0.5 cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Enregistrer un paiement</span>
-        </button>
+        {unpaidInvoices.length > 0 && (
+          <button
+            onClick={() => setSelectedInvoiceForPayment(unpaidInvoices[0])}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            + Enregistrer un paiement
+          </button>
+        )}
       </div>
 
-      {/* Top Banner Total Collected */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-3xl p-6 text-white shadow-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-200">
-            Total des encaissements enregistrés
-          </span>
-          <p className="text-2xl sm:text-3xl font-black mt-1">
-            {totalCollected.toLocaleString('fr-FR')}{' '}
-            <span className="text-base font-medium text-emerald-200">FCFA</span>
+      {/* 4 Status Cards (Payé, Partiellement payé, Impayé / En retard, En attente) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-extrabold uppercase text-[#15803D]">Payé</span>
+            <CheckCircle2 className="w-4 h-4 text-[#16A34A]" />
+          </div>
+          <p className="text-xl font-extrabold text-[#101828]">
+            {invoices.filter((i) => i.status === 'paid').length} facture(s)
+          </p>
+          <p className="text-xs text-[#526581] mt-1">
+            Total encaissé : {formatFCFA(invoices.reduce((s, i) => s + i.paidAmount, 0))}
           </p>
         </div>
-        <div className="text-xs text-emerald-100 bg-white/10 px-4 py-2 rounded-2xl border border-white/15">
-          {payments.length} transaction{payments.length > 1 ? 's' : ''} validée{payments.length > 1 ? 's' : ''}
+
+        <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-extrabold uppercase text-[#B45309]">
+              Partiellement payé
+            </span>
+            <Wallet className="w-4 h-4 text-[#F59E0B]" />
+          </div>
+          <p className="text-xl font-extrabold text-[#101828]">
+            {invoices.filter((i) => i.status === 'partial').length} facture(s)
+          </p>
+          <p className="text-xs text-[#526581] mt-1">Acomptes enregistrés</p>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-extrabold uppercase text-[#DC2626]">
+              Impayé / En retard
+            </span>
+            <AlertTriangle className="w-4 h-4 text-[#DC2626]" />
+          </div>
+          <p className="text-xl font-extrabold text-[#101828]">
+            {invoices.filter((i) => i.status === 'late').length} facture(s)
+          </p>
+          <p className="text-xs text-[#526581] mt-1">Échéance dépassée</p>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-[#E2E8F0]">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-extrabold uppercase text-[#1E4F91]">En attente</span>
+            <Clock className="w-4 h-4 text-[#1E4F91]" />
+          </div>
+          <p className="text-xl font-extrabold text-[#101828]">
+            {invoices.filter((i) => i.status === 'sent').length} facture(s)
+          </p>
+          <p className="text-xs text-[#526581] mt-1">
+            Reste global : {formatFCFA(invoices.reduce((s, i) => s + i.remainingAmount, 0))}
+          </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-xs font-bold bg-slate-100 p-1 rounded-2xl flex-wrap">
-            {[
-              { id: 'all', label: 'Tous' },
-              { id: 'mobile_money', label: 'Mobile Money' },
-              { id: 'cash', label: 'Espèces' },
-              { id: 'bank_transfer', label: 'Virement' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setMethodFilter(tab.id)}
-                className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-                  methodFilter === tab.id
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
+      {/* Invoices awaiting payment */}
+      {unpaidInvoices.length > 0 && (
+        <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-3">
+          <h2 className="text-base font-extrabold text-[#101828]">
+            Factures en attente d&apos;encaissement
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {unpaidInvoices.map((inv) => (
+              <div
+                key={inv.id}
+                className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex items-center justify-between gap-3"
               >
-                {tab.label}
-              </button>
+                <div>
+                  <p className="text-sm font-extrabold text-[#1E4F91]">
+                    {inv.number} — {inv.clientName}
+                  </p>
+                  <p className="text-xs text-[#526581]">
+                    Reste à régler : <strong className="text-[#F47B20]">{formatFCFA(inv.remainingAmount)}</strong>
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSelectedInvoiceForPayment(inv)}
+                  className="px-3.5 py-2 rounded-xl bg-[#16A34A] hover:bg-[#15803D] text-white text-xs font-extrabold cursor-pointer"
+                >
+                  Encaisser
+                </button>
+              </div>
             ))}
           </div>
-
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par client, facture ou réf..."
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-teal-500 outline-none bg-slate-50 focus:bg-white"
-            />
-          </div>
         </div>
+      )}
 
-        {filtered.length === 0 ? (
-          <div className="py-12 text-center border-t border-slate-100 mt-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3">
-              <CreditCard className="w-6 h-6" />
-            </div>
-            <p className="text-sm font-bold text-slate-700">Aucun paiement enregistré</p>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              Dès qu'un client règle une facture, enregistrez le paiement ici pour solder la facture.
+      {/* Recorded Payments Table */}
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#E2E8F0]">
+          <h2 className="text-base font-extrabold text-[#101828]">
+            Journal des paiements enregistrés ({payments.length})
+          </h2>
+        </div>
+        {payments.length === 0 ? (
+          <div className="py-12 px-6 text-center">
+            <Wallet className="w-10 h-10 text-[#CBD5E1] mx-auto mb-2.5" />
+            <h3 className="text-base font-extrabold text-[#101828]">
+              Aucun paiement enregistré pour l&apos;instant.
+            </h3>
+            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1">
+              Dès qu&apos;un client règle une facture, enregistrez son règlement pour mettre à jour vos encaissements et vos graphiques.
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto border-t border-slate-100 pt-2">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px] tracking-wider">
-                  <th className="py-3 px-3">Date</th>
-                  <th className="py-3 px-3">Client</th>
-                  <th className="py-3 px-3">Facture liée</th>
-                  <th className="py-3 px-3">Mode</th>
-                  <th className="py-3 px-3">Référence</th>
-                  <th className="py-3 px-3 text-right">Montant</th>
-                  <th className="py-3 px-3 text-right">Actions</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#F5F7FA] text-[11px] font-bold text-[#526581] uppercase tracking-wider border-b border-[#E2E8F0]">
+                <th className="py-3.5 px-5">Date</th>
+                <th className="py-3.5 px-5">N° Facture</th>
+                <th className="py-3.5 px-5">Client</th>
+                <th className="py-3.5 px-5">Mode de paiement</th>
+                <th className="py-3.5 px-5">Référence</th>
+                <th className="py-3.5 px-5 text-right">Montant encaissé</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#E2E8F0] text-sm">
+              {payments.map((p) => (
+                <tr key={p.id} className="hover:bg-[#F5F7FA]/60">
+                  <td className="py-3.5 px-5 text-xs text-[#526581]">{formatDateFr(p.paidAt)}</td>
+                  <td className="py-3.5 px-5 font-extrabold text-[#1E4F91]">{p.invoiceNumber}</td>
+                  <td className="py-3.5 px-5 font-bold text-[#101828]">{p.clientName}</td>
+                  <td className="py-3.5 px-5 text-xs font-semibold text-[#526581]">
+                    {methodLabels[p.paymentMethod]}
+                  </td>
+                  <td className="py-3.5 px-5 font-mono text-xs text-[#526581]">
+                    {p.reference || '—'}
+                  </td>
+                  <td className="py-3.5 px-5 text-right font-extrabold text-[#15803D]">
+                    +{formatFCFA(p.amount)}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {filtered.map((p) => {
-                  const linkedInvoice = invoices.find((inv) => inv.id === p.invoiceId);
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
 
-                  return (
-                    <tr key={p.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-3 text-slate-500">
-                        {new Date(p.paidAt).toLocaleDateString('fr-FR')}
-                      </td>
-                      <td className="py-3.5 px-3 font-bold text-slate-900">{p.clientName}</td>
-                      <td className="py-3.5 px-3 font-mono font-bold text-teal-700">
-                        {linkedInvoice ? (
-                          <button
-                            onClick={() => onViewInvoice(linkedInvoice)}
-                            className="hover:underline cursor-pointer"
-                          >
-                            {p.invoiceNumber}
-                          </button>
-                        ) : (
-                          p.invoiceNumber
-                        )}
-                      </td>
-                      <td className="py-3.5 px-3">{getMethodBadge(p.paymentMethod)}</td>
-                      <td className="py-3.5 px-3 text-slate-500 font-mono text-[11px]">
-                        {p.reference || '—'}
-                      </td>
-                      <td className="py-3.5 px-3 text-right font-black text-emerald-600 text-sm">
-                        +{p.amount.toLocaleString('fr-FR')} FCFA
-                      </td>
-                      <td className="py-3.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
-                          {linkedInvoice && (
-                            <button
-                              onClick={() => onViewInvoice(linkedInvoice)}
-                              title="Voir la facture"
-                              className="p-1.5 rounded-lg text-slate-400 hover:text-teal-600 hover:bg-teal-50 cursor-pointer"
-                            >
-                              <Eye className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDelete(p.id)}
-                            title="Annuler ce paiement"
-                            className="p-1.5 rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-50 cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {selectedInvoiceForPayment && (
+        <PaymentModal
+          invoice={selectedInvoiceForPayment}
+          onClose={() => setSelectedInvoiceForPayment(null)}
+          onSuccess={() => {
+            setSelectedInvoiceForPayment(null);
+            loadData();
+          }}
+        />
+      )}
     </div>
   );
 }

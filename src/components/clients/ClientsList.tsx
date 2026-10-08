@@ -1,187 +1,423 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { clientsStorage, invoicesStorage, quotesStorage } from '../../services/storage';
-import type { Client, Invoice } from '../../types';
+import React, { useState, useEffect } from 'react';
 import {
-  Users,
   Plus,
   Search,
+  Download,
+  Upload,
   Phone,
   Mail,
-  Building2,
   MapPin,
-  FileText,
-  CreditCard,
   Edit2,
   Trash2,
   Eye,
+  FileText,
+  FileCheck2,
+  Wallet,
+  StickyNote,
+  History,
+  User,
   X,
-  MessageSquareShare,
+  CheckCircle2,
+  Save,
+  Users,
+  AlertTriangle,
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { workspaceService, formatFCFA, formatDateFr } from '../../services/storage';
+import { Client, Invoice, Quote, Payment } from '../../types';
+import { ClientModal } from './ClientModal';
 
-interface ClientsListProps {
-  onOpenNewClient: () => void;
-  onEditClient: (client: Client) => void;
-  onViewInvoice: (invoice: Invoice) => void;
-}
+type ClientFicheTab = 'info' | 'history' | 'invoices' | 'quotes' | 'payments' | 'notes';
 
-export function ClientsList({ onOpenNewClient, onEditClient, onViewInvoice }: ClientsListProps) {
-  const { currentUser, refreshUser } = useAuth();
+export function ClientsList() {
+  const { user } = useAuth();
+  const companyId = user?.companyId || user?.id || '';
+
+  const [clients, setClients] = useState<Client[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
+
   const [search, setSearch] = useState('');
-  const [selectedClientForDetail, setSelectedClientForDetail] = useState<Client | null>(null);
+  const [filterType, setFilterType] = useState<'all' | 'with_invoices' | 'vip'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  if (!currentUser) return null;
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [deletingClient, setDeletingClient] = useState<Client | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [ficheTab, setFicheTab] = useState<ClientFicheTab>('info');
+  const [crmNoteDraft, setCrmNoteDraft] = useState('');
+  const [noteSavedBanner, setNoteSavedBanner] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [csvInput, setCsvInput] = useState('');
+  const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
 
-  const allClients = clientsStorage.getAll(currentUser.id);
-  const allInvoices = invoicesStorage.getAll(currentUser.id);
-  const allQuotes = quotesStorage.getAll(currentUser.id);
-
-  const filteredClients = allClients.filter((c) => {
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      const matchName = c.name.toLowerCase().includes(q);
-      const matchCompany = (c.company || '').toLowerCase().includes(q);
-      const matchPhone = c.phone.includes(q);
-      if (!matchName && !matchCompany && !matchPhone) return false;
-    }
-    return true;
-  });
-
-  const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Voulez-vous supprimer le client ${name} ?`)) {
-      clientsStorage.delete(currentUser.id, id);
-      refreshUser();
-      if (selectedClientForDetail?.id === id) {
-        setSelectedClientForDetail(null);
+  const loadAll = () => {
+    if (!companyId) return;
+    const cList = workspaceService.getClients(companyId);
+    setClients(cList);
+    setInvoices(workspaceService.getInvoices(companyId));
+    setQuotes(workspaceService.getQuotes(companyId));
+    setPayments(workspaceService.getPayments(companyId));
+    if (selectedClient) {
+      const updated = cList.find((c) => c.id === selectedClient.id);
+      if (updated) {
+        setSelectedClient(updated);
+        setCrmNoteDraft(updated.notes || '');
       }
     }
   };
 
+  useEffect(() => {
+    loadAll();
+  }, [companyId]);
+
+  if (!user) return null;
+
   const getClientStats = (clientId: string) => {
-    const clientInvoices = allInvoices.filter((inv) => inv.clientId === clientId);
-    const totalBilled = clientInvoices.reduce((sum, inv) => sum + inv.totalTtc, 0);
-    const totalPaid = clientInvoices.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
-    const remaining = Math.max(0, totalBilled - totalPaid);
-    return { totalBilled, totalPaid, remaining, invoicesCount: clientInvoices.length };
+    const clientInvoices = invoices.filter((i) => i.clientId === clientId);
+    const clientQuotes = quotes.filter((q) => q.clientId === clientId);
+    const clientPayments = payments.filter((p) => p.clientId === clientId);
+    const totalBilled = clientInvoices.reduce((s, i) => s + (Number(i.totalTtc) || 0), 0);
+
+    const dates = [
+      ...clientInvoices.map((i) => i.createdAt),
+      ...clientQuotes.map((q) => q.createdAt),
+      ...clientPayments.map((p) => p.createdAt),
+    ];
+    const lastActivityTs = dates.length > 0 ? Math.max(...dates) : null;
+
+    return {
+      invoicesCount: clientInvoices.length,
+      quotesCount: clientQuotes.length,
+      paymentsCount: clientPayments.length,
+      totalBilled,
+      lastActivity: lastActivityTs
+        ? new Date(lastActivityTs).toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+          })
+        : 'Aucune transaction',
+      clientInvoices,
+      clientQuotes,
+      clientPayments,
+    };
+  };
+
+  const filteredClients = clients.filter((c) => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      c.name.toLowerCase().includes(q) ||
+      (c.company || '').toLowerCase().includes(q) ||
+      c.phone.toLowerCase().includes(q) ||
+      (c.email || '').toLowerCase().includes(q);
+
+    if (!matchesSearch) return false;
+
+    const stats = getClientStats(c.id);
+    if (filterType === 'with_invoices') return stats.invoicesCount > 0;
+    if (filterType === 'vip') return stats.totalBilled >= 500000;
+    return true;
+  });
+
+  const handleExportCsv = () => {
+    if (clients.length === 0) return;
+    const headers = [
+      'Nom',
+      'Entreprise',
+      'Telephone',
+      'Email',
+      'Adresse',
+      'Ville',
+      'Pays',
+      'Nombre de factures',
+      'Montant total FCFA',
+    ];
+    const rows = clients.map((c) => {
+      const st = getClientStats(c.id);
+      return [
+        `"${c.name}"`,
+        `"${c.company || ''}"`,
+        `"${c.phone}"`,
+        `"${c.email || ''}"`,
+        `"${c.address || ''}"`,
+        `"${c.city || ''}"`,
+        `"${c.country || ''}"`,
+        st.invoicesCount,
+        st.totalBilled,
+      ].join(';');
+    });
+
+    const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(';'), ...rows].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `clients_faktelio_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleImportSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const lines = csvInput
+      .split('\n')
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const parsed = lines.map((line) => {
+      const parts = line.split(';');
+      return {
+        name: parts[0] || '',
+        company: parts[1] || '',
+        email: parts[2] || '',
+        phone: parts[3] || '',
+        address: parts[4] || '',
+        city: parts[5] || 'Abidjan',
+      };
+    });
+    const count = workspaceService.importClients(companyId, parsed);
+    setImportModalOpen(false);
+    setCsvInput('');
+    setNotificationMsg(`${count} client(s) importé(s) avec succès.`);
+    loadAll();
+  };
+
+  const handleOpenFiche = (client: Client, initialTab: ClientFicheTab = 'info') => {
+    setSelectedClient(client);
+    setCrmNoteDraft(client.notes || '');
+    setFicheTab(initialTab);
+    setNoteSavedBanner(false);
+  };
+
+  const handleSaveCrmNotes = () => {
+    if (!selectedClient) return;
+    workspaceService.saveClient(companyId, {
+      ...selectedClient,
+      notes: crmNoteDraft,
+    });
+    setNoteSavedBanner(true);
+    setTimeout(() => setNoteSavedBanner(false), 3000);
+    loadAll();
+  };
+
+  const confirmDeleteClient = () => {
+    if (!deletingClient) return;
+    workspaceService.deleteClient(companyId, deletingClient.id);
+    if (selectedClient?.id === deletingClient.id) setSelectedClient(null);
+    setDeletingClient(null);
+    setNotificationMsg('Client supprimé avec succès.');
+    loadAll();
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Clients</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Gérez votre portefeuille clients, leur historique de facturation et leurs coordonnées.
+          <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
+            Clients &amp; CRM
+          </h1>
+          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+            Centralisez vos contacts, coordonnées, historique des factures et notes commerciales.
           </p>
         </div>
 
-        <button
-          onClick={onOpenNewClient}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-md shadow-purple-600/20 transition-transform hover:-translate-y-0.5 cursor-pointer self-start sm:self-auto"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Ajouter un client</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setImportModalOpen(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0]/70 text-[#101828] text-xs font-bold border border-[#E2E8F0] transition-colors cursor-pointer"
+          >
+            <Upload className="w-3.5 h-3.5 text-[#1E4F91]" />
+            Importer
+          </button>
+
+          {clients.length > 0 && (
+            <button
+              onClick={handleExportCsv}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#F5F7FA] hover:bg-[#E2E8F0]/70 text-[#101828] text-xs font-bold border border-[#E2E8F0] transition-colors cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-[#1E4F91]" />
+              Exporter ({clients.length})
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              setEditingClient(null);
+              setModalOpen(true);
+            }}
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            + Nouveau client
+          </button>
+        </div>
       </div>
 
-      <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            {filteredClients.length} client{filteredClients.length > 1 ? 's' : ''} enregistré
-            {filteredClients.length > 1 ? 's' : ''}
-          </p>
+      {notificationMsg && (
+        <div className="p-3.5 rounded-xl bg-[#DCFCE7] border border-[#16A34A]/30 text-[#15803D] text-xs font-bold flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            {notificationMsg}
+          </span>
+          <button onClick={() => setNotificationMsg(null)} className="text-xs underline cursor-pointer">
+            Fermer
+          </button>
+        </div>
+      )}
 
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+      {/* Search & Filters */}
+      {clients.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par nom, entreprise, tél..."
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-teal-500 outline-none bg-slate-50 focus:bg-white"
+              placeholder="Rechercher par nom, entreprise, téléphone ou email..."
+              className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-[#E2E8F0] focus:outline-none focus:border-[#1E4F91]"
             />
           </div>
-        </div>
 
-        {filteredClients.length === 0 ? (
-          <div className="py-12 text-center border-t border-slate-100 mt-4">
-            <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-3">
-              <Users className="w-6 h-6" />
-            </div>
-            <p className="text-sm font-bold text-slate-700">Aucun client trouvé</p>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              Ajoutez vos clients pour commencer à leur facturer des prestations ou produits.
+          <div className="flex items-center gap-2">
+            {(
+              [
+                { id: 'all', label: `Tous (${clients.length})` },
+                { id: 'with_invoices', label: 'Clients facturés' },
+                { id: 'vip', label: 'Clients VIP (+500k)' },
+              ] as const
+            ).map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilterType(f.id)}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                  filterType === f.id
+                    ? 'bg-[#1E4F91] text-white'
+                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Table or Empty State */}
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        {clients.length === 0 ? (
+          <div className="py-16 px-6 text-center">
+            <Users className="w-12 h-12 text-[#CBD5E1] mx-auto mb-3" />
+            <h3 className="text-base font-extrabold text-[#101828]">
+              Vous n&apos;avez encore aucun client.
+            </h3>
+            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-5">
+              Ajoutez les coordonnées de vos clients pour commencer à leur éditer des devis et des factures.
             </p>
+            <button
+              onClick={() => {
+                setEditingClient(null);
+                setModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              + Ajouter mon premier client
+            </button>
+          </div>
+        ) : filteredClients.length === 0 ? (
+          <div className="py-12 px-4 text-center">
+            <p className="text-sm font-bold text-[#101828]">Aucun client ne correspond à votre recherche.</p>
+            <button
+              onClick={() => {
+                setSearch('');
+                setFilterType('all');
+              }}
+              className="mt-2 text-xs font-bold text-[#1E4F91] hover:underline cursor-pointer"
+            >
+              Réinitialiser les filtres
+            </button>
           </div>
         ) : (
-          <div className="overflow-x-auto border-t border-slate-100 pt-2">
-            <table className="w-full text-left text-xs border-collapse">
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px] tracking-wider">
-                  <th className="py-3 px-3">Client</th>
-                  <th className="py-3 px-3">Contact</th>
-                  <th className="py-3 px-3 text-right">Total Facturé</th>
-                  <th className="py-3 px-3 text-right">Encaissé</th>
-                  <th className="py-3 px-3 text-right">Reste à payer</th>
-                  <th className="py-3 px-3 text-right">Actions</th>
+                <tr className="bg-[#F5F7FA] text-[11px] font-bold text-[#526581] uppercase tracking-wider border-b border-[#E2E8F0]">
+                  <th className="py-3.5 px-5">Nom</th>
+                  <th className="py-3.5 px-5">Téléphone</th>
+                  <th className="py-3.5 px-5">Email</th>
+                  <th className="py-3.5 px-5 text-center">Nombre de factures</th>
+                  <th className="py-3.5 px-5">Montant total</th>
+                  <th className="py-3.5 px-5">Dernière activité</th>
+                  <th className="py-3.5 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
-                {filteredClients.map((client) => {
+              <tbody className="divide-y divide-[#E2E8F0] text-sm">
+                {filteredClients
+                  .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                  .map((client) => {
                   const stats = getClientStats(client.id);
-
                   return (
-                    <tr key={client.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="py-3.5 px-3">
+                    <tr key={client.id} className="hover:bg-[#F5F7FA]/60 transition-colors">
+                      <td className="py-3.5 px-5">
                         <button
-                          onClick={() => setSelectedClientForDetail(client)}
-                          className="font-bold text-slate-900 hover:text-purple-600 hover:underline text-left cursor-pointer block"
+                          onClick={() => handleOpenFiche(client, 'info')}
+                          className="text-left group cursor-pointer"
                         >
-                          {client.name}
+                          <div className="font-extrabold text-[#101828] group-hover:text-[#1E4F91]">
+                            {client.name}
+                          </div>
+                          {client.company && (
+                            <div className="text-xs text-[#526581]">{client.company}</div>
+                          )}
                         </button>
-                        {client.company && (
-                          <span className="text-[11px] text-slate-400 font-medium block">
-                            {client.company}
-                          </span>
-                        )}
                       </td>
-                      <td className="py-3.5 px-3">
-                        <div className="space-y-0.5">
-                          <p className="font-semibold text-slate-700">{client.phone}</p>
-                          {client.email && <p className="text-[11px] text-slate-400">{client.email}</p>}
-                        </div>
+                      <td className="py-3.5 px-5 text-xs font-semibold text-[#101828]">
+                        {client.phone || '—'}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-extrabold text-slate-900">
-                        {stats.totalBilled.toLocaleString('fr-FR')} FCFA
+                      <td className="py-3.5 px-5 text-xs text-[#526581]">
+                        {client.email || '—'}
                       </td>
-                      <td className="py-3.5 px-3 text-right font-bold text-emerald-600">
-                        {stats.totalPaid.toLocaleString('fr-FR')} FCFA
+                      <td className="py-3.5 px-5 text-center">
+                        <span className="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#1E4F91]/10 text-[#1E4F91]">
+                          {stats.invoicesCount}
+                        </span>
                       </td>
-                      <td className="py-3.5 px-3 text-right font-bold text-amber-600">
-                        {stats.remaining.toLocaleString('fr-FR')} FCFA
+                      <td className="py-3.5 px-5 font-extrabold text-[#101828]">
+                        {formatFCFA(stats.totalBilled)}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
-                        <div className="flex items-center justify-end gap-1.5">
+                      <td className="py-3.5 px-5 text-xs text-[#526581]">
+                        {stats.lastActivity}
+                      </td>
+                      <td className="py-3.5 px-5 text-right">
+                        <div className="inline-flex items-center justify-end gap-1.5">
                           <button
-                            onClick={() => setSelectedClientForDetail(client)}
-                            title="Voir la fiche détaillée & historique"
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-purple-600 hover:bg-purple-50 transition-colors cursor-pointer"
+                            onClick={() => handleOpenFiche(client, 'info')}
+                            title="Ouvrir la fiche CRM complète"
+                            className="px-2.5 py-1.5 rounded-lg bg-[#1E4F91]/10 hover:bg-[#1E4F91] text-[#1E4F91] hover:text-white text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Eye className="w-3.5 h-3.5" />
+                            Fiche
                           </button>
-
                           <button
-                            onClick={() => onEditClient(client)}
-                            title="Modifier les coordonnées"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                            onClick={() => {
+                              setEditingClient(client);
+                              setModalOpen(true);
+                            }}
+                            title="Modifier"
+                            className="p-1.5 rounded-lg bg-[#F5F7FA] hover:bg-[#E2E8F0] text-[#526581] hover:text-[#101828] cursor-pointer"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
-
                           <button
-                            onClick={() => handleDelete(client.id, client.name)}
-                            title="Supprimer le client"
-                            className="p-1.5 rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                            onClick={() => setDeletingClient(client)}
+                            title="Supprimer"
+                            className="p-1.5 rounded-lg bg-[#FEE2E2]/60 hover:bg-[#FEE2E2] text-[#DC2626] cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -193,142 +429,427 @@ export function ClientsList({ onOpenNewClient, onEditClient, onViewInvoice }: Cl
               </tbody>
             </table>
           </div>
-        )}
-      </div>
 
-      {/* CLIENT DETAIL DRAWER / MODAL */}
-      {selectedClientForDetail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+          {filteredClients.length > itemsPerPage && (
+            <div className="px-6 py-4 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 text-xs text-[#526581]">
+              <span>
+                Affichage de {(currentPage - 1) * itemsPerPage + 1} à{' '}
+                {Math.min(currentPage * itemsPerPage, filteredClients.length)} sur{' '}
+                {filteredClients.length} clients
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  className="px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#101828] font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#F5F7FA] cursor-pointer"
+                >
+                  Précédent
+                </button>
+                {Array.from({ length: Math.ceil(filteredClients.length / itemsPerPage) }, (_, idx) => (
+                  <button
+                    key={idx + 1}
+                    type="button"
+                    onClick={() => setCurrentPage(idx + 1)}
+                    className={`w-8 h-8 rounded-lg font-bold cursor-pointer ${
+                      currentPage === idx + 1
+                        ? 'bg-[#1E4F91] text-white'
+                        : 'border border-[#E2E8F0] bg-white text-[#101828] hover:bg-[#F5F7FA]'
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  disabled={currentPage >= Math.ceil(filteredClients.length / itemsPerPage)}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                  className="px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#101828] font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#F5F7FA] cursor-pointer"
+                >
+                  Suivant
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+
+      {/* Confirmation Modal before Deleting Client */}
+      {deletingClient && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border border-[#E2E8F0] space-y-4">
+            <div className="flex items-center gap-3 text-[#DC2626]">
+              <AlertTriangle className="w-6 h-6 shrink-0" />
+              <h3 className="text-base font-extrabold text-[#101828]">Confirmer la suppression</h3>
+            </div>
+            <p className="text-xs text-[#526581] leading-relaxed">
+              Êtes-vous sûr de vouloir supprimer le client <strong>{deletingClient.name}</strong> ? Cette action est irréversible.
+            </p>
+            <div className="flex justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeletingClient(null)}
+                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteClient}
+                className="px-4 py-2 rounded-xl bg-[#DC2626] text-white text-xs font-extrabold hover:bg-[#B91C1C] cursor-pointer"
+              >
+                Supprimer définitivement
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fiche Client Complète */}
+      {selectedClient && (
+        <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
+            {/* Header */}
+            <div className="p-6 bg-[#1E4F91] text-white flex items-start justify-between gap-4">
               <div>
-                <span className="text-xs font-bold text-purple-600 uppercase tracking-wider">
-                  Fiche Client
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-white/15 text-[10px] font-extrabold uppercase tracking-wider mb-1.5">
+                  Fiche Client CRM
                 </span>
-                <h3 className="text-xl font-black text-slate-900 mt-0.5">
-                  {selectedClientForDetail.name}
-                </h3>
-                {selectedClientForDetail.company && (
-                  <p className="text-sm font-semibold text-slate-500">
-                    {selectedClientForDetail.company}
-                  </p>
+                <h2 className="text-xl font-extrabold">{selectedClient.name}</h2>
+                {selectedClient.company && (
+                  <p className="text-xs text-white/85 font-medium">{selectedClient.company}</p>
                 )}
               </div>
               <button
-                onClick={() => setSelectedClientForDetail(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600"
+                onClick={() => setSelectedClient(null)}
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Financial Overview for this client */}
-            {(() => {
-              const s = getClientStats(selectedClientForDetail.id);
-              const clientInvoices = allInvoices.filter(
-                (i) => i.clientId === selectedClientForDetail.id
-              );
-              const clientQuotes = allQuotes.filter((q) => q.clientId === selectedClientForDetail.id);
+            {/* 6 Tabs */}
+            <div className="px-6 pt-3 bg-[#F5F7FA] border-b border-[#E2E8F0] flex items-center gap-2 overflow-x-auto">
+              {(
+                [
+                  { id: 'info', label: 'Informations', icon: User },
+                  { id: 'history', label: 'Historique', icon: History },
+                  { id: 'invoices', label: 'Factures', icon: FileText },
+                  { id: 'quotes', label: 'Devis', icon: FileCheck2 },
+                  { id: 'payments', label: 'Paiements', icon: Wallet },
+                  { id: 'notes', label: 'Notes', icon: StickyNote },
+                ] as const
+              ).map((tab) => {
+                const Icon = tab.icon;
+                const active = ficheTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setFicheTab(tab.id)}
+                    className={`px-3.5 py-2.5 text-xs font-extrabold rounded-t-xl inline-flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
+                      active
+                        ? 'bg-white text-[#1E4F91] border-[#F47B20]'
+                        : 'text-[#526581] border-transparent hover:text-[#101828]'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
 
-              return (
-                <div className="mt-5 space-y-6">
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Total Facturé</span>
-                      <p className="text-base font-extrabold text-slate-900 mt-1">
-                        {s.totalBilled.toLocaleString('fr-FR')} FCFA
-                      </p>
-                    </div>
-                    <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100">
-                      <span className="text-[10px] font-bold text-emerald-800 uppercase">Encaissé</span>
-                      <p className="text-base font-extrabold text-emerald-700 mt-1">
-                        {s.totalPaid.toLocaleString('fr-FR')} FCFA
-                      </p>
-                    </div>
-                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-100">
-                      <span className="text-[10px] font-bold text-amber-800 uppercase">Reste dû</span>
-                      <p className="text-base font-extrabold text-amber-700 mt-1">
-                        {s.remaining.toLocaleString('fr-FR')} FCFA
-                      </p>
-                    </div>
-                  </div>
+            {/* Tab Body */}
+            <div className="p-6 max-h-[65vh] overflow-y-auto">
+              {(() => {
+                const st = getClientStats(selectedClient.id);
 
-                  {/* Contact Info */}
-                  <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-2 text-xs">
-                    <div className="flex items-center gap-2 text-slate-700">
-                      <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                      <span>{selectedClientForDetail.phone}</span>
-                    </div>
-                    {selectedClientForDetail.email && (
-                      <div className="flex items-center gap-2 text-slate-700">
-                        <Mail className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span>{selectedClientForDetail.email}</span>
+                if (ficheTab === 'info') {
+                  return (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                          <p className="text-[11px] font-bold text-[#526581] uppercase">Chiffre d&apos;affaires</p>
+                          <p className="text-lg font-extrabold text-[#1E4F91] mt-1">
+                            {formatFCFA(st.totalBilled)}
+                          </p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                          <p className="text-[11px] font-bold text-[#526581] uppercase">Factures &amp; Devis</p>
+                          <p className="text-lg font-extrabold text-[#101828] mt-1">
+                            {st.invoicesCount} factures • {st.quotesCount} devis
+                          </p>
+                        </div>
+                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                          <p className="text-[11px] font-bold text-[#526581] uppercase">Dernière activité</p>
+                          <p className="text-sm font-extrabold text-[#101828] mt-1">
+                            {st.lastActivity}
+                          </p>
+                        </div>
                       </div>
-                    )}
-                    {(selectedClientForDetail.address || selectedClientForDetail.city) && (
-                      <div className="flex items-center gap-2 text-slate-700">
-                        <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span>
-                          {selectedClientForDetail.address}{' '}
-                          {selectedClientForDetail.city && `(${selectedClientForDetail.city})`}
-                        </span>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Invoices History */}
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                      Historique des factures ({clientInvoices.length})
-                    </h4>
-                    {clientInvoices.length === 0 ? (
-                      <p className="text-xs text-slate-400 italic">Aucune facture émise pour ce client.</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {clientInvoices.map((inv) => (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
+                        <div className="p-4 rounded-xl border border-[#E2E8F0] space-y-2">
+                          <div className="flex items-center gap-2 text-[#526581]">
+                            <Phone className="w-4 h-4 text-[#1E4F91]" />
+                            <span className="font-bold text-[#101828]">{selectedClient.phone || 'Non renseigné'}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#526581]">
+                            <Mail className="w-4 h-4 text-[#1E4F91]" />
+                            <span>{selectedClient.email || 'Non renseigné'}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[#526581]">
+                            <MapPin className="w-4 h-4 text-[#1E4F91]" />
+                            <span>
+                              {selectedClient.address ? `${selectedClient.address}, ` : ''}{selectedClient.city || 'Abidjan'} ({selectedClient.country || "Côte d'Ivoire"})
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+                          <p className="text-xs font-extrabold uppercase text-[#526581] mb-1">
+                            Notes CRM enregistrées
+                          </p>
+                          <p className="text-xs text-[#101828] leading-relaxed">
+                            {selectedClient.notes || 'Aucune note particulière sur ce client.'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (ficheTab === 'history') {
+                  return (
+                    <div className="space-y-3">
+                      <p className="text-xs font-bold text-[#526581] uppercase">
+                        Chronologie des opérations avec {selectedClient.name}
+                      </p>
+                      {st.clientInvoices.length === 0 && st.clientQuotes.length === 0 ? (
+                        <p className="text-sm text-[#526581] py-4 text-center">Aucun document pour le moment.</p>
+                      ) : (
+                        <div className="space-y-2.5">
+                          {st.clientInvoices.map((inv) => (
+                            <div
+                              key={inv.id}
+                              className="p-3.5 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex items-center justify-between text-xs"
+                            >
+                              <div>
+                                <span className="font-extrabold text-[#1E4F91]">
+                                  Facture {inv.number}
+                                </span>
+                                <span className="text-[#526581] ml-2">
+                                  Émise le {formatDateFr(inv.issueDate)}
+                                </span>
+                              </div>
+                              <span className="font-extrabold text-[#101828]">
+                                {formatFCFA(inv.totalTtc)}
+                              </span>
+                            </div>
+                          ))}
+                          {st.clientQuotes.map((quo) => (
+                            <div
+                              key={quo.id}
+                              className="p-3.5 rounded-xl bg-white border border-[#E2E8F0] flex items-center justify-between text-xs"
+                            >
+                              <div>
+                                <span className="font-extrabold text-[#F47B20]">
+                                  Devis {quo.number}
+                                </span>
+                                <span className="text-[#526581] ml-2">
+                                  Émis le {formatDateFr(quo.issueDate)}
+                                </span>
+                              </div>
+                              <span className="font-extrabold text-[#101828]">
+                                {formatFCFA(quo.totalTtc)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
+                if (ficheTab === 'invoices') {
+                  return (
+                    <div className="space-y-2.5">
+                      {st.clientInvoices.length === 0 ? (
+                        <p className="text-sm text-[#526581] text-center py-4">Aucune facture pour ce client.</p>
+                      ) : (
+                        st.clientInvoices.map((inv) => (
                           <div
                             key={inv.id}
-                            className="p-3 rounded-xl border border-slate-200 flex items-center justify-between text-xs hover:bg-slate-50 transition-colors"
+                            className="p-3.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between text-xs"
                           >
                             <div>
-                              <p className="font-bold text-slate-900">{inv.number}</p>
-                              <p className="text-[10px] text-slate-400">
-                                Émise le {new Date(inv.issueDate).toLocaleDateString('fr-FR')}
-                              </p>
+                              <p className="font-extrabold text-[#1E4F91]">{inv.number}</p>
+                              <p className="text-[#526581]">Échéance : {formatDateFr(inv.dueDate)}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-bold text-slate-900">
-                                {inv.totalTtc.toLocaleString('fr-FR')} FCFA
+                              <p className="font-extrabold text-[#101828]">{formatFCFA(inv.totalTtc)}</p>
+                              <p className="text-[11px] text-[#526581]">
+                                Reste : {formatFCFA(inv.remainingAmount)}
                               </p>
-                              <button
-                                onClick={() => {
-                                  setSelectedClientForDetail(null);
-                                  onViewInvoice(inv);
-                                }}
-                                className="text-[11px] font-bold text-teal-600 hover:underline"
-                              >
-                                Voir facture
-                              </button>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                        ))
+                      )}
+                    </div>
+                  );
+                }
 
-                  <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={() => setSelectedClientForDetail(null)}
-                      className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700"
-                    >
-                      Fermer
-                    </button>
+                if (ficheTab === 'quotes') {
+                  return (
+                    <div className="space-y-2.5">
+                      {st.clientQuotes.length === 0 ? (
+                        <p className="text-sm text-[#526581] text-center py-4">Aucun devis pour ce client.</p>
+                      ) : (
+                        st.clientQuotes.map((q) => (
+                          <div
+                            key={q.id}
+                            className="p-3.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between text-xs"
+                          >
+                            <div>
+                              <p className="font-extrabold text-[#101828]">{q.number}</p>
+                              <p className="text-[#526581]">Validité : {formatDateFr(q.expiryDate)}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-extrabold text-[#1E4F91]">{formatFCFA(q.totalTtc)}</p>
+                              <span className="text-[10px] font-bold uppercase text-[#F47B20]">
+                                {q.status}
+                              </span>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  );
+                }
+
+                if (ficheTab === 'payments') {
+                  return (
+                    <div className="space-y-2.5">
+                      {st.clientPayments.length === 0 ? (
+                        <p className="text-sm text-[#526581] text-center py-4">Aucun règlement enregistré pour ce client.</p>
+                      ) : (
+                        st.clientPayments.map((p) => (
+                          <div
+                            key={p.id}
+                            className="p-3.5 rounded-xl border border-[#E2E8F0] flex items-center justify-between text-xs"
+                          >
+                            <div>
+                              <p className="font-extrabold text-[#15803D]">
+                                +{formatFCFA(p.amount)} ({p.invoiceNumber})
+                              </p>
+                              <p className="text-[#526581]">Réf : {p.reference || '—'}</p>
+                            </div>
+                            <span className="text-[#526581]">{formatDateFr(p.paidAt)}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-3">
+                    <label className="block text-xs font-extrabold uppercase text-[#101828]">
+                      Notes commerciales &amp; préférences du client
+                    </label>
+                    <textarea
+                      rows={4}
+                      value={crmNoteDraft}
+                      onChange={(e) => setCrmNoteDraft(e.target.value)}
+                      placeholder="Ajoutez vos observations..."
+                      className="w-full p-3.5 rounded-xl border border-[#E2E8F0] text-sm text-[#101828] focus:outline-none focus:border-[#1E4F91]"
+                    />
+                    <div className="flex items-center justify-between">
+                      {noteSavedBanner ? (
+                        <span className="text-xs font-bold text-[#15803D] flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4" /> Notes enregistrées !
+                        </span>
+                      ) : (
+                        <span />
+                      )}
+                      <button
+                        type="button"
+                        onClick={handleSaveCrmNotes}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#1E4F91] text-white text-xs font-bold cursor-pointer"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        Enregistrer la note
+                      </button>
+                    </div>
                   </div>
-                </div>
-              );
-            })()}
+                );
+              })()}
+            </div>
           </div>
         </div>
+      )}
+
+      {/* Import Clients Modal */}
+      {importModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#E2E8F0] p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-extrabold text-[#101828]">
+                Importer des clients (Format CSV)
+              </h3>
+              <button
+                onClick={() => setImportModalOpen(false)}
+                className="p-1.5 rounded-lg text-[#526581] hover:text-[#101828]"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-xs text-[#526581]">
+              Collez vos lignes au format :{' '}
+              <code className="bg-[#F5F7FA] px-1.5 py-0.5 rounded font-mono text-[#1E4F91]">
+                Nom;Entreprise;Email;Téléphone;Adresse;Ville
+              </code>
+            </p>
+            <form onSubmit={handleImportSubmit} className="space-y-4">
+              <textarea
+                rows={4}
+                required
+                value={csvInput}
+                onChange={(e) => setCsvInput(e.target.value)}
+                placeholder="Exemple : Jean Dupont;Dupont SARL;jean@dupont.ci;+225 07 10 20 30 40;Zone 4;Abidjan"
+                className="w-full p-3 rounded-xl border border-[#E2E8F0] text-xs font-mono text-[#101828]"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setImportModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581]"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-[#F47B20] text-white text-xs font-extrabold cursor-pointer"
+                >
+                  Importer dans FAKTELIO
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {modalOpen && (
+        <ClientModal
+          client={editingClient}
+          onClose={() => setModalOpen(false)}
+          onSaved={() => {
+            setModalOpen(false);
+            setNotificationMsg(editingClient ? 'Client mis à jour.' : 'Nouveau client créé avec succès.');
+            loadAll();
+          }}
+        />
       )}
     </div>
   );

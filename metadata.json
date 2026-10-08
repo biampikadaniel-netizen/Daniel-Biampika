@@ -1,6 +1,6 @@
 {
-  "name": "Chapfacture — Logiciel de facturation, devis & gestion commerciale pour PME",
-  "description": "Créez vos devis et factures en moins de 30 secondes, suivez vos paiements et relancez vos clients par WhatsApp. Le logiciel de facturation simple pour PME, commerçants, prestataires et freelances. Essai gratuit, sans carte bancaire.",
+  "name": "FAKTELIO — Logiciel de facturation, devis & gestion commerciale pour PME",
+  "description": "Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur. Créez vos devis et factures en quelques secondes.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

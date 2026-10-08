@@ -1,563 +1,331 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Save, Building2, Palette, Stamp, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { settingsStorage, authStorage } from '../../services/storage';
-import type { CompanySettings } from '../../types';
-import {
-  Building2,
-  User,
-  Sliders,
-  Bell,
-  Lock,
-  Save,
-  CheckCircle2,
-  AlertCircle,
-} from 'lucide-react';
+import { workspaceService } from '../../services/storage';
+import { CompanySettings } from '../../types';
+import { FaktelioLogo } from '../common/FaktelioLogo';
 
 export function SettingsView() {
-  const { currentUser, refreshUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<'profile' | 'company' | 'invoicing' | 'notifications' | 'security'>(
-    'company'
-  );
+  const { user, updateUser } = useAuth();
+  const [settings, setSettings] = useState<CompanySettings | null>(null);
+  const [savedBanner, setSavedBanner] = useState(false);
 
-  const [savedSuccess, setSavedSuccess] = useState(false);
-  const [passwordSuccess, setPasswordSuccess] = useState(false);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-
-  // Form states
-  const [name, setName] = useState(currentUser?.name || '');
-  const [phone, setPhone] = useState(currentUser?.phone || '');
-
-  // Settings
-  const currentSettings = currentUser ? settingsStorage.getSettings(currentUser.id) : null;
-  const [companyName, setCompanyName] = useState(currentSettings?.name || '');
-  const [companyAddress, setCompanyAddress] = useState(currentSettings?.address || '');
-  const [companyCity, setCompanyCity] = useState(currentSettings?.city || '');
-  const [companyPhone, setCompanyPhone] = useState(currentSettings?.phone || '');
-  const [companyEmail, setCompanyEmail] = useState(currentSettings?.email || '');
-  const [companyWebsite, setCompanyWebsite] = useState(currentSettings?.website || '');
-  const [taxNumber, setTaxNumber] = useState(currentSettings?.taxNumber || '');
-
-  // Invoicing
-  const [currency, setCurrency] = useState(currentSettings?.currency || 'FCFA');
-  const [defaultVatRate, setDefaultVatRate] = useState<number>(currentSettings?.defaultVatRate ?? 18);
-  const [invoicePrefix, setInvoicePrefix] = useState(currentSettings?.invoicePrefix || 'FAC-');
-  const [quotePrefix, setQuotePrefix] = useState(currentSettings?.quotePrefix || 'DEV-');
-  const [paymentTerms, setPaymentTerms] = useState(
-    currentSettings?.paymentTerms || 'Paiement à réception de facture par Mobile Money ou Virement bancaire.'
-  );
-
-  // Security
-  const [currentPwd, setCurrentPwd] = useState('');
-  const [newPwd, setNewPwd] = useState('');
-  const [confirmPwd, setConfirmPwd] = useState('');
-
-  if (!currentUser) return null;
-
-  const handleSaveCompany = (e: React.FormEvent) => {
-    e.preventDefault();
-    settingsStorage.updateSettings(currentUser.id, {
-      name: companyName,
-      address: companyAddress,
-      city: companyCity,
-      phone: companyPhone,
-      email: companyEmail,
-      website: companyWebsite,
-      taxNumber,
-      currency,
-      defaultVatRate,
-      invoicePrefix,
-      quotePrefix,
-      paymentTerms,
-    });
-
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
-  };
-
-  const handleSaveProfile = (e: React.FormEvent) => {
-    e.preventDefault();
-    authStorage.updateUserProfile(currentUser.id, {
-      name,
-      phone,
-      companyName,
-    });
-    refreshUser();
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
-  };
-
-  const handleChangePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPasswordError(null);
-    setPasswordSuccess(false);
-
-    if (newPwd.length < 6) {
-      setPasswordError('Le nouveau mot de passe doit comporter au moins 6 caractères.');
-      return;
+  useEffect(() => {
+    if (user) {
+      setSettings(workspaceService.getSettings(user.id));
     }
+  }, [user]);
 
-    if (newPwd !== confirmPwd) {
-      setPasswordError('Les mots de passe ne correspondent pas.');
-      return;
-    }
+  if (!user || !settings) return null;
 
-    const ok = authStorage.changePassword(currentUser.id, currentPwd, newPwd);
-    if (!ok) {
-      setPasswordError('Le mot de passe actuel est incorrect.');
-      return;
-    }
-
-    setPasswordSuccess(true);
-    setCurrentPwd('');
-    setNewPwd('');
-    setConfirmPwd('');
-    setTimeout(() => setPasswordSuccess(false), 3000);
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    workspaceService.saveSettings(user.id, settings);
+    updateUser({ companyName: settings.name });
+    setSavedBanner(true);
+    setTimeout(() => setSavedBanner(false), 3500);
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Paramètres</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Personnalisez les coordonnées de votre entreprise, vos mentions légales et vos préférences de facturation.
-        </p>
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
+            Paramètres &amp; Documents Personnalisés FAKTELIO
+          </h1>
+          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+            Personnalisez le logo, les couleurs, les informations entreprise, la signature, le cachet et les conditions de paiement de vos factures PDF.
+          </p>
+        </div>
       </div>
 
-      {savedSuccess && (
-        <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-          <span>Vos modifications ont été enregistrées avec succès !</span>
+      {savedBanner && (
+        <div className="p-4 rounded-2xl bg-[#DCFCE7] border border-[#16A34A]/30 text-[#15803D] text-sm font-bold flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4" />
+          Vos paramètres et la personnalisation de vos documents FAKTELIO ont été enregistrés.
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-2xl overflow-x-auto text-xs font-bold">
-        <button
-          onClick={() => setActiveTab('company')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'company' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <Building2 className="w-4 h-4 text-teal-600" />
-          <span>Entreprise &amp; Mentions</span>
-        </button>
+      <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-8 space-y-6">
+          {/* Informations Entreprise */}
+          <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#F5F7FA]">
+              <Building2 className="w-5 h-5 text-[#1E4F91]" />
+              <h2 className="text-base font-extrabold text-[#101828]">
+                Informations de l&apos;entreprise
+              </h2>
+            </div>
 
-        <button
-          onClick={() => setActiveTab('invoicing')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'invoicing' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <Sliders className="w-4 h-4 text-[#295294]" />
-          <span>Facturation &amp; TVA</span>
-        </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2 p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-white border border-[#E2E8F0] p-1 flex items-center justify-center overflow-hidden shrink-0">
+                    {settings.logoUrl ? (
+                      <img src={settings.logoUrl} alt="Logo entreprise" className="max-w-full max-h-full object-contain" />
+                    ) : (
+                      <span className="text-[10px] font-bold text-[#526581] text-center">Aucun logo</span>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-[#101828]">Logo officiel de l&apos;entreprise</label>
+                    <p className="text-[11px] text-[#526581] mt-0.5">
+                      S&apos;affichera sur vos factures PDF certifiées et vos devis.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="px-3.5 py-2 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs font-bold cursor-pointer transition-colors">
+                    <span>{settings.logoUrl ? 'Changer le logo' : 'Téléverser un logo'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setSettings({ ...settings, logoUrl: event.target?.result as string });
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                  {settings.logoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setSettings({ ...settings, logoUrl: '' })}
+                      className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#DC2626] hover:bg-[#FEE2E2] cursor-pointer"
+                    >
+                      Supprimer
+                    </button>
+                  )}
+                </div>
+              </div>
 
-        <button
-          onClick={() => setActiveTab('profile')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'profile' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <User className="w-4 h-4 text-purple-600" />
-          <span>Mon profil</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('notifications')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'notifications' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <Bell className="w-4 h-4 text-amber-600" />
-          <span>Notifications</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('security')}
-          className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
-            activeTab === 'security' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
-          }`}
-        >
-          <Lock className="w-4 h-4 text-slate-600" />
-          <span>Sécurité</span>
-        </button>
-      </div>
-
-      {/* Tab: Company */}
-      {activeTab === 'company' && (
-        <form onSubmit={handleSaveCompany} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-extrabold text-slate-900">Coordonnées de l'entreprise</h2>
-            <p className="text-xs text-slate-500">
-              Ces informations apparaîtront sur l'en-tête de vos devis et factures PDF.
-            </p>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">
+                  Raison sociale / Nom commercial *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={settings.name}
+                  onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">
+                  NIF / RCCM / Identifiant fiscal
+                </label>
+                <input
+                  type="text"
+                  value={settings.taxNumber || ''}
+                  onChange={(e) => setSettings({ ...settings, taxNumber: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">Téléphone</label>
+                <input
+                  type="text"
+                  value={settings.phone}
+                  onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">Email</label>
+                <input
+                  type="email"
+                  value={settings.email}
+                  onChange={(e) => setSettings({ ...settings, email: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">Adresse</label>
+                <input
+                  type="text"
+                  value={settings.address}
+                  onChange={(e) => setSettings({ ...settings, address: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">Ville &amp; Pays</label>
+                <input
+                  type="text"
+                  value={settings.city}
+                  onChange={(e) => setSettings({ ...settings, city: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Personnalisation Visuelle, Signature, Cachet & Conditions */}
+          <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[#F5F7FA]">
+              <Palette className="w-5 h-5 text-[#F47B20]" />
+              <h2 className="text-base font-extrabold text-[#101828]">
+                Personnalisation des documents (Logo, Couleurs, Signature &amp; Cachet)
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1.5">
+                  Couleur principale des factures &amp; devis
+                </label>
+                <div className="flex items-center gap-2.5">
+                  {['#1E4F91', '#2D5FA8', '#F47B20', '#0F172A', '#15803D'].map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setSettings({ ...settings, accentColor: color })}
+                      className={`w-8 h-8 rounded-full border-2 transition-transform cursor-pointer ${
+                        (settings.accentColor || '#1E4F91') === color
+                          ? 'scale-110 border-[#101828]'
+                          : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: color }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">
+                  Mention Signature &amp; Cachet officiel
+                </label>
+                <input
+                  type="text"
+                  value={settings.signatureText || ''}
+                  onChange={(e) => setSettings({ ...settings, signatureText: e.target.value })}
+                  placeholder="Ex: La Direction Générale — Certifié"
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">
+                  Préfixe Factures
+                </label>
+                <input
+                  type="text"
+                  value={settings.invoicePrefix}
+                  onChange={(e) => setSettings({ ...settings, invoicePrefix: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">Préfixe Devis</label>
+                <input
+                  type="text"
+                  value={settings.quotePrefix}
+                  onChange={(e) => setSettings({ ...settings, quotePrefix: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-mono"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-[#101828] mb-1">
+                  TVA par défaut (%)
+                </label>
+                <input
+                  type="number"
+                  value={settings.defaultVatRate}
+                  onChange={(e) =>
+                    setSettings({ ...settings, defaultVatRate: Number(e.target.value) })
+                  }
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Nom commercial / Raison sociale
+              <label className="block text-xs font-bold text-[#101828] mb-1">
+                Conditions de paiement par défaut
+              </label>
+              <textarea
+                rows={2}
+                value={settings.paymentTerms}
+                onChange={(e) => setSettings({ ...settings, paymentTerms: e.target.value })}
+                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-[#101828] mb-1">
+                Coordonnées bancaires / Mobile Money affichées en pied de facture
               </label>
               <input
                 type="text"
-                required
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
+                value={settings.bankDetails || ''}
+                onChange={(e) => setSettings({ ...settings, bankDetails: e.target.value })}
+                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                NIF / Numéro RCCM
-              </label>
-              <input
-                type="text"
-                value={taxNumber}
-                onChange={(e) => setTaxNumber(e.target.value)}
-                placeholder="Ex: CI-ABJ-2023-B-12345"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Adresse du siège
-              </label>
-              <input
-                type="text"
-                value={companyAddress}
-                onChange={(e) => setCompanyAddress(e.target.value)}
-                placeholder="Cocody Angré 7e Tranche"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Ville &amp; Pays
-              </label>
-              <input
-                type="text"
-                value={companyCity}
-                onChange={(e) => setCompanyCity(e.target.value)}
-                placeholder="Abidjan, Côte d'Ivoire"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Téléphone officiel
-              </label>
-              <input
-                type="text"
-                value={companyPhone}
-                onChange={(e) => setCompanyPhone(e.target.value)}
-                placeholder="+225 27 00 00 00 00"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Email commercial
-              </label>
-              <input
-                type="email"
-                value={companyEmail}
-                onChange={(e) => setCompanyEmail(e.target.value)}
-                placeholder="contact@entreprise.ci"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-4 border-t border-slate-100">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-extrabold shadow-md shadow-teal-600/20 cursor-pointer"
-            >
-              <Save className="w-4 h-4" />
-              <span>Enregistrer les coordonnées</span>
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Tab: Invoicing */}
-      {activeTab === 'invoicing' && (
-        <form onSubmit={handleSaveCompany} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-extrabold text-slate-900">Préférences de Facturation</h2>
-            <p className="text-xs text-slate-500">
-              Paramétrez les préfixes de numérotation, devise et taux de taxe.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Devise par défaut
-              </label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium bg-white"
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs sm:text-sm font-extrabold shadow-md transition-all cursor-pointer"
               >
-                <option value="FCFA">FCFA (Franc CFA - XOF / XAF)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="USD">USD ($)</option>
-              </select>
+                <Save className="w-4 h-4" />
+                Enregistrer la configuration FAKTELIO
+              </button>
             </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Taux de TVA par défaut (%)
-              </label>
-              <select
-                value={defaultVatRate}
-                onChange={(e) => setDefaultVatRate(parseInt(e.target.value))}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium bg-white"
-              >
-                <option value={18}>18% (Taux normal UEMOA)</option>
-                <option value={0}>0% (Régime simplifié / Exonéré)</option>
-                <option value={9}>9% (Taux réduit)</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Préfixe factures
-              </label>
-              <input
-                type="text"
-                value={invoicePrefix}
-                onChange={(e) => setInvoicePrefix(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Préfixe devis
-              </label>
-              <input
-                type="text"
-                value={quotePrefix}
-                onChange={(e) => setQuotePrefix(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-mono font-bold"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Conditions de paiement par défaut
-            </label>
-            <textarea
-              rows={3}
-              value={paymentTerms}
-              onChange={(e) => setPaymentTerms(e.target.value)}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium"
-            />
-          </div>
-
-          <div className="flex justify-end pt-4 border-t border-slate-100">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-extrabold shadow-md shadow-teal-600/20 cursor-pointer"
-            >
-              <Save className="w-4 h-4" />
-              <span>Enregistrer les préférences</span>
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Tab: Profile */}
-      {activeTab === 'profile' && (
-        <form onSubmit={handleSaveProfile} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-extrabold text-slate-900">Informations personnelles</h2>
-            <p className="text-xs text-slate-500">Gérez vos identifiants d'accès utilisateur.</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Nom complet
-              </label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Numéro WhatsApp personnel
-              </label>
-              <input
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Email de connexion
-            </label>
-            <input
-              type="email"
-              disabled
-              value={currentUser.email}
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-100 text-xs font-medium text-slate-500 cursor-not-allowed"
-            />
-            <p className="text-[10px] text-slate-400 mt-1">L'adresse email ne peut pas être modifiée.</p>
-          </div>
-
-          <div className="flex justify-end pt-4 border-t border-slate-100">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-extrabold shadow-md shadow-purple-600/20 cursor-pointer"
-            >
-              <Save className="w-4 h-4" />
-              <span>Mettre à jour le profil</span>
-            </button>
-          </div>
-        </form>
-      )}
-
-      {/* Tab: Notifications */}
-      {activeTab === 'notifications' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-extrabold text-slate-900">Préférences d'alerte</h2>
-            <p className="text-xs text-slate-500">Choisissez comment vous souhaitez être notifié.</p>
-          </div>
-
-          <div className="space-y-4">
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-teal-600 mt-0.5" />
-              <div>
-                <span className="text-xs font-bold text-slate-800 block">Alertes de stock faible</span>
-                <span className="text-[11px] text-slate-500">
-                  Recevez un avertissement dès qu'un produit atteint son seuil d'alerte.
-                </span>
-              </div>
-            </label>
-
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-teal-600 mt-0.5" />
-              <div>
-                <span className="text-xs font-bold text-slate-800 block">Notifications de paiement</span>
-                <span className="text-[11px] text-slate-500">
-                  Notification instantanée lors de chaque enregistrement d'encaissement.
-                </span>
-              </div>
-            </label>
-
-            <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 rounded text-teal-600 mt-0.5" />
-              <div>
-                <span className="text-xs font-bold text-slate-800 block">Rappels de relances WhatsApp</span>
-                <span className="text-[11px] text-slate-500">
-                  Rappels automatiques lorsque des factures dépassent leur date d'échéance.
-                </span>
-              </div>
-            </label>
           </div>
         </div>
-      )}
 
-      {/* Tab: Security */}
-      {activeTab === 'security' && (
-        <form onSubmit={handleChangePassword} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs space-y-6">
-          <div className="border-b border-slate-100 pb-4">
-            <h2 className="text-base font-extrabold text-slate-900">Modifier mon mot de passe</h2>
-            <p className="text-xs text-slate-500">Sécurisez votre compte avec un mot de passe robuste.</p>
-          </div>
+        {/* Live Document Preview Card */}
+        <div className="lg:col-span-4 bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-4">
+          <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#526581]">
+            Aperçu en direct de vos documents
+          </h3>
 
-          {passwordError && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-bold text-red-700 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{passwordError}</span>
-            </div>
-          )}
-
-          {passwordSuccess && (
-            <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0" />
-              <span>Votre mot de passe a été modifié avec succès !</span>
-            </div>
-          )}
-
-          <div className="space-y-4 max-w-sm">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Mot de passe actuel
-              </label>
-              <input
-                type="password"
-                required
-                value={currentPwd}
-                onChange={(e) => setCurrentPwd(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Nouveau mot de passe
-              </label>
-              <input
-                type="password"
-                required
-                value={newPwd}
-                onChange={(e) => setNewPwd(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Confirmer le nouveau mot de passe
-              </label>
-              <input
-                type="password"
-                required
-                value={confirmPwd}
-                onChange={(e) => setConfirmPwd(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end pt-4 border-t border-slate-100">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-extrabold shadow-md cursor-pointer"
+          <div className="p-4 rounded-xl border border-[#E2E8F0] bg-[#F5F7FA]/50 space-y-3">
+            <div
+              className="pb-3 border-b-2 flex items-start justify-between"
+              style={{ borderColor: settings.accentColor || '#1E4F91' }}
             >
-              <Lock className="w-4 h-4" />
-              <span>Changer le mot de passe</span>
-            </button>
+              <div>
+                <FaktelioLogo size="sm" />
+                <p className="text-xs font-extrabold text-[#101828] mt-1">{settings.name}</p>
+                <p className="text-[10px] text-[#526581]">{settings.city}</p>
+              </div>
+              <span
+                className="px-2 py-0.5 rounded text-[10px] font-extrabold text-white"
+                style={{ backgroundColor: settings.accentColor || '#1E4F91' }}
+              >
+                {settings.invoicePrefix}001
+              </span>
+            </div>
+
+            <div className="text-[11px] text-[#526581] space-y-1">
+              <p>
+                <strong>Conditions :</strong> {settings.paymentTerms}
+              </p>
+            </div>
+
+            <div className="p-2.5 rounded-lg border border-dashed border-[#1E4F91]/40 bg-white flex items-center gap-2">
+              <Stamp className="w-4 h-4 text-[#1E4F91]" />
+              <div>
+                <p className="text-[9px] font-bold uppercase text-[#1E4F91]">Signature &amp; Cachet</p>
+                <p className="text-[11px] font-bold text-[#101828]">
+                  {settings.signatureText || settings.name}
+                </p>
+              </div>
+            </div>
           </div>
-        </form>
-      )}
+        </div>
+      </form>
     </div>
   );
 }

@@ -1,76 +1,80 @@
-import type { Testimonial } from '../types';
+import React from 'react';
+import { Star, Quote as QuoteIcon } from 'lucide-react';
+import { Testimonial } from '../types';
 
-const TESTIMONIALS: Testimonial[] = [
+const testimonials: Testimonial[] = [
   {
     quote:
-      '« Avant, je passais mes dimanches soirs à faire des factures sur Word. Aujourd’hui, je les fais directement depuis mon téléphone au magasin. Mes clients sont impressionnés par le rendu professionnel. »',
-    initials: 'AK',
-    name: 'Amadou K.',
-    role: 'Boutique de prêt-à-porter',
-    city: 'Abidjan',
-    gradient: 'from-emerald-500 to-teal-400',
-  },
-  {
-    quote:
-      '« Le fait de pouvoir envoyer la facture par WhatsApp en un clic a tout changé pour moi. Les clients paient beaucoup plus vite, et le suivi des impayés est clair. Je ne perds plus d’argent. »',
+      'Avec FAKTELIO, mes commerciaux envoient les devis directement sur WhatsApp en sortant de rendez-vous. Dès que le client accepte, on transforme en facture en 1 clic.',
     initials: 'MD',
-    name: 'Mariam D.',
-    role: 'Prestations de services & Conseil',
-    city: 'Dakar',
-    gradient: 'from-teal-500 to-teal-400',
+    name: 'Moussa Diallo',
+    role: 'Directeur Général, Ivoire Équipements',
+    city: 'Abidjan',
+    gradient: 'bg-[#1E4F91]',
   },
   {
     quote:
-      '« Je ne suis pas très à l’aise avec l’informatique, mais Chapfacture est tellement simple que j’ai compris en 5 minutes. Mon comptable est ravi d’avoir des documents propres et numérotés. »',
-    initials: 'SA',
-    name: 'Seydou A.',
-    role: 'Menuiserie & Aménagement',
-    city: 'Cotonou',
-    gradient: 'from-emerald-600 to-emerald-400',
+      'Avant FAKTELIO, nous perdions un temps fou à chercher quelles factures étaient payées ou en attente. Aujourd’hui, tout notre tableau de bord et nos relances sont centralisés.',
+    initials: 'AT',
+    name: 'Aminata Touré',
+    role: 'Fondatrice, Agence Digitale Kora',
+    city: 'Dakar',
+    gradient: 'bg-[#F47B20]',
+  },
+  {
+    quote:
+      'La gestion du catalogue et les alertes de stock nous ont permis d’éviter les ruptures sur nos articles les plus vendus. L’interface est claire et très rapide.',
+    initials: 'JK',
+    name: 'Jean-Marc Koffi',
+    role: 'Gérant, ElectroPro Distribution',
+    city: 'Abidjan',
+    gradient: 'bg-[#2D5FA8]',
   },
 ];
 
 export function Testimonials() {
   return (
-    <section className="border-t border-slate-200/70 bg-slate-50/50 py-14 sm:py-20">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
-            Témoignages
+    <section className="py-20 bg-[#F5F7FA] border-b border-[#E2E8F0]">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-14">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+            Avis Clients
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Ils ont simplifié leur gestion</h2>
-          <p className="mt-4 text-slate-600">
-            Découvrez comment des entrepreneurs transforment leur quotidien avec Chapfacture.
-          </p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight">
+            Ils gèrent leur facturation au quotidien avec FAKTELIO
+          </h2>
         </div>
 
-        <div className="reveal mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {TESTIMONIALS.map((testimonial) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          {testimonials.map((t, i) => (
             <div
-              key={testimonial.name}
-              className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md"
+              key={i}
+              className="bg-white rounded-2xl p-7 border border-[#E2E8F0] shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="flex gap-0.5 text-teal-400">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-1 text-[#F47B20]">
+                    {[...Array(5)].map((_, idx) => (
+                      <Star key={idx} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <QuoteIcon className="w-6 h-6 text-[#1E4F91]/15" />
                 </div>
-                <p className="mt-4 text-sm leading-relaxed text-slate-600">{testimonial.quote}</p>
+                <p className="text-sm sm:text-base text-[#101828] leading-relaxed mb-6">
+                  &ldquo;{t.quote}&rdquo;
+                </p>
               </div>
 
-              <div className="mt-6 flex items-center gap-3 border-t border-slate-100 pt-4">
-                <span
-                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr ${testimonial.gradient} text-xs font-bold text-white`}
+              <div className="flex items-center gap-3 pt-4 border-t border-[#F5F7FA]">
+                <div
+                  className={`w-10 h-10 rounded-full ${t.gradient} text-white text-xs font-extrabold flex items-center justify-center shrink-0`}
                 >
-                  {testimonial.initials}
-                </span>
+                  {t.initials}
+                </div>
                 <div>
-                  <p className="text-sm font-bold text-slate-900">{testimonial.name}</p>
-                  <p className="text-xs text-slate-500">
-                    {testimonial.role} • {testimonial.city}
+                  <p className="text-sm font-extrabold text-[#101828]">{t.name}</p>
+                  <p className="text-xs text-[#526581]">
+                    {t.role} • {t.city}
                   </p>
                 </div>
               </div>

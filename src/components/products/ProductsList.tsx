@@ -1,213 +1,387 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { productsStorage } from '../../services/storage';
-import type { Product } from '../../types';
+import React, { useState, useEffect } from 'react';
 import {
-  Package,
   Plus,
   Search,
+  Package,
+  Briefcase,
   Tag,
   Edit2,
   Trash2,
-  Boxes,
-  Layers,
-  ArrowRight,
+  Copy,
+  AlertTriangle,
+  CheckCircle2,
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { workspaceService, formatFCFA } from '../../services/storage';
+import { Product } from '../../types';
+import { ProductModal } from './ProductModal';
 
-interface ProductsListProps {
-  onOpenNewProduct: () => void;
-  onEditProduct: (product: Product) => void;
-  onNavigateStock: () => void;
-}
+export function ProductsList() {
+  const { user } = useAuth();
+  const companyId = user?.companyId || user?.id || '';
 
-export function ProductsList({
-  onOpenNewProduct,
-  onEditProduct,
-  onNavigateStock,
-}: ProductsListProps) {
-  const { currentUser, refreshUser } = useAuth();
-  const [filterType, setFilterType] = useState<'all' | 'product' | 'service'>('all');
+  const [products, setProducts] = useState<Product[]>([]);
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<'all' | 'product' | 'service' | 'categories'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('Toutes');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
 
-  if (!currentUser) return null;
+  const loadProducts = () => {
+    if (!companyId) return;
+    setProducts(workspaceService.getProducts(companyId));
+  };
 
-  const allProducts = productsStorage.getAll(currentUser.id);
+  useEffect(() => {
+    loadProducts();
+  }, [companyId]);
 
-  const filtered = allProducts.filter((p) => {
-    if (filterType !== 'all' && p.type !== filterType) return false;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      const matchName = p.name.toLowerCase().includes(q);
-      const matchRef = p.reference.toLowerCase().includes(q);
-      if (!matchName && !matchRef) return false;
-    }
+  if (!user) return null;
+
+  const categories = Array.from(
+    new Set(products.map((p) => p.category).filter(Boolean))
+  );
+
+  const filtered = products.filter((p) => {
+    const q = search.toLowerCase();
+    const matchesSearch =
+      p.name.toLowerCase().includes(q) ||
+      p.reference.toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q);
+
+    if (!matchesSearch) return false;
+    if (activeTab === 'product' && p.type !== 'product') return false;
+    if (activeTab === 'service' && p.type !== 'service') return false;
+    if (selectedCategory !== 'Toutes' && (p.category || '') !== selectedCategory) return false;
     return true;
   });
 
-  const handleDelete = (id: string, name: string) => {
-    if (window.confirm(`Voulez-vous supprimer « ${name} » du catalogue ?`)) {
-      productsStorage.delete(currentUser.id, id);
-      refreshUser();
-    }
+  const handleDuplicate = (product: Product) => {
+    workspaceService.duplicateProduct(companyId, product.id);
+    setNotificationMsg(`Article "${product.name}" dupliqué avec succès.`);
+    loadProducts();
+  };
+
+  const confirmDelete = () => {
+    if (!deletingProduct) return;
+    workspaceService.deleteProduct(companyId, deletingProduct.id);
+    setDeletingProduct(null);
+    setNotificationMsg('Article supprimé du catalogue.');
+    loadProducts();
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Header */}
+      <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Produits &amp; Services
+          <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
+            Catalogue Produits, Services &amp; Catégories
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Gérez votre catalogue de prix, prestations de services et articles marchands.
+          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+            Gérez vos références, tarifs, stocks réels et alertes de seuil minimum.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onNavigateStock}
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 shadow-xs cursor-pointer"
-          >
-            <Boxes className="w-4 h-4 text-orange-600" />
-            <span>Gestion du Stock</span>
-          </button>
-
-          <button
-            onClick={onOpenNewProduct}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-orange-600 hover:bg-orange-700 shadow-md shadow-orange-600/20 transition-transform hover:-translate-y-0.5 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Ajouter un article</span>
-          </button>
-        </div>
+        <button
+          onClick={() => {
+            setEditingProduct(null);
+            setModalOpen(true);
+          }}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer"
+        >
+          <Plus className="w-4 h-4" />
+          + Ajouter au catalogue
+        </button>
       </div>
 
-      <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-xs font-bold bg-slate-100 p-1 rounded-2xl">
-            {[
-              { id: 'all', label: 'Tous' },
-              { id: 'product', label: '📦 Produits' },
-              { id: 'service', label: '💼 Services' },
-            ].map((tab) => (
+      {notificationMsg && (
+        <div className="p-3.5 rounded-xl bg-[#DCFCE7] border border-[#16A34A]/30 text-[#15803D] text-xs font-bold flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            {notificationMsg}
+          </span>
+          <button onClick={() => setNotificationMsg(null)} className="text-xs underline cursor-pointer">
+            Fermer
+          </button>
+        </div>
+      )}
+
+      {/* Tabs & Search */}
+      {products.length > 0 && (
+        <div className="bg-white rounded-2xl p-4 border border-[#E2E8F0] shadow-xs space-y-3">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
               <button
-                key={tab.id}
-                onClick={() => setFilterType(tab.id as any)}
-                className={`px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
-                  filterType === tab.id
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                onClick={() => {
+                  setActiveTab('all');
+                  setSelectedCategory('Toutes');
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+                  activeTab === 'all'
+                    ? 'bg-[#1E4F91] text-white'
+                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
                 }`}
               >
-                {tab.label}
+                Tout ({products.length})
               </button>
-            ))}
-          </div>
-
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Rechercher par nom ou référence..."
-              className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium focus:border-teal-500 outline-none bg-slate-50 focus:bg-white"
-            />
-          </div>
-        </div>
-
-        {filtered.length === 0 ? (
-          <div className="py-12 text-center border-t border-slate-100 mt-4">
-            <div className="w-12 h-12 rounded-2xl bg-orange-50 text-orange-600 flex items-center justify-center mx-auto mb-3">
-              <Package className="w-6 h-6" />
+              <button
+                onClick={() => setActiveTab('product')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  activeTab === 'product'
+                    ? 'bg-[#1E4F91] text-white'
+                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                }`}
+              >
+                <Package className="w-3.5 h-3.5" />
+                Produits ({products.filter((p) => p.type === 'product').length})
+              </button>
+              <button
+                onClick={() => setActiveTab('service')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  activeTab === 'service'
+                    ? 'bg-[#1E4F91] text-white'
+                    : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                }`}
+              >
+                <Briefcase className="w-3.5 h-3.5" />
+                Services ({products.filter((p) => p.type === 'service').length})
+              </button>
+              {categories.length > 0 && (
+                <button
+                  onClick={() => setActiveTab('categories')}
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    activeTab === 'categories'
+                      ? 'bg-[#F47B20] text-white'
+                      : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                  }`}
+                >
+                  <Tag className="w-3.5 h-3.5" />
+                  Catégories ({categories.length})
+                </button>
+              )}
             </div>
-            <p className="text-sm font-bold text-slate-700">Aucun produit ou service</p>
-            <p className="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
-              Ajoutez vos tarifs pour les injecter automatiquement lors de la création de vos factures en 1 clic.
+
+            <div className="relative w-full md:w-72">
+              <Search className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher nom, référence..."
+                className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-[#E2E8F0] focus:outline-none focus:border-[#1E4F91]"
+              />
+            </div>
+          </div>
+
+          {categories.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#F5F7FA]">
+              <span className="text-[11px] font-bold text-[#526581] uppercase">Filtrer par catégorie :</span>
+              {['Toutes', ...categories].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                    selectedCategory === cat
+                      ? 'bg-[#1E4F91]/15 text-[#1E4F91] font-bold'
+                      : 'bg-[#F5F7FA] text-[#526581] hover:text-[#101828]'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Table or Empty State */}
+      <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-xs overflow-hidden">
+        {products.length === 0 ? (
+          <div className="py-16 px-6 text-center">
+            <Package className="w-12 h-12 text-[#CBD5E1] mx-auto mb-3" />
+            <h3 className="text-base font-extrabold text-[#101828]">
+              Votre catalogue est vide.
+            </h3>
+            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-5">
+              Ajoutez vos premiers produits ou services pour créer des factures et devis en 1 clic.
             </p>
+            <button
+              onClick={() => {
+                setEditingProduct(null);
+                setModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold shadow-sm cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              + Ajouter un produit
+            </button>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="py-12 px-4 text-center">
+            <p className="text-sm font-bold text-[#101828]">Aucun article ne correspond à votre filtre.</p>
+            <button
+              onClick={() => {
+                setSearch('');
+                setActiveTab('all');
+                setSelectedCategory('Toutes');
+              }}
+              className="mt-2 text-xs font-bold text-[#1E4F91] hover:underline cursor-pointer"
+            >
+              Réinitialiser les filtres
+            </button>
           </div>
         ) : (
-          <div className="overflow-x-auto border-t border-slate-100 pt-2">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 text-slate-400 uppercase font-bold text-[10px] tracking-wider">
-                  <th className="py-3 px-3">Référence</th>
-                  <th className="py-3 px-3">Désignation</th>
-                  <th className="py-3 px-3">Type</th>
-                  <th className="py-3 px-3 text-right">Prix HT</th>
-                  <th className="py-3 px-3 text-center">TVA</th>
-                  <th className="py-3 px-3 text-center">Stock</th>
-                  <th className="py-3 px-3 text-right">Actions</th>
+                <tr className="bg-[#F5F7FA] text-[11px] font-bold text-[#526581] uppercase tracking-wider border-b border-[#E2E8F0]">
+                  <th className="py-3.5 px-5">Référence</th>
+                  <th className="py-3.5 px-5">Nom &amp; Description</th>
+                  <th className="py-3.5 px-5">Catégorie</th>
+                  <th className="py-3.5 px-5">Prix Unitaire</th>
+                  <th className="py-3.5 px-5 text-center">TVA</th>
+                  <th className="py-3.5 px-5">Stock réel</th>
+                  <th className="py-3.5 px-5 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
-                {filtered.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="py-3.5 px-3 font-mono font-bold text-slate-700">{item.reference}</td>
-                    <td className="py-3.5 px-3">
-                      <p className="font-bold text-slate-900">{item.name}</p>
-                      {item.description && (
-                        <p className="text-[11px] text-slate-400 truncate max-w-xs">{item.description}</p>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-3">
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                          item.type === 'product'
-                            ? 'bg-orange-100 text-orange-800'
-                            : 'bg-blue-100 text-blue-800'
-                        }`}
-                      >
-                        {item.type === 'product' ? 'Produit' : 'Service'}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-3 text-right font-extrabold text-slate-900">
-                      {item.unitPrice.toLocaleString('fr-FR')} FCFA{' '}
-                      <span className="text-[10px] text-slate-400 font-normal">/{item.unit}</span>
-                    </td>
-                    <td className="py-3.5 px-3 text-center font-medium text-slate-600">{item.vatRate}%</td>
-                    <td className="py-3.5 px-3 text-center">
-                      {item.type === 'product' ? (
-                        <span
-                          className={`font-bold ${
-                            item.stock === 0
-                              ? 'text-red-600'
-                              : item.stock <= item.minStockAlert
-                              ? 'text-amber-600'
-                              : 'text-emerald-700'
-                          }`}
-                        >
-                          {item.stock} {item.unit}s
+              <tbody className="divide-y divide-[#E2E8F0] text-sm">
+                {filtered.map((item) => {
+                  const isLowStock = item.type === 'product' && item.stock <= item.minStockAlert;
+                  return (
+                    <tr key={item.id} className="hover:bg-[#F5F7FA]/60 transition-colors">
+                      <td className="py-3.5 px-5">
+                        <span className="font-mono text-xs font-extrabold text-[#1E4F91] bg-[#1E4F91]/8 px-2.5 py-1 rounded-lg">
+                          {item.reference}
                         </span>
-                      ) : (
-                        <span className="text-slate-400 italic">Illimité</span>
-                      )}
-                    </td>
-                    <td className="py-3.5 px-3 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => onEditProduct(item)}
-                          title="Modifier l'article"
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-                        >
-                          <Edit2 className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item.id, item.name)}
-                          title="Supprimer l'article"
-                          className="p-1.5 rounded-lg text-slate-300 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="py-3.5 px-5 max-w-xs">
+                        <div className="font-extrabold text-[#101828]">{item.name}</div>
+                        {item.description && (
+                          <div className="text-xs text-[#526581] truncate mt-0.5">
+                            {item.description}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-5">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#F5F7FA] text-[#526581] border border-[#E2E8F0]">
+                          {item.category || (item.type === 'service' ? 'Prestation' : 'Marchandise')}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-5 font-extrabold text-[#101828]">
+                        {formatFCFA(item.unitPrice)}
+                        <span className="text-[11px] font-normal text-[#526581]"> / {item.unit}</span>
+                      </td>
+                      <td className="py-3.5 px-5 text-center text-xs font-bold text-[#526581]">
+                        {item.vatRate}%
+                      </td>
+                      <td className="py-3.5 px-5">
+                        {item.type === 'service' ? (
+                          <span className="text-xs font-semibold text-[#526581]">
+                            Prestation de service
+                          </span>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`px-2.5 py-0.5 rounded-full text-xs font-extrabold ${
+                                isLowStock
+                                  ? 'bg-[#FEE2E2] text-[#DC2626]'
+                                  : 'bg-[#DCFCE7] text-[#15803D]'
+                              }`}
+                            >
+                              {item.stock} en stock
+                            </span>
+                            {item.minStockAlert > 0 && (
+                              <span className="text-[11px] text-[#526581]">
+                                (Seuil : {item.minStockAlert})
+                              </span>
+                            )}
+                            {isLowStock && <AlertTriangle className="w-4 h-4 text-[#DC2626]" />}
+                          </div>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-5 text-right">
+                        <div className="inline-flex items-center justify-end gap-1.5">
+                          <button
+                            onClick={() => {
+                              setEditingProduct(item);
+                              setModalOpen(true);
+                            }}
+                            title="Modifier"
+                            className="p-2 rounded-lg bg-[#F5F7FA] hover:bg-[#1E4F91] text-[#101828] hover:text-white transition-colors cursor-pointer"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDuplicate(item)}
+                            title="Dupliquer"
+                            className="p-2 rounded-lg bg-[#F5F7FA] hover:bg-[#F47B20] text-[#101828] hover:text-white transition-colors cursor-pointer"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setDeletingProduct(item)}
+                            title="Supprimer"
+                            className="p-2 rounded-lg bg-[#FEE2E2]/60 hover:bg-[#DC2626] text-[#DC2626] hover:text-white transition-colors cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal before Deleting Product */}
+      {deletingProduct && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border border-[#E2E8F0] space-y-4">
+            <div className="flex items-center gap-3 text-[#DC2626]">
+              <AlertTriangle className="w-6 h-6 shrink-0" />
+              <h3 className="text-base font-extrabold text-[#101828]">Confirmer la suppression</h3>
+            </div>
+            <p className="text-xs text-[#526581] leading-relaxed">
+              Êtes-vous sûr de vouloir supprimer l&apos;article <strong>{deletingProduct.name}</strong> ?
+            </p>
+            <div className="flex justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeletingProduct(null)}
+                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+              >
+                Annuler
+              </button>
+              <button
+                type="button"
+                onClick={confirmDelete}
+                className="px-4 py-2 rounded-xl bg-[#DC2626] text-white text-xs font-extrabold hover:bg-[#B91C1C] cursor-pointer"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalOpen && (
+        <ProductModal
+          product={editingProduct}
+          onClose={() => setModalOpen(false)}
+          onSaved={() => {
+            setModalOpen(false);
+            setNotificationMsg(editingProduct ? 'Article mis à jour.' : 'Nouvel article ajouté au catalogue.');
+            loadProducts();
+          }}
+        />
+      )}
     </div>
   );
 }

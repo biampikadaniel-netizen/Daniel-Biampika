@@ -1,113 +1,73 @@
-import type { ComparisonRow } from '../types';
+import React from 'react';
+import { Check, X } from 'lucide-react';
+import { ComparisonRow } from '../types';
+import { FaktelioLogo } from './common/FaktelioLogo';
 
-const COMPARISON_ROWS: ComparisonRow[] = [
+const rows: ComparisonRow[] = [
   {
-    feature: 'Créer un devis / une facture',
-    traditional: 'Long, tout à la main',
-    chapfacture: 'En moins de 30 secondes',
+    feature: 'Temps de création d’une facture',
+    traditional: '15 à 30 minutes (risque d’erreur de calcul)',
+    faktelio: '+30 secondes avec calcul automatique HT/TVA/TTC',
   },
   {
-    feature: 'Passer du devis à la facture',
-    traditional: "Copier-coller, risque d'erreur",
-    chapfacture: 'En un seul clic',
+    feature: 'Conversion Devis → Facture',
+    traditional: 'Ressaisie complète manuelle',
+    faktelio: 'En 1 clic sans aucune ressaisie',
   },
   {
-    feature: 'Calculs & TVA',
-    traditional: 'Erreurs de formules fréquentes',
-    chapfacture: 'Calculés automatiquement',
+    feature: 'Relances clients impayés',
+    traditional: 'Oublis fréquents, messages rédigés à la main',
+    faktelio: 'Message WhatsApp pré-rempli en 1 clic',
   },
   {
-    feature: 'Suivi des paiements',
-    traditional: 'Manuel ou introuvable',
-    chapfacture: 'En temps réel : payé / en attente',
+    feature: 'Suivi du stock et des alertes',
+    traditional: 'Déconnecté de la facturation',
+    faktelio: 'Synchronisé automatiquement à chaque facture',
   },
   {
-    feature: 'Relances clients',
-    traditional: 'Souvent oubliées',
-    chapfacture: 'En un clic sur WhatsApp',
-  },
-  {
-    feature: 'Image de marque',
-    traditional: 'Document basique',
-    chapfacture: 'Factures pro à votre logo',
-  },
-  {
-    feature: 'Sécurité & sauvegarde',
-    traditional: 'Fichier perdu = tout perdu',
-    chapfacture: 'Sauvegardé dans le cloud',
-  },
-  {
-    feature: 'Accès mobile',
-    traditional: 'Compliqué',
-    chapfacture: 'Depuis votre téléphone, partout',
+    feature: 'Accès depuis téléphone et ordinateur',
+    traditional: 'Fichiers bloqués sur un seul poste',
+    faktelio: 'Accessible 24/7 partout avec sauvegarde Cloud',
   },
 ];
 
 export function Comparison() {
   return (
-    <section className="py-14 sm:py-20">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
+    <section className="py-20 bg-white border-b border-[#E2E8F0]">
+      <div className="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-14">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#F47B20]/10 text-[#F47B20] text-xs font-extrabold uppercase tracking-wider mb-3">
             Comparatif
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-            Pourquoi abandonner Excel et Word ?
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight">
+            Pourquoi passer d&apos;Excel ou du papier à FAKTELIO ?
           </h2>
-          <p className="mt-4 text-slate-600">Voyez la différence entre vos anciennes méthodes et Chapfacture.</p>
         </div>
 
-        <div className="reveal mx-auto mt-12 max-w-4xl overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-          {/* Table Header */}
-          <div className="grid grid-cols-[1.3fr_1fr_1fr] items-center gap-2 border-b border-slate-200 bg-slate-50 px-4 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 sm:px-6 sm:text-sm">
-            <span>Fonctionnalité</span>
-            <span className="text-slate-400">Excel / Word / Papier</span>
-            <span className="text-teal-600">Avec Chapfacture</span>
+        <div className="bg-white rounded-2xl border border-[#E2E8F0] shadow-sm overflow-hidden">
+          <div className="grid grid-cols-12 bg-[#F5F7FA] border-b border-[#E2E8F0] p-4 sm:p-5 text-xs sm:text-sm font-extrabold text-[#101828]">
+            <div className="col-span-12 sm:col-span-4 mb-2 sm:mb-0">Critère</div>
+            <div className="col-span-6 sm:col-span-4 text-[#526581]">Méthode classique (Excel / Papier)</div>
+            <div className="col-span-6 sm:col-span-4 flex items-center gap-2 text-[#1E4F91]">
+              <FaktelioLogo size="sm" />
+            </div>
           </div>
 
-          {/* Table Body */}
-          {COMPARISON_ROWS.map((row, index) => {
-            const isLast = index === COMPARISON_ROWS.length - 1;
-            return (
-              <div
-                key={row.feature}
-                className={`grid grid-cols-[1.3fr_1fr_1fr] items-center gap-2 px-4 py-4 text-sm sm:px-6 ${
-                  isLast ? '' : 'border-b border-slate-100'
-                }`}
-              >
-                <span className="font-semibold text-slate-800">{row.feature}</span>
-                <span className="flex items-center gap-1.5 text-slate-500">
-                  <svg
-                    className="h-4 w-4 shrink-0 text-red-400"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" x2="6" y1="6" y2="18" />
-                    <line x1="6" x2="18" y1="6" y2="18" />
-                  </svg>
+          <div className="divide-y divide-[#E2E8F0]">
+            {rows.map((row, idx) => (
+              <div key={idx} className="grid grid-cols-12 p-4 sm:p-5 items-center gap-2 text-xs sm:text-sm">
+                <div className="col-span-12 sm:col-span-4 font-bold text-[#101828]">{row.feature}</div>
+                <div className="col-span-6 sm:col-span-4 text-[#526581] flex items-start gap-2 pr-2">
+                  <X className="w-4 h-4 text-[#DC2626] shrink-0 mt-0.5" />
                   <span>{row.traditional}</span>
-                </span>
-                <span className="flex items-center gap-1.5 font-semibold text-teal-700">
-                  <svg
-                    className="h-4 w-4 shrink-0 text-teal-500"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span>{row.chapfacture}</span>
-                </span>
+                </div>
+                <div className="col-span-6 sm:col-span-4 text-[#101828] font-semibold flex items-start gap-2 bg-[#1E4F91]/4 p-2.5 rounded-xl">
+                  <Check className="w-4 h-4 text-[#16A34A] stroke-[2.5] shrink-0 mt-0.5" />
+                  <span>{row.faktelio}</span>
+                </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
     </section>

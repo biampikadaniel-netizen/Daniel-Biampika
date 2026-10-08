@@ -1,218 +1,194 @@
 import React from 'react';
+import { X, Printer, MessageCircle, Download, CheckCircle2, Stamp } from 'lucide-react';
+import { Invoice } from '../../types';
 import { useAuth } from '../../context/AuthContext';
-import { settingsStorage } from '../../services/storage';
-import type { Invoice } from '../../types';
-import {
-  X,
-  Printer,
-  Download,
-  MessageSquareShare,
-  CreditCard,
-  Building2,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  AlertTriangle,
-} from 'lucide-react';
+import { workspaceService, formatFCFA, formatDateFr } from '../../services/storage';
+import { FaktelioLogo } from '../common/FaktelioLogo';
 
-interface InvoiceDetailModalProps {
-  invoice: Invoice | null;
+export function InvoiceDetailModal({
+  invoice,
+  onClose,
+}: {
+  invoice: Invoice;
   onClose: () => void;
-  onRecordPayment: (invoice: Invoice) => void;
-}
+}) {
+  const { user } = useAuth();
+  if (!user) return null;
 
-export function InvoiceDetailModal({ invoice, onClose, onRecordPayment }: InvoiceDetailModalProps) {
-  const { currentUser } = useAuth();
-  if (!invoice || !currentUser) return null;
-
-  const settings = settingsStorage.getSettings(currentUser.id);
-  const isPaid = invoice.status === 'paid' || invoice.remainingAmount <= 0;
-  const isLate =
-    invoice.status === 'late' || (!isPaid && new Date(invoice.dueDate).getTime() < Date.now());
+  const settings = workspaceService.getSettings(user.id);
+  const accentColor = settings.accentColor || '#1E4F91';
 
   const handlePrint = () => {
     window.print();
   };
 
-  const handleWhatsAppShare = () => {
-    const phone = (invoice.clientPhone || '').replace(/[^0-9]/g, '');
-    const amount = invoice.totalTtc.toLocaleString('fr-FR');
-    const remaining = invoice.remainingAmount.toLocaleString('fr-FR');
-
-    let text = `Bonjour ${invoice.clientName},\n\nVoici votre facture #${invoice.number} d'un montant de ${amount} FCFA émise par *${settings.name}*.\n`;
-    if (isPaid) {
-      text += `Cette facture a été intégralement réglée avec succès. Merci pour votre fidélité !\n`;
-    } else {
-      text += `Reste à régler : *${remaining} FCFA* avant le ${new Date(invoice.dueDate).toLocaleDateString(
-        'fr-FR'
-      )}.\nMerci de procéder à son règlement.\n`;
-    }
-    if (settings.phone) {
-      text += `Contact : ${settings.phone}`;
-    }
-
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`, '_blank');
+  const handleWhatsApp = () => {
+    const msg = `Bonjour ${invoice.clientName},\n\nVeuillez trouver les informations de votre facture *${invoice.number}* émise par *${settings.name}* sur FAKTELIO :\n- Date d'émission : ${formatDateFr(invoice.issueDate)}\n- Date d'échéance : ${formatDateFr(invoice.dueDate)}\n- Montant Total TTC : *${formatFCFA(invoice.totalTtc)}*\n- Montant réglé : ${formatFCFA(invoice.paidAmount)}\n- Solde restant : *${formatFCFA(invoice.remainingAmount)}*\n\nModes de règlement : ${settings.paymentTerms}\n\nMerci pour votre confiance !`;
+    const cleanPhone = (invoice.clientPhone || '').replace(/[^0-9]/g, '');
+    window.open(
+      `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto print:p-0 print:bg-white">
-      <div className="bg-white rounded-3xl max-w-3xl w-full my-6 shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh] print:max-h-none print:shadow-none print:border-none print:m-0 print:w-full">
-        {/* Modal Toolbar (Hidden during print) */}
-        <div className="px-6 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70 print:hidden">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Aperçu Facture</span>
-            <span className="px-2 py-0.5 rounded-md bg-teal-100 text-teal-800 font-mono text-xs font-bold">
-              {invoice.number}
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+        {/* Modal Action Bar (Hidden in Print) */}
+        <div className="px-6 py-4 bg-[#F5F7FA] border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 print:hidden">
+          <div className="flex items-center gap-2.5">
+            <span className="text-sm font-extrabold text-[#101828]">
+              Aperçu Facture {invoice.number}
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#1E4F91]/10 text-[#1E4F91]">
+              Document Certifié FAKTELIO
             </span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
-              onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 shadow-xs cursor-pointer"
+              onClick={handleWhatsApp}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-bold transition-colors cursor-pointer"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Imprimer / PDF</span>
+              <MessageCircle className="w-3.5 h-3.5" />
+              Partager WhatsApp
             </button>
-
             <button
-              onClick={handleWhatsAppShare}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs cursor-pointer"
+              onClick={handlePrint}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1E4F91] hover:bg-[#163C70] text-white text-xs font-bold transition-colors cursor-pointer"
             >
-              <MessageSquareShare className="w-3.5 h-3.5" />
-              <span>WhatsApp</span>
+              <Download className="w-3.5 h-3.5" />
+              Télécharger PDF / Imprimer
             </button>
-
-            {!isPaid && (
-              <button
-                onClick={() => {
-                  onRecordPayment(invoice);
-                }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold shadow-xs cursor-pointer"
-              >
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>Encaisser</span>
-              </button>
-            )}
-
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 ml-2"
+              className="p-2 rounded-xl text-[#526581] hover:text-[#101828] hover:bg-[#E2E8F0]/50 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* PRINTABLE DOCUMENT BODY */}
-        <div className="p-8 sm:p-10 overflow-y-auto bg-white print:p-8 text-slate-800 space-y-8">
-          {/* Header Row: Company Info & Invoice Info */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 pb-6 border-b border-slate-200">
+        {/* Printable A4 Invoice Document */}
+        <div className="p-6 sm:p-10 overflow-y-auto space-y-8 bg-white text-[#101828]" id="printable-invoice">
+          {/* Top Header */}
+          <div
+            className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 pb-6 border-b-2"
+            style={{ borderColor: accentColor }}
+          >
             <div>
-              <div className="flex items-center gap-2.5 mb-2">
-                <img src="/icon.svg" alt="Logo" className="w-8 h-8 object-contain" />
-                <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">{settings.name}</h2>
-              </div>
-              <p className="text-xs text-slate-500 leading-relaxed max-w-xs">
-                {settings.address}
-                {settings.city && `, ${settings.city}`}
-                <br />
-                Tél : {settings.phone || currentUser.phone}
-                <br />
-                Email : {settings.email || currentUser.email}
-                {settings.taxNumber && (
-                  <>
-                    <br />
-                    NIF / RCCM : {settings.taxNumber}
-                  </>
+              <div className="mb-2">
+                {settings.logoUrl ? (
+                  <img
+                    src={settings.logoUrl}
+                    alt={settings.name}
+                    className="h-12 object-contain mb-2"
+                  />
+                ) : (
+                  <FaktelioLogo size="md" />
                 )}
+              </div>
+              <p className="text-base font-extrabold text-[#101828]">{settings.name}</p>
+              <div className="text-xs text-[#526581] mt-1.5 space-y-0.5">
+                <p>
+                  {settings.address}, {settings.city} — {settings.country}
+                </p>
+                <p>
+                  Tél : {settings.phone} • Email : {settings.email}
+                </p>
+                {settings.taxNumber && <p>NIF / RCCM : {settings.taxNumber}</p>}
+              </div>
+            </div>
+
+            <div className="sm:text-right">
+              <div
+                className="inline-block px-3.5 py-1 rounded-lg text-white text-xs font-extrabold uppercase tracking-widest mb-2"
+                style={{ backgroundColor: accentColor }}
+              >
+                FACTURE
+              </div>
+              <p className="text-xl font-extrabold text-[#101828]">{invoice.number}</p>
+              <p className="text-xs text-[#526581] mt-1">
+                Date d&apos;émission : <strong>{formatDateFr(invoice.issueDate)}</strong>
+              </p>
+              <p className="text-xs text-[#526581]">
+                Date d&apos;échéance : <strong>{formatDateFr(invoice.dueDate)}</strong>
               </p>
             </div>
-
-            <div className="text-left sm:text-right">
-              <div className="inline-block">
-                <span className="text-2xl sm:text-3xl font-black text-[#295294] tracking-tight uppercase block">
-                  FACTURE
-                </span>
-                <span className="font-mono text-sm font-bold text-slate-600 mt-1 block">
-                  N° {invoice.number}
-                </span>
-
-                <div className="mt-2">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider ${
-                      isPaid
-                        ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                        : isLate
-                        ? 'bg-red-100 text-red-800 border border-red-300'
-                        : 'bg-amber-100 text-amber-800 border border-amber-300'
-                    }`}
-                  >
-                    {isPaid ? 'PAYÉE' : isLate ? 'EN RETARD' : 'EN ATTENTE DE PAIEMENT'}
-                  </span>
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Client & Date Meta Box */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-200/80">
-            <div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+          {/* Client Box & Payment Status */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#526581] mb-1">
                 Facturé à :
-              </span>
-              <p className="font-extrabold text-slate-900 text-sm">{invoice.clientName}</p>
+              </p>
+              <p className="text-sm font-extrabold text-[#101828]">{invoice.clientName}</p>
               {invoice.clientCompany && (
-                <p className="text-xs font-semibold text-slate-600">{invoice.clientCompany}</p>
+                <p className="text-xs font-semibold text-[#1E4F91]">{invoice.clientCompany}</p>
               )}
-              {invoice.clientAddress && <p className="text-xs text-slate-500 mt-0.5">{invoice.clientAddress}</p>}
-              {invoice.clientPhone && <p className="text-xs text-slate-500 mt-0.5">Tél : {invoice.clientPhone}</p>}
-              {invoice.clientEmail && <p className="text-xs text-slate-500">{invoice.clientEmail}</p>}
+              {invoice.clientAddress && (
+                <p className="text-xs text-[#526581] mt-1">{invoice.clientAddress}</p>
+              )}
+              {invoice.clientPhone && (
+                <p className="text-xs text-[#526581]">Tél : {invoice.clientPhone}</p>
+              )}
+              {invoice.clientEmail && (
+                <p className="text-xs text-[#526581]">Email : {invoice.clientEmail}</p>
+              )}
             </div>
 
-            <div className="space-y-1.5 text-xs sm:text-right">
-              <div>
-                <span className="text-slate-400 font-medium">Date d'émission : </span>
-                <span className="font-bold text-slate-800">
-                  {new Date(invoice.issueDate).toLocaleDateString('fr-FR')}
-                </span>
+            <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#526581]">Statut du règlement</span>
+                {invoice.remainingAmount === 0 ? (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#DCFCE7] text-[#15803D]">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> PAYÉE
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#FEF3C7] text-[#B45309]">
+                    RESTE À PAYER
+                  </span>
+                )}
               </div>
-              <div>
-                <span className="text-slate-400 font-medium">Date d'échéance : </span>
-                <span className="font-bold text-slate-800">
-                  {new Date(invoice.dueDate).toLocaleDateString('fr-FR')}
+              <div className="mt-3 pt-3 border-t border-[#E2E8F0] flex items-baseline justify-between">
+                <span className="text-xs text-[#526581]">Solde restant :</span>
+                <span className="text-lg font-extrabold text-[#F47B20]">
+                  {formatFCFA(invoice.remainingAmount)}
                 </span>
-              </div>
-              <div>
-                <span className="text-slate-400 font-medium">Mode de paiement : </span>
-                <span className="font-bold text-slate-800">{invoice.paymentMethod || 'Virement / Mobile Money'}</span>
               </div>
             </div>
           </div>
 
-          {/* Items Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse">
+          {/* Line Items Table */}
+          <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
+            <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="border-b-2 border-slate-200 text-slate-400 uppercase font-bold text-[10px] tracking-wider">
-                  <th className="py-2.5 px-2">Désignation</th>
-                  <th className="py-2.5 px-2 text-center">Qté</th>
-                  <th className="py-2.5 px-2 text-right">Prix Unitaire</th>
-                  <th className="py-2.5 px-2 text-center">TVA</th>
-                  <th className="py-2.5 px-2 text-right">Total HT</th>
+                <tr
+                  className="text-white text-[11px] font-bold uppercase tracking-wider"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  <th className="py-3 px-4">Désignation</th>
+                  <th className="py-3 px-4 text-center">Qté</th>
+                  <th className="py-3 px-4 text-right">Prix Unitaire HT</th>
+                  <th className="py-3 px-4 text-center">TVA</th>
+                  <th className="py-3 px-4 text-right">Total HT</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {invoice.items.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50">
-                    <td className="py-3 px-2 font-medium text-slate-900">{item.description}</td>
-                    <td className="py-3 px-2 text-center font-bold text-slate-700">{item.quantity}</td>
-                    <td className="py-3 px-2 text-right font-medium text-slate-700">
-                      {item.unitPrice.toLocaleString('fr-FR')} FCFA
+              <tbody className="divide-y divide-[#E2E8F0] text-xs sm:text-sm">
+                {invoice.items.map((item) => (
+                  <tr key={item.id}>
+                    <td className="py-3.5 px-4 font-semibold text-[#101828]">
+                      {item.description}
                     </td>
-                    <td className="py-3 px-2 text-center text-slate-500">{item.vatRate}%</td>
-                    <td className="py-3 px-2 text-right font-bold text-slate-900">
-                      {(item.quantity * item.unitPrice).toLocaleString('fr-FR')} FCFA
+                    <td className="py-3.5 px-4 text-center text-[#526581]">{item.quantity}</td>
+                    <td className="py-3.5 px-4 text-right text-[#526581]">
+                      {formatFCFA(item.unitPrice)}
+                    </td>
+                    <td className="py-3.5 px-4 text-center text-[#526581]">{item.vatRate}%</td>
+                    <td className="py-3.5 px-4 text-right font-bold text-[#101828]">
+                      {formatFCFA(item.totalHt)}
                     </td>
                   </tr>
                 ))}
@@ -220,72 +196,77 @@ export function InvoiceDetailModal({ invoice, onClose, onRecordPayment }: Invoic
             </table>
           </div>
 
-          {/* Summary & Totals */}
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 pt-4 border-t border-slate-200">
-            <div className="text-xs text-slate-500 max-w-sm space-y-1">
+          {/* Summary & Totals + Signature/Stamp */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+            <div className="space-y-3 text-xs text-[#526581]">
+              <div>
+                <p className="font-bold text-[#101828] uppercase tracking-wider mb-1">
+                  Conditions &amp; Moyens de paiement
+                </p>
+                <p>{invoice.terms || settings.paymentTerms}</p>
+                {settings.bankDetails && <p className="mt-1 font-medium">{settings.bankDetails}</p>}
+              </div>
               {invoice.notes && (
                 <div>
-                  <span className="font-bold text-slate-700">Notes : </span>
-                  <p className="mt-0.5 italic">{invoice.notes}</p>
+                  <p className="font-bold text-[#101828] uppercase tracking-wider mb-1">Notes</p>
+                  <p>{invoice.notes}</p>
                 </div>
               )}
-              <div className="pt-2">
-                <span className="font-bold text-slate-700">Conditions : </span>
-                <p className="mt-0.5">{invoice.terms || settings.paymentTerms}</p>
+
+              {/* Official Signature / Cachet Box */}
+              <div className="pt-3">
+                <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-dashed border-[#1E4F91]/40 bg-[#F5F7FA]">
+                  <Stamp className="w-4 h-4 text-[#1E4F91]" />
+                  <div>
+                    <p className="text-[10px] font-extrabold uppercase text-[#1E4F91]">
+                      Cachet &amp; Signature Entreprise
+                    </p>
+                    <p className="text-xs font-bold text-[#101828]">
+                      {settings.signatureText || settings.name}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="w-full sm:w-72 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs space-y-2">
-              <div className="flex justify-between text-slate-600">
-                <span>Total HT :</span>
-                <span className="font-bold text-slate-900">
-                  {invoice.subtotalHt.toLocaleString('fr-FR')} FCFA
-                </span>
+            <div className="bg-[#F5F7FA] p-5 rounded-xl border border-[#E2E8F0] space-y-2.5 text-sm">
+              <div className="flex justify-between text-[#526581]">
+                <span>Sous-total HT</span>
+                <span className="font-bold text-[#101828]">{formatFCFA(invoice.subtotalHt)}</span>
               </div>
               {invoice.discountRate > 0 && (
-                <div className="flex justify-between text-red-600">
-                  <span>Remise ({invoice.discountRate}%) :</span>
-                  <span className="font-bold">
-                    -{Math.round((invoice.subtotalHt * invoice.discountRate) / 100).toLocaleString('fr-FR')} FCFA
+                <div className="flex justify-between text-[#15803D]">
+                  <span>Remise ({invoice.discountRate}%)</span>
+                  <span>
+                    -{formatFCFA(Math.round((invoice.subtotalHt * invoice.discountRate) / 100))}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-600">
-                <span>TVA :</span>
-                <span className="font-bold text-slate-900">{invoice.totalVat.toLocaleString('fr-FR')} FCFA</span>
+              <div className="flex justify-between text-[#526581]">
+                <span>Total TVA</span>
+                <span className="font-bold text-[#101828]">{formatFCFA(invoice.totalVat)}</span>
               </div>
-              <div className="flex justify-between text-base font-extrabold text-slate-900 pt-2 border-t border-slate-200">
-                <span>Total TTC :</span>
-                <span className="text-[#295294]">{invoice.totalTtc.toLocaleString('fr-FR')} FCFA</span>
+              <div className="pt-2.5 border-t border-[#E2E8F0] flex justify-between text-base font-extrabold text-[#1E4F91]">
+                <span>TOTAL TTC</span>
+                <span>{formatFCFA(invoice.totalTtc)}</span>
               </div>
-              <div className="flex justify-between text-emerald-700 pt-1">
-                <span>Déjà réglé :</span>
-                <span className="font-bold">{(invoice.paidAmount || 0).toLocaleString('fr-FR')} FCFA</span>
+              <div className="flex justify-between text-xs text-[#15803D] font-bold">
+                <span>Montant déjà payé</span>
+                <span>{formatFCFA(invoice.paidAmount)}</span>
               </div>
-              <div className="flex justify-between text-amber-700 font-extrabold text-sm pt-1 border-t border-dashed border-slate-300">
-                <span>Reste à payer :</span>
-                <span>{invoice.remainingAmount.toLocaleString('fr-FR')} FCFA</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Stamp / Signature Box */}
-          <div className="pt-6 flex justify-end">
-            <div className="w-48 text-center border border-dashed border-slate-300 rounded-2xl p-4 bg-slate-50/50">
-              <span className="text-[10px] font-bold text-slate-400 uppercase block mb-6">
-                Cachet &amp; Signature
-              </span>
-              <div className="h-10 flex items-center justify-center">
-                <span className="text-xs font-serif italic text-teal-800 font-bold border-b border-teal-800 pb-1">
-                  {settings.name}
-                </span>
+              <div className="pt-2 border-t border-[#E2E8F0] flex justify-between text-sm font-extrabold text-[#F47B20]">
+                <span>Net à payer</span>
+                <span>{formatFCFA(invoice.remainingAmount)}</span>
               </div>
             </div>
           </div>
 
-          {/* Footer legal note */}
-          <div className="text-center pt-6 border-t border-slate-100 text-[10px] text-slate-400">
-            Facture générée numériquement par Chapfacture — Document conforme aux normes commerciales en vigueur.
+          {/* Document Footer */}
+          <div className="pt-6 border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#526581]">
+            <span>
+              Document généré électroniquement via <strong>FAKTELIO</strong> (www.faktelio.com)
+            </span>
+            <span>Merci pour votre confiance !</span>
           </div>
         </div>
       </div>

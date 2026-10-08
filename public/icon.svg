@@ -1,14 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="60 30 296 345" xml:space="preserve">
-<style type="text/css">
-	.st0{fill:#295294;}
-	.st1{fill:#F27A2C;}
-</style>
-<path class="st0" d="M182.61,112.73h111.88v34.32h-69.28v33.56h69.28v33.81h-69.28v83.22h-42.61V112.73z"/>
-<path class="st0" d="M351.92,262.79c-21.99,43.59-67.16,73.48-119.32,73.48c-73.77,0-133.57-59.8-133.57-133.57
-	s59.8-133.57,133.57-133.57c22.39,0,43.48,5.52,62.01,15.25V45.15c-19.2-7.56-40.12-11.72-62.01-11.72
-	c-93.49,0-169.27,75.79-169.27,169.27s75.79,169.27,169.27,169.27c72.32,0,134.04-45.36,158.28-109.18H351.92z"/>
-<path class="st1" d="M298.52,262.79c-16.31,17.88-39.8,29.11-65.92,29.11c-49.26,0-89.2-39.93-89.2-89.2s39.93-89.2,89.2-89.2
-	c24.1,0,45.96,9.56,62.01,25.09V97.48c-18.18-10.74-39.37-16.9-62.01-16.9c-67.45,0-122.13,54.68-122.13,122.13
-	s54.68,122.13,122.13,122.13c45.6,0,85.36-25,106.34-62.04H298.52z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Main Rounded Square Base in Institutional Blue -->
+  <rect x="8" y="8" width="104" height="104" rx="26" fill="#1E4F91" />
+  <rect x="12" y="12" width="96" height="96" rx="22" stroke="#2D5FA8" stroke-width="2" stroke-opacity="0.6" />
+  
+  <!-- Stylized Invoice Document / F Monogram -->
+  <path d="M36 32C36 28.6863 38.6863 26 42 26H78C81.3137 26 84 28.6863 84 32V38C84 40.2091 82.2091 42 80 42H50V54H72C74.2091 54 76 55.7909 76 58V64C76 66.2091 74.2091 68 72 68H50V88C50 91.3137 47.3137 94 44 94H42C38.6863 94 36 91.3137 36 88V32Z" fill="#FFFFFF" />
+  
+  <!-- Orange Payment / Validation Accent Badge -->
+  <circle cx="80" cy="80" r="20" fill="#F47B20" />
+  <path d="M72 80.5L77.5 86L89 74.5" stroke="#FFFFFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

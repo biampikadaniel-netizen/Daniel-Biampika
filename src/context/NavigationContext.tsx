@@ -5,8 +5,9 @@ export type AppRoute =
   | '/login'
   | '/register'
   | '/dashboard'
-  | '/quotes'
+  | '/billing'
   | '/invoices'
+  | '/quotes'
   | '/clients'
   | '/products'
   | '/stock'
@@ -17,103 +18,40 @@ export type AppRoute =
   | '/subscription'
   | '/settings';
 
-interface NavigationContextType {
-  currentRoute: AppRoute;
-  navigate: (route: AppRoute | string) => void;
-  isDashboardRoute: boolean;
+interface NavigationContextValue {
+  route: AppRoute;
+  navigate: (to: AppRoute, params?: Record<string, string>) => void;
+  params: Record<string, string>;
 }
 
-const NavigationContext = createContext<NavigationContextType | undefined>(undefined);
-
-const PROTECTED_PREFIXES = [
-  '/dashboard',
-  '/quotes',
-  '/invoices',
-  '/clients',
-  '/products',
-  '/stock',
-  '/payments',
-  '/reminders',
-  '/reports',
-  '/team',
-  '/subscription',
-  '/settings',
-];
+const NavigationContext = createContext<NavigationContextValue | undefined>(undefined);
 
 export function NavigationProvider({ children }: { children: React.ReactNode }) {
-  const [currentRoute, setCurrentRoute] = useState<AppRoute>(() => {
-    const path = window.location.pathname;
-    if (PROTECTED_PREFIXES.includes(path) || path === '/login' || path === '/register') {
-      return path as AppRoute;
-    }
-    return '/';
-  });
+  const [route, setRoute] = useState<AppRoute>('/');
+  const [params, setParams] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname;
-      if (PROTECTED_PREFIXES.includes(path) || path === '/login' || path === '/register') {
-        setCurrentRoute(path as AppRoute);
-      } else {
-        setCurrentRoute('/');
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    const hash = window.location.hash.replace('#', '');
+    if (hash.startsWith('/')) {
+      setRoute(hash as AppRoute);
+    }
   }, []);
 
-  const navigate = (route: AppRoute | string) => {
-    // If it's an anchor on landing page (e.g. #tarifs or #fonctionnalites)
-    if (route.startsWith('#')) {
-      if (currentRoute !== '/') {
-        window.history.pushState({}, '', '/' + route);
-        setCurrentRoute('/');
-        setTimeout(() => {
-          const el = document.querySelector(route);
-          el?.scrollIntoView({ behavior: 'smooth' });
-        }, 100);
-      } else {
-        const el = document.querySelector(route);
-        el?.scrollIntoView({ behavior: 'smooth' });
-      }
-      return;
-    }
-
-    const cleanRoute = (route as AppRoute) || '/';
-    if (window.location.pathname !== cleanRoute) {
-      window.history.pushState({}, '', cleanRoute);
-    }
-    setCurrentRoute(cleanRoute);
-    window.scrollTo(0, 0);
+  const navigate = (to: AppRoute, nextParams: Record<string, string> = {}) => {
+    setRoute(to);
+    setParams(nextParams);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const isDashboardRoute = PROTECTED_PREFIXES.some((prefix) => currentRoute.startsWith(prefix));
-
   return (
-    <NavigationContext.Provider value={{ currentRoute, navigate, isDashboardRoute }}>
+    <NavigationContext.Provider value={{ route, navigate, params }}>
       {children}
     </NavigationContext.Provider>
   );
 }
 
-export function useNavigation(): NavigationContextType {
-  const context = useContext(NavigationContext);
-  if (!context) {
-    return {
-      currentRoute: '/',
-      navigate: (route: string) => {
-        if (typeof window !== 'undefined') {
-          if (route.startsWith('#')) {
-            const el = document.querySelector(route);
-            el?.scrollIntoView({ behavior: 'smooth' });
-          } else {
-            window.location.pathname = route;
-          }
-        }
-      },
-      isDashboardRoute: false,
-    };
-  }
-  return context;
+export function useNavigation() {
+  const ctx = useContext(NavigationContext);
+  if (!ctx) throw new Error('useNavigation must be used within a NavigationProvider');
+  return ctx;
 }

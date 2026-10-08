@@ -1,460 +1,663 @@
-import type {
+import {
   User,
+  Company,
   CompanySettings,
   Client,
   Product,
+  Category,
+  StockMovement,
   Quote,
   Invoice,
   Payment,
   NotificationItem,
   TeamMember,
+  Subscription,
   PlanType,
 } from '../types';
 
-// Storage keys
-const USERS_KEY = 'chapfacture_users_v1';
-const SESSION_KEY = 'chapfacture_session_v1';
-const CLIENTS_KEY = 'chapfacture_clients_v1';
-const PRODUCTS_KEY = 'chapfacture_products_v1';
-const QUOTES_KEY = 'chapfacture_quotes_v1';
-const INVOICES_KEY = 'chapfacture_invoices_v1';
-const PAYMENTS_KEY = 'chapfacture_payments_v1';
-const NOTIFICATIONS_KEY = 'chapfacture_notifications_v1';
-const TEAM_KEY = 'chapfacture_team_v1';
-const SETTINGS_KEY = 'chapfacture_settings_v1';
+const DB_KEYS = {
+  CURRENT_USER: 'faktelio_current_user_v4',
+  USERS: 'faktelio_users_v4',
+  COMPANIES: 'faktelio_companies_v4',
+  SETTINGS: 'faktelio_settings_v4',
+  CLIENTS: 'faktelio_clients_v4',
+  PRODUCTS: 'faktelio_products_v4',
+  CATEGORIES: 'faktelio_categories_v4',
+  STOCK_MOVEMENTS: 'faktelio_stock_movements_v4',
+  QUOTES: 'faktelio_quotes_v4',
+  INVOICES: 'faktelio_invoices_v4',
+  PAYMENTS: 'faktelio_payments_v4',
+  NOTIFICATIONS: 'faktelio_notifications_v4',
+  TEAM: 'faktelio_team_v4',
+  SUBSCRIPTIONS: 'faktelio_subscriptions_v4',
+  CLEANSED_OLD_FAKES: 'faktelio_cleansed_fake_data_v4',
+};
 
-// Helper to get array from localStorage
-function getList<T>(key: string): T[] {
+// Purge any legacy fake seeded data from previous app iterations
+function purgeLegacyFakeData() {
+  try {
+    if (!localStorage.getItem(DB_KEYS.CLEANSED_OLD_FAKES)) {
+      const legacyKeys = [
+        'faktelio_current_user',
+        'faktelio_users',
+        'faktelio_settings',
+        'faktelio_clients',
+        'faktelio_products',
+        'faktelio_stock_movements',
+        'faktelio_quotes',
+        'faktelio_invoices',
+        'faktelio_payments',
+        'faktelio_notifications',
+        'faktelio_team',
+        'faktelio_current_user_v3',
+        'faktelio_users_v3',
+        'faktelio_companies_v3',
+        'faktelio_settings_v3',
+        'faktelio_clients_v3',
+        'faktelio_products_v3',
+        'faktelio_categories_v3',
+        'faktelio_stock_movements_v3',
+        'faktelio_quotes_v3',
+        'faktelio_invoices_v3',
+        'faktelio_payments_v3',
+        'faktelio_notifications_v3',
+        'faktelio_team_v3',
+        'faktelio_subscriptions_v3',
+        'faktelio_cleansed_fake_data_v3',
+        'chapfacture_current_user',
+        'chapfacture_invoices',
+        'chapfacture_clients',
+      ];
+      legacyKeys.forEach((k) => localStorage.removeItem(k));
+      localStorage.setItem(DB_KEYS.CLEANSED_OLD_FAKES, 'true');
+    }
+  } catch {
+    // Ignore storage access errors in restricted iframe
+  }
+}
+purgeLegacyFakeData();
+
+function getTable<T>(key: string): T[] {
   try {
     const raw = localStorage.getItem(key);
-    if (!raw) return [];
-    return JSON.parse(raw) as T[];
-  } catch (e) {
-    console.error(`Error reading ${key} from storage:`, e);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
     return [];
   }
 }
 
-// Helper to save array to localStorage
-function saveList<T>(key: string, list: T[]): void {
+function setTable<T>(key: string, items: T[]): void {
   try {
-    localStorage.setItem(key, JSON.stringify(list));
-  } catch (e) {
-    console.error(`Error saving ${key} to storage:`, e);
+    localStorage.setItem(key, JSON.stringify(items));
+  } catch {
+    // Ignore storage quota errors
   }
 }
 
-// -------------------------------------------------------------
-// Authentication & User Accounts (Multi-user with password check)
-// -------------------------------------------------------------
-
-interface StoredUserAccount {
-  user: User;
-  passwordHash: string;
+export function uid(prefix = 'id'): string {
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 }
 
-export const authStorage = {
-  getUsers(): StoredUserAccount[] {
-    return getList<StoredUserAccount>(USERS_KEY);
+export function formatFCFA(amount: number, currency = 'FCFA'): string {
+  const rounded = Math.round(amount || 0);
+  return `${rounded.toLocaleString('fr-FR')} ${currency}`;
+}
+
+export function formatDateFr(dateStr: string): string {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  } catch {
+    return dateStr;
+  }
+}
+
+/**
+ * Ensures strict company-level isolation.
+ * Any input (whether userId or companyId) is canonically mapped to its companyId.
+ */
+export function resolveCompanyId(idOrCompanyId: string): string {
+  if (!idOrCompanyId) return '';
+  const users = getTable<User>(DB_KEYS.USERS);
+  const found = users.find((u) => u.id === idOrCompanyId || u.companyId === idOrCompanyId);
+  return found?.companyId || idOrCompanyId;
+}
+
+// ------------------------------------
+// Authentication & Multi-Company DB
+// ------------------------------------
+export const authService = {
+  getCurrentUser(): User | null {
+    try {
+      const raw = localStorage.getItem(DB_KEYS.CURRENT_USER);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
   },
 
   register(data: {
     name: string;
     email: string;
+    password?: string;
     companyName: string;
     phone: string;
-    password: string;
-  }): { success: boolean; user?: User; error?: string } {
-    const users = this.getUsers();
-    const cleanEmail = data.email.trim().toLowerCase();
+    plan?: PlanType;
+  }): { user?: User; error?: string } {
+    const users = getTable<User & { password?: string }>(DB_KEYS.USERS);
+    const normalized = data.email.trim().toLowerCase();
 
-    if (users.some((u) => u.user.email.toLowerCase() === cleanEmail)) {
-      return { success: false, error: 'Un compte avec cette adresse email existe déjà.' };
+    if (users.some((u) => u.email.toLowerCase() === normalized)) {
+      return { error: 'Cette adresse email est déjà associée à un compte FAKTELIO.' };
     }
 
-    const userId = 'usr_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
-    const now = Date.now();
-    const fourteenDaysMs = 14 * 24 * 60 * 60 * 1000;
+    const companyId = uid('comp');
+    const userId = uid('usr');
+    const plan = data.plan || 'startup';
+    const companyName = data.companyName.trim() || `Entreprise ${data.name.trim()}`;
 
-    const newUser: User = {
-      id: userId,
-      name: data.name.trim(),
-      email: cleanEmail,
-      companyName: data.companyName.trim(),
-      phone: data.phone.trim(),
-      role: 'admin',
-      plan: 'entreprise', // 14-day free trial on Entreprise
-      trialEndsAt: now + fourteenDaysMs,
-      createdAt: now,
+    // 1. Create Company
+    const companies = getTable<Company>(DB_KEYS.COMPANIES);
+    const newCompany: Company = {
+      id: companyId,
+      name: companyName,
+      ownerId: userId,
+      plan,
+      trialEndsAt: Date.now() + 14 * 86400000,
+      createdAt: Date.now(),
     };
+    companies.push(newCompany);
+    setTable(DB_KEYS.COMPANIES, companies);
 
-    users.push({
-      user: newUser,
-      passwordHash: btoa(data.password), // simple reversible encoded hash for client session verification
-    });
-    saveList(USERS_KEY, users);
+    // 2. Create User
+    const newUser: User & { password?: string } = {
+      id: userId,
+      companyId,
+      name: data.name.trim(),
+      email: normalized,
+      password: data.password || '123456',
+      companyName,
+      phone: data.phone.trim() || '',
+      role: 'admin',
+      plan,
+      trialEndsAt: Date.now() + 14 * 86400000,
+      createdAt: Date.now(),
+    };
+    users.push(newUser);
+    setTable(DB_KEYS.USERS, users);
 
-    // Initialize default company settings
-    const defaultSettings: CompanySettings = {
-      name: data.companyName.trim(),
-      address: 'Abidjan, Côte d’Ivoire',
+    // 3. Create Default Company Settings (starts with 0 clients, 0 products, 0 invoices)
+    const settingsList = getTable<CompanySettings>(DB_KEYS.SETTINGS);
+    const initialSettings: CompanySettings = {
+      companyId,
+      name: companyName,
+      accentColor: '#1E4F91',
+      address: '',
       city: 'Abidjan',
-      country: 'Côte d’Ivoire',
-      phone: data.phone.trim(),
-      email: cleanEmail,
+      country: "Côte d'Ivoire",
+      phone: data.phone.trim() || '',
+      email: normalized,
+      website: '',
+      taxNumber: '',
       currency: 'FCFA',
       defaultVatRate: 18,
-      invoicePrefix: 'FAC-',
-      quotePrefix: 'DEV-',
-      paymentTerms: 'Paiement sous 15 jours dès réception',
+      invoicePrefix: 'FAC-2026-',
+      quotePrefix: 'DEV-2026-',
+      paymentTerms: 'Paiement à réception par Mobile Money ou virement.',
+      signatureText: `Direction — ${companyName}`,
+      bankDetails: '',
     };
-    settingsStorage.saveSettings(userId, defaultSettings);
+    settingsList.push(initialSettings);
+    setTable(DB_KEYS.SETTINGS, settingsList);
 
-    // Initial welcome notification
-    notificationsStorage.addNotification({
+    // 4. Initial Team Member
+    const team = getTable<TeamMember>(DB_KEYS.TEAM);
+    team.push({
+      id: uid('tm'),
+      companyId,
       userId,
-      type: 'trial',
-      title: 'Bienvenue sur Chapfacture ! 🎉',
-      message:
-        'Votre essai gratuit de 14 jours à l’offre Entreprise est actif. Créez vos premiers clients et factures en toute liberté.',
-      read: false,
+      name: newUser.name,
+      email: newUser.email,
+      role: 'admin',
+      status: 'active',
+      createdAt: Date.now(),
     });
+    setTable(DB_KEYS.TEAM, team);
 
-    // Automatically set session
-    this.createSession(newUser);
+    // 5. Subscription
+    const subs = getTable<Subscription>(DB_KEYS.SUBSCRIPTIONS);
+    subs.push({
+      id: uid('sub'),
+      companyId,
+      plan,
+      status: 'trial',
+      priceMonthly: plan === 'entreprise' ? 24900 : plan === 'startup' ? 9900 : 0,
+      updatedAt: Date.now(),
+    });
+    setTable(DB_KEYS.SUBSCRIPTIONS, subs);
 
-    return { success: true, user: newUser };
+    // Set current active session
+    localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(newUser));
+    return { user: newUser };
   },
 
-  login(email: string, password: string): { success: boolean; user?: User; error?: string } {
-    const users = this.getUsers();
-    const cleanEmail = email.trim().toLowerCase();
-    const record = users.find((u) => u.user.email.toLowerCase() === cleanEmail);
+  login(email: string, password?: string): { user?: User; error?: string } {
+    const users = getTable<User & { password?: string }>(DB_KEYS.USERS);
+    const normalized = email.trim().toLowerCase();
+    const found = users.find((u) => u.email.toLowerCase() === normalized);
 
-    if (!record) {
-      return { success: false, error: 'Identifiants incorrects ou compte introuvable.' };
+    if (!found) {
+      return { error: 'Aucun compte trouvé avec cette adresse email. Veuillez créer votre compte pour démarrer.' };
     }
 
-    if (record.passwordHash !== btoa(password)) {
-      return { success: false, error: 'Mot de passe incorrect.' };
+    if (password && found.password && found.password !== password) {
+      return { error: 'Mot de passe incorrect.' };
     }
 
-    this.createSession(record.user);
-    return { success: true, user: record.user };
+    if (!found.companyId) {
+      found.companyId = found.id;
+    }
+
+    localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(found));
+    return { user: found };
   },
 
-  createSession(user: User): void {
-    try {
-      localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: user.id, savedAt: Date.now() }));
-    } catch (e) {
-      console.error('Session write error', e);
-    }
+  loginDemo(): User {
+    // Demo login creates a clean isolated test workspace with 0 fake data
+    const demoEmail = 'demo@faktelio.com';
+    const existing = this.login(demoEmail, 'demo');
+    if (existing.user) return existing.user;
+
+    const registered = this.register({
+      name: 'Utilisateur Démo',
+      email: demoEmail,
+      password: 'demo',
+      companyName: 'Mon Entreprise',
+      phone: '',
+      plan: 'startup',
+    });
+    return registered.user!;
   },
 
-  getCurrentUser(): User | null {
-    try {
-      const rawSession = localStorage.getItem(SESSION_KEY);
-      if (!rawSession) return null;
-      const { userId } = JSON.parse(rawSession);
-      const users = this.getUsers();
-      const match = users.find((u) => u.user.id === userId);
-      return match ? match.user : null;
-    } catch (e) {
-      return null;
+  updateUser(updated: Partial<User>): User | null {
+    const current = this.getCurrentUser();
+    if (!current) return null;
+    const merged: User = { ...current, ...updated };
+    localStorage.setItem(DB_KEYS.CURRENT_USER, JSON.stringify(merged));
+
+    const users = getTable<User & { password?: string }>(DB_KEYS.USERS);
+    const idx = users.findIndex((u) => u.id === current.id);
+    if (idx !== -1) {
+      users[idx] = { ...users[idx], ...merged };
+      setTable(DB_KEYS.USERS, users);
     }
+    return merged;
   },
 
   logout(): void {
-    try {
-      localStorage.removeItem(SESSION_KEY);
-    } catch (e) {
-      console.error('Logout error', e);
-    }
-  },
-
-  updateUserProfile(userId: string, updates: Partial<User>): User | null {
-    const users = this.getUsers();
-    const index = users.findIndex((u) => u.user.id === userId);
-    if (index === -1) return null;
-
-    users[index].user = { ...users[index].user, ...updates };
-    saveList(USERS_KEY, users);
-    return users[index].user;
-  },
-
-  changePassword(userId: string, oldPass: string, newPass: string): { success: boolean; error?: string } {
-    const users = this.getUsers();
-    const record = users.find((u) => u.user.id === userId);
-    if (!record) return { success: false, error: 'Utilisateur non trouvé' };
-
-    if (record.passwordHash !== btoa(oldPass)) {
-      return { success: false, error: 'Le mot de passe actuel est incorrect.' };
-    }
-
-    record.passwordHash = btoa(newPass);
-    saveList(USERS_KEY, users);
-    return { success: true };
-  },
-
-  resetPasswordByEmail(email: string): { success: boolean; message: string } {
-    const users = this.getUsers();
-    const cleanEmail = email.trim().toLowerCase();
-    const record = users.find((u) => u.user.email.toLowerCase() === cleanEmail);
-
-    if (!record) {
-      return {
-        success: false,
-        message: 'Aucun compte associé à cette adresse e-mail n’a été trouvé.',
-      };
-    }
-
-    // Generate simulated recovery token / reset password to default "Chap1234!"
-    record.passwordHash = btoa('Chap1234!');
-    saveList(USERS_KEY, users);
-
-    return {
-      success: true,
-      message: 'Un mot de passe temporaire a été réinitialisé à "Chap1234!". Vous pouvez vous connecter et le changer dans Paramètres.',
-    };
+    localStorage.removeItem(DB_KEYS.CURRENT_USER);
   },
 };
 
-// -------------------------------------------------------------
-// Settings Storage
-// -------------------------------------------------------------
-export const settingsStorage = {
-  getSettings(userId: string): CompanySettings {
-    const all = getList<{ userId: string; settings: CompanySettings }>(SETTINGS_KEY);
-    const found = all.find((item) => item.userId === userId);
-    if (found) return found.settings;
+// ------------------------------------
+// Data Workspace Operations (Strictly Isolated by Company)
+// ------------------------------------
+export const workspaceService = {
+  // SETTINGS
+  getSettings(companyOrUserId: string): CompanySettings {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<CompanySettings>(DB_KEYS.SETTINGS);
+    const found = all.find((s) => s.companyId === cId || s.companyId === companyOrUserId);
+    if (found) return found;
 
-    const user = authStorage.getCurrentUser();
-    return {
-      name: user?.companyName || 'Mon Entreprise',
-      address: 'Abidjan, Côte d’Ivoire',
+    const fallback: CompanySettings = {
+      companyId: cId,
+      name: 'Mon Entreprise',
+      accentColor: '#1E4F91',
+      address: '',
       city: 'Abidjan',
-      country: 'Côte d’Ivoire',
-      phone: user?.phone || '+225 07 00 00 00 00',
-      email: user?.email || 'contact@monentreprise.com',
+      country: "Côte d'Ivoire",
+      phone: '',
+      email: '',
+      website: '',
+      taxNumber: '',
       currency: 'FCFA',
       defaultVatRate: 18,
-      invoicePrefix: 'FAC-',
-      quotePrefix: 'DEV-',
-      paymentTerms: 'Paiement sous 15 jours dès réception',
+      invoicePrefix: 'FAC-2026-',
+      quotePrefix: 'DEV-2026-',
+      paymentTerms: 'Paiement à réception par Mobile Money ou virement.',
+      signatureText: 'La Direction',
+      bankDetails: '',
     };
+    all.push(fallback);
+    setTable(DB_KEYS.SETTINGS, all);
+    return fallback;
   },
 
-  saveSettings(userId: string, settings: CompanySettings): void {
-    const all = getList<{ userId: string; settings: CompanySettings }>(SETTINGS_KEY);
-    const index = all.findIndex((item) => item.userId === userId);
-    if (index >= 0) {
-      all[index].settings = settings;
+  saveSettings(companyOrUserId: string, settings: CompanySettings): CompanySettings {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<CompanySettings>(DB_KEYS.SETTINGS);
+    const idx = all.findIndex((s) => s.companyId === cId || s.companyId === companyOrUserId);
+    const updated = { ...settings, companyId: cId };
+    if (idx !== -1) {
+      all[idx] = updated;
     } else {
-      all.push({ userId, settings });
+      all.push(updated);
     }
-    saveList(SETTINGS_KEY, all);
-  },
-
-  updateSettings(userId: string, updates: Partial<CompanySettings>): CompanySettings {
-    const current = this.getSettings(userId);
-    const updated = { ...current, ...updates };
-    this.saveSettings(userId, updated);
+    setTable(DB_KEYS.SETTINGS, all);
     return updated;
   },
-};
 
-// -------------------------------------------------------------
-// Clients Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const clientsStorage = {
-  getAll(userId: string): Client[] {
-    const list = getList<Client>(CLIENTS_KEY);
-    return list.filter((c) => c.userId === userId).sort((a, b) => b.createdAt - a.createdAt);
+  // CLIENTS
+  getClients(companyOrUserId: string): Client[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<Client>(DB_KEYS.CLIENTS)
+      .filter((c) => c.companyId === cId || c.userId === cId || c.companyId === companyOrUserId || c.userId === companyOrUserId)
+      .sort((a, b) => b.createdAt - a.createdAt);
   },
 
-  getById(userId: string, id: string): Client | undefined {
-    return this.getAll(userId).find((c) => c.id === id);
-  },
+  saveClient(
+    companyOrUserId: string,
+    clientData: Omit<Client, 'id' | 'companyId' | 'userId' | 'createdAt'> & { id?: string }
+  ): Client {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Client>(DB_KEYS.CLIENTS);
+    if (clientData.id) {
+      const idx = all.findIndex(
+        (c) =>
+          c.id === clientData.id &&
+          (c.companyId === cId || c.userId === cId || c.companyId === companyOrUserId || c.userId === companyOrUserId)
+      );
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...clientData, companyId: cId };
+        setTable(DB_KEYS.CLIENTS, all);
+        return all[idx];
+      }
+    }
 
-  add(userId: string, clientData: Omit<Client, 'id' | 'userId' | 'createdAt'>): Client {
-    const all = getList<Client>(CLIENTS_KEY);
     const newClient: Client = {
-      ...clientData,
-      id: 'cli_' + Math.random().toString(36).substring(2, 9),
-      userId,
+      id: uid('cli'),
+      companyId: cId,
+      userId: companyOrUserId,
+      name: clientData.name.trim(),
+      company: clientData.company?.trim() || '',
+      email: clientData.email?.trim() || '',
+      phone: clientData.phone?.trim() || '',
+      address: clientData.address?.trim() || '',
+      city: clientData.city?.trim() || 'Abidjan',
+      country: clientData.country?.trim() || "Côte d'Ivoire",
+      notes: clientData.notes?.trim() || '',
       createdAt: Date.now(),
     };
     all.push(newClient);
-    saveList(CLIENTS_KEY, all);
-
-    notificationsStorage.addNotification({
-      userId,
-      type: 'system',
-      title: 'Nouveau client ajouté',
-      message: `Le client ${newClient.name} a été enregistré avec succès.`,
-      read: false,
-    });
-
+    setTable(DB_KEYS.CLIENTS, all);
     return newClient;
   },
 
-  update(userId: string, id: string, updates: Partial<Client>): Client | null {
-    const all = getList<Client>(CLIENTS_KEY);
-    const index = all.findIndex((c) => c.id === id && c.userId === userId);
-    if (index === -1) return null;
-
-    all[index] = { ...all[index], ...updates };
-    saveList(CLIENTS_KEY, all);
-    return all[index];
+  deleteClient(companyOrUserId: string, clientId: string): void {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Client>(DB_KEYS.CLIENTS).filter(
+      (c) =>
+        !(
+          c.id === clientId &&
+          (c.companyId === cId || c.userId === cId || c.companyId === companyOrUserId || c.userId === companyOrUserId)
+        )
+    );
+    setTable(DB_KEYS.CLIENTS, all);
   },
 
-  delete(userId: string, id: string): boolean {
-    const all = getList<Client>(CLIENTS_KEY);
-    const filtered = all.filter((c) => !(c.id === id && c.userId === userId));
-    saveList(CLIENTS_KEY, filtered);
-    return true;
+  importClients(companyOrUserId: string, imported: Array<Partial<Client>>): number {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Client>(DB_KEYS.CLIENTS);
+    let count = 0;
+    for (const item of imported) {
+      if (!item.name || !item.name.trim()) continue;
+      all.push({
+        id: uid('cli'),
+        companyId: cId,
+        userId: companyOrUserId,
+        name: item.name.trim(),
+        company: item.company?.trim() || '',
+        email: item.email?.trim() || '',
+        phone: item.phone?.trim() || '',
+        address: item.address?.trim() || '',
+        city: item.city?.trim() || 'Abidjan',
+        country: item.country?.trim() || "Côte d'Ivoire",
+        notes: item.notes?.trim() || '',
+        createdAt: Date.now() - count * 1000,
+      });
+      count++;
+    }
+    setTable(DB_KEYS.CLIENTS, all);
+    return count;
   },
-};
 
-// -------------------------------------------------------------
-// Products & Services Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const productsStorage = {
-  getAll(userId: string): Product[] {
-    const list = getList<Product>(PRODUCTS_KEY);
-    return list.filter((p) => p.userId === userId).sort((a, b) => b.createdAt - a.createdAt);
+  // PRODUCTS & SERVICES (CATALOGUE)
+  getProducts(companyOrUserId: string): Product[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<Product>(DB_KEYS.PRODUCTS)
+      .filter((p) => p.companyId === cId || p.userId === cId || p.companyId === companyOrUserId || p.userId === companyOrUserId)
+      .sort((a, b) => b.createdAt - a.createdAt);
   },
 
-  getById(userId: string, id: string): Product | undefined {
-    return this.getAll(userId).find((p) => p.id === id);
-  },
+  saveProduct(
+    companyOrUserId: string,
+    productData: Omit<Product, 'id' | 'companyId' | 'userId' | 'createdAt'> & { id?: string }
+  ): Product {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Product>(DB_KEYS.PRODUCTS);
+    if (productData.id) {
+      const idx = all.findIndex(
+        (p) =>
+          p.id === productData.id &&
+          (p.companyId === cId || p.userId === cId || p.companyId === companyOrUserId || p.userId === companyOrUserId)
+      );
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...productData, companyId: cId };
+        setTable(DB_KEYS.PRODUCTS, all);
+        return all[idx];
+      }
+    }
 
-  add(userId: string, productData: Omit<Product, 'id' | 'userId' | 'createdAt'>): Product {
-    const all = getList<Product>(PRODUCTS_KEY);
     const newProduct: Product = {
-      ...productData,
-      id: 'prd_' + Math.random().toString(36).substring(2, 9),
-      userId,
+      id: uid('prd'),
+      companyId: cId,
+      userId: companyOrUserId,
+      type: productData.type,
+      category: productData.category?.trim() || (productData.type === 'service' ? 'Prestations' : 'Matériel'),
+      reference: productData.reference?.trim() || `REF-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: productData.name.trim(),
+      description: productData.description?.trim() || '',
+      unitPrice: Number(productData.unitPrice) || 0,
+      vatRate: Number(productData.vatRate) || 0,
+      unit: productData.unit || 'unité',
+      stock: productData.type === 'service' ? 0 : Number(productData.stock) || 0,
+      minStockAlert: productData.type === 'service' ? 0 : Number(productData.minStockAlert) || 0,
       createdAt: Date.now(),
     };
     all.push(newProduct);
-    saveList(PRODUCTS_KEY, all);
+    setTable(DB_KEYS.PRODUCTS, all);
     return newProduct;
   },
 
-  update(userId: string, id: string, updates: Partial<Product>): Product | null {
-    const all = getList<Product>(PRODUCTS_KEY);
-    const index = all.findIndex((p) => p.id === id && p.userId === userId);
-    if (index === -1) return null;
-
-    all[index] = { ...all[index], ...updates };
-    saveList(PRODUCTS_KEY, all);
-    return all[index];
+  duplicateProduct(companyOrUserId: string, productId: string): Product | null {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Product>(DB_KEYS.PRODUCTS);
+    const orig = all.find(
+      (p) =>
+        p.id === productId &&
+        (p.companyId === cId || p.userId === cId || p.companyId === companyOrUserId || p.userId === companyOrUserId)
+    );
+    if (!orig) return null;
+    const copy: Product = {
+      ...orig,
+      id: uid('prd'),
+      companyId: cId,
+      reference: `${orig.reference}-COPIE`,
+      name: `${orig.name} (Copie)`,
+      createdAt: Date.now(),
+    };
+    all.push(copy);
+    setTable(DB_KEYS.PRODUCTS, all);
+    return copy;
   },
 
-  adjustStock(userId: string, id: string, delta: number, reason?: string): Product | null {
-    const product = this.getById(userId, id);
-    if (!product) return null;
+  deleteProduct(companyOrUserId: string, productId: string): void {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Product>(DB_KEYS.PRODUCTS).filter(
+      (p) =>
+        !(
+          p.id === productId &&
+          (p.companyId === cId || p.userId === cId || p.companyId === companyOrUserId || p.userId === companyOrUserId)
+        )
+    );
+    setTable(DB_KEYS.PRODUCTS, all);
+  },
 
-    const newStock = Math.max(0, (product.stock || 0) + delta);
-    const updated = this.update(userId, id, { stock: newStock });
+  // STOCK MOVEMENTS
+  getStockMovements(companyOrUserId: string): StockMovement[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<StockMovement>(DB_KEYS.STOCK_MOVEMENTS)
+      .filter((m) => m.companyId === cId || m.userId === cId || m.companyId === companyOrUserId || m.userId === companyOrUserId)
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
 
-    if (updated && updated.type === 'product' && newStock <= updated.minStockAlert) {
-      notificationsStorage.addNotification({
-        userId,
-        type: 'stock',
-        title: 'Alerte stock faible ! ⚠️',
-        message: `Le stock de « ${updated.name} » est maintenant à ${newStock} (seuil d'alerte : ${updated.minStockAlert}).`,
-        read: false,
-      });
+  adjustStock(
+    companyOrUserId: string,
+    productId: string,
+    type: 'in' | 'out',
+    quantity: number,
+    reason: string
+  ): StockMovement | null {
+    const cId = resolveCompanyId(companyOrUserId);
+    const products = getTable<Product>(DB_KEYS.PRODUCTS);
+    const idx = products.findIndex(
+      (p) =>
+        p.id === productId &&
+        (p.companyId === cId || p.userId === cId || p.companyId === companyOrUserId || p.userId === companyOrUserId)
+    );
+    if (idx === -1) return null;
+
+    const product = products[idx];
+    if (product.type === 'service') return null;
+
+    const previousStock = Number(product.stock) || 0;
+    const delta = type === 'in' ? Math.abs(quantity) : -Math.abs(quantity);
+    const newStock = Math.max(0, previousStock + delta);
+    products[idx].stock = newStock;
+    setTable(DB_KEYS.PRODUCTS, products);
+
+    const movements = getTable<StockMovement>(DB_KEYS.STOCK_MOVEMENTS);
+    const movement: StockMovement = {
+      id: uid('mov'),
+      companyId: cId,
+      userId: companyOrUserId,
+      productId: product.id,
+      productName: product.name,
+      productReference: product.reference,
+      type,
+      quantity: Math.abs(quantity),
+      previousStock,
+      newStock,
+      reason: reason || (type === 'in' ? 'Entrée manuelle en stock' : 'Sortie manuelle de stock'),
+      date: new Date().toISOString().split('T')[0],
+      createdAt: Date.now(),
+    };
+    movements.push(movement);
+    setTable(DB_KEYS.STOCK_MOVEMENTS, movements);
+    return movement;
+  },
+
+  // QUOTES (DEVIS)
+  getQuotes(companyOrUserId: string): Quote[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<Quote>(DB_KEYS.QUOTES)
+      .filter((q) => q.companyId === cId || q.userId === cId || q.companyId === companyOrUserId || q.userId === companyOrUserId)
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
+
+  getNextQuoteNumber(companyOrUserId: string): string {
+    const settings = this.getSettings(companyOrUserId);
+    const quotes = this.getQuotes(companyOrUserId);
+    const prefix = settings.quotePrefix || 'DEV-2026-';
+    let maxNum = 0;
+    quotes.forEach((q) => {
+      if (q.number && q.number.startsWith(prefix)) {
+        const numPart = parseInt(q.number.replace(prefix, ''), 10);
+        if (!isNaN(numPart) && numPart > maxNum) {
+          maxNum = numPart;
+        }
+      }
+    });
+    return `${prefix}${String(maxNum + 1).padStart(4, '0')}`;
+  },
+
+  saveQuote(
+    companyOrUserId: string,
+    quoteData: Omit<Quote, 'id' | 'companyId' | 'userId' | 'createdAt'> & { id?: string }
+  ): Quote {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Quote>(DB_KEYS.QUOTES);
+    if (quoteData.id) {
+      const idx = all.findIndex(
+        (q) =>
+          q.id === quoteData.id &&
+          (q.companyId === cId || q.userId === cId || q.companyId === companyOrUserId || q.userId === companyOrUserId)
+      );
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...quoteData, companyId: cId };
+        setTable(DB_KEYS.QUOTES, all);
+        return all[idx];
+      }
     }
 
-    return updated;
-  },
-
-  delete(userId: string, id: string): boolean {
-    const all = getList<Product>(PRODUCTS_KEY);
-    const filtered = all.filter((p) => !(p.id === id && p.userId === userId));
-    saveList(PRODUCTS_KEY, filtered);
-    return true;
-  },
-};
-
-// -------------------------------------------------------------
-// Quotes Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const quotesStorage = {
-  getAll(userId: string): Quote[] {
-    const list = getList<Quote>(QUOTES_KEY);
-    return list.filter((q) => q.userId === userId).sort((a, b) => b.createdAt - a.createdAt);
-  },
-
-  getById(userId: string, id: string): Quote | undefined {
-    return this.getAll(userId).find((q) => q.id === id);
-  },
-
-  getNextNumber(userId: string): string {
-    const quotes = this.getAll(userId);
-    const count = quotes.length + 1;
-    const settings = settingsStorage.getSettings(userId);
-    const prefix = settings.quotePrefix || 'DEV-';
-    const year = new Date().getFullYear();
-    return `${prefix}${year}-${String(count).padStart(3, '0')}`;
-  },
-
-  add(userId: string, data: Omit<Quote, 'id' | 'userId' | 'createdAt'>): Quote {
-    const all = getList<Quote>(QUOTES_KEY);
     const newQuote: Quote = {
-      ...data,
-      id: 'dev_' + Math.random().toString(36).substring(2, 9),
-      userId,
+      ...quoteData,
+      id: uid('quo'),
+      companyId: cId,
+      userId: companyOrUserId,
       createdAt: Date.now(),
     };
     all.push(newQuote);
-    saveList(QUOTES_KEY, all);
-
-    notificationsStorage.addNotification({
-      userId,
-      type: 'quote',
-      title: `Devis ${newQuote.number} créé`,
-      message: `Devis de ${newQuote.totalTtc.toLocaleString('fr-FR')} FCFA pour ${newQuote.clientName}.`,
-      read: false,
-    });
-
+    setTable(DB_KEYS.QUOTES, all);
     return newQuote;
   },
 
-  update(userId: string, id: string, updates: Partial<Quote>): Quote | null {
-    const all = getList<Quote>(QUOTES_KEY);
-    const index = all.findIndex((q) => q.id === id && q.userId === userId);
-    if (index === -1) return null;
-
-    all[index] = { ...all[index], ...updates };
-    saveList(QUOTES_KEY, all);
-    return all[index];
+  deleteQuote(companyOrUserId: string, quoteId: string): void {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Quote>(DB_KEYS.QUOTES).filter(
+      (q) =>
+        !(
+          q.id === quoteId &&
+          (q.companyId === cId || q.userId === cId || q.companyId === companyOrUserId || q.userId === companyOrUserId)
+        )
+    );
+    setTable(DB_KEYS.QUOTES, all);
   },
 
-  delete(userId: string, id: string): boolean {
-    const all = getList<Quote>(QUOTES_KEY);
-    const filtered = all.filter((q) => !(q.id === id && q.userId === userId));
-    saveList(QUOTES_KEY, filtered);
-    return true;
-  },
+  convertQuoteToInvoice(companyOrUserId: string, quoteId: string): Invoice | null {
+    const cId = resolveCompanyId(companyOrUserId);
+    const allQuotes = getTable<Quote>(DB_KEYS.QUOTES);
+    const qIdx = allQuotes.findIndex(
+      (q) =>
+        q.id === quoteId &&
+        (q.companyId === cId || q.userId === cId || q.companyId === companyOrUserId || q.userId === companyOrUserId)
+    );
+    if (qIdx === -1) return null;
 
-  /**
-   * 1-Click: "Transformer le devis en facture"
-   */
-  convertToInvoice(userId: string, quoteId: string): Invoice | null {
-    const quote = this.getById(userId, quoteId);
-    if (!quote) return null;
-
-    // Create corresponding invoice
-    const invoiceNumber = invoicesStorage.getNextNumber(userId);
+    const quote = allQuotes[qIdx];
     const today = new Date().toISOString().split('T')[0];
-    const dueDate = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const due = new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0];
 
-    const newInvoice = invoicesStorage.add(userId, {
-      number: invoiceNumber,
+    const invoice = this.saveInvoice(cId, {
+      number: this.getNextInvoiceNumber(cId),
       quoteId: quote.id,
       clientId: quote.clientId,
       clientName: quote.clientName,
@@ -463,7 +666,7 @@ export const quotesStorage = {
       clientCompany: quote.clientCompany,
       clientAddress: quote.clientAddress,
       issueDate: today,
-      dueDate,
+      dueDate: due,
       items: quote.items,
       subtotalHt: quote.subtotalHt,
       totalVat: quote.totalVat,
@@ -472,108 +675,182 @@ export const quotesStorage = {
       paidAmount: 0,
       remainingAmount: quote.totalTtc,
       status: 'sent',
-      notes: quote.notes,
+      notes: quote.notes || `Facture générée depuis le devis ${quote.number}`,
       terms: quote.terms,
     });
 
-    // Mark quote as accepted & reference invoice
-    this.update(userId, quoteId, {
-      status: 'accepted',
-      convertedToInvoiceId: newInvoice.id,
+    allQuotes[qIdx].status = 'accepted';
+    allQuotes[qIdx].convertedToInvoiceId = invoice.id;
+    setTable(DB_KEYS.QUOTES, allQuotes);
+    return invoice;
+  },
+
+  // INVOICES (FACTURES)
+  getInvoices(companyOrUserId: string): Invoice[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    const today = new Date().toISOString().split('T')[0];
+
+    return getTable<Invoice>(DB_KEYS.INVOICES)
+      .filter((i) => i.companyId === cId || i.userId === cId || i.companyId === companyOrUserId || i.userId === companyOrUserId)
+      .map((inv) => {
+        // Compute dynamically exact status based on real payments and due date
+        let status = inv.status;
+        const total = Number(inv.totalTtc) || 0;
+        const paid = Number(inv.paidAmount) || 0;
+        const remaining = Math.max(0, total - paid);
+
+        if (status !== 'draft') {
+          if (remaining === 0 && total > 0) {
+            status = 'paid';
+          } else if (paid > 0 && remaining > 0) {
+            status = 'partial';
+          } else if (inv.dueDate && inv.dueDate < today && remaining > 0) {
+            status = 'late';
+          } else {
+            status = 'sent';
+          }
+        }
+        return {
+          ...inv,
+          remainingAmount: remaining,
+          status,
+        };
+      })
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
+
+  getNextInvoiceNumber(companyOrUserId: string): string {
+    const settings = this.getSettings(companyOrUserId);
+    const invoices = this.getInvoices(companyOrUserId);
+    const prefix = settings.invoicePrefix || 'FAC-2026-';
+    let maxNum = 0;
+    invoices.forEach((i) => {
+      if (i.number && i.number.startsWith(prefix)) {
+        const numPart = parseInt(i.number.replace(prefix, ''), 10);
+        if (!isNaN(numPart) && numPart > maxNum) {
+          maxNum = numPart;
+        }
+      }
     });
-
-    notificationsStorage.addNotification({
-      userId,
-      type: 'quote',
-      title: 'Devis converti en facture ! 🚀',
-      message: `Le devis ${quote.number} est maintenant la facture ${newInvoice.number}.`,
-      read: false,
-    });
-
-    return newInvoice;
-  },
-};
-
-// -------------------------------------------------------------
-// Invoices Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const invoicesStorage = {
-  getAll(userId: string): Invoice[] {
-    const list = getList<Invoice>(INVOICES_KEY);
-    return list.filter((inv) => inv.userId === userId).sort((a, b) => b.createdAt - a.createdAt);
+    return `${prefix}${String(maxNum + 1).padStart(4, '0')}`;
   },
 
-  getById(userId: string, id: string): Invoice | undefined {
-    return this.getAll(userId).find((inv) => inv.id === id);
-  },
+  saveInvoice(
+    companyOrUserId: string,
+    invoiceData: Omit<Invoice, 'id' | 'companyId' | 'userId' | 'createdAt'> & { id?: string }
+  ): Invoice {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Invoice>(DB_KEYS.INVOICES);
+    const isNew = !invoiceData.id;
 
-  getNextNumber(userId: string): string {
-    const invoices = this.getAll(userId);
-    const count = invoices.length + 1;
-    const settings = settingsStorage.getSettings(userId);
-    const prefix = settings.invoicePrefix || 'FAC-';
-    const year = new Date().getFullYear();
-    return `${prefix}${year}-${String(count).padStart(3, '0')}`;
-  },
+    if (invoiceData.id) {
+      const idx = all.findIndex(
+        (i) =>
+          i.id === invoiceData.id &&
+          (i.companyId === cId || i.userId === cId || i.companyId === companyOrUserId || i.userId === companyOrUserId)
+      );
+      if (idx !== -1) {
+        all[idx] = { ...all[idx], ...invoiceData, companyId: cId };
+        setTable(DB_KEYS.INVOICES, all);
+        return all[idx];
+      }
+    }
 
-  add(userId: string, data: Omit<Invoice, 'id' | 'userId' | 'createdAt'>): Invoice {
-    const all = getList<Invoice>(INVOICES_KEY);
     const newInvoice: Invoice = {
-      ...data,
-      id: 'inv_' + Math.random().toString(36).substring(2, 9),
-      userId,
+      ...invoiceData,
+      id: uid('inv'),
+      companyId: cId,
+      userId: companyOrUserId,
       createdAt: Date.now(),
     };
     all.push(newInvoice);
-    saveList(INVOICES_KEY, all);
+    setTable(DB_KEYS.INVOICES, all);
 
-    // Auto-decrement inventory stock if products were selected
-    newInvoice.items.forEach((item) => {
-      if (item.productId) {
-        productsStorage.adjustStock(userId, item.productId, -item.quantity, `Vente facture ${newInvoice.number}`);
-      }
-    });
+    // If new valid invoice (non-draft), automatically deduct physical product stock
+    if (isNew && newInvoice.status !== 'draft') {
+      newInvoice.items.forEach((item) => {
+        if (item.productId) {
+          this.adjustStock(
+            cId,
+            item.productId,
+            'out',
+            item.quantity,
+            `Facture ${newInvoice.number} — ${newInvoice.clientName}`
+          );
+        }
+      });
+    }
 
-    notificationsStorage.addNotification({
-      userId,
-      type: 'invoice',
-      title: `Facture ${newInvoice.number} créée`,
-      message: `Facture de ${newInvoice.totalTtc.toLocaleString('fr-FR')} FCFA pour ${newInvoice.clientName}.`,
-      read: false,
-    });
+    // If created with initial paidAmount > 0, record real payment in payments journal
+    if (isNew && newInvoice.paidAmount > 0) {
+      const payments = getTable<Payment>(DB_KEYS.PAYMENTS);
+      payments.push({
+        id: uid('pay'),
+        companyId: cId,
+        userId: companyOrUserId,
+        invoiceId: newInvoice.id,
+        invoiceNumber: newInvoice.number,
+        clientId: newInvoice.clientId,
+        clientName: newInvoice.clientName,
+        amount: newInvoice.paidAmount,
+        paymentMethod: (newInvoice.paymentMethod as any) || 'mobile_money',
+        reference: `REG-${newInvoice.number}`,
+        notes: 'Paiement comptant initial à la facturation',
+        paidAt: newInvoice.issueDate,
+        createdAt: Date.now(),
+      });
+      setTable(DB_KEYS.PAYMENTS, payments);
+    }
 
     return newInvoice;
   },
 
-  update(userId: string, id: string, updates: Partial<Invoice>): Invoice | null {
-    const all = getList<Invoice>(INVOICES_KEY);
-    const index = all.findIndex((inv) => inv.id === id && inv.userId === userId);
-    if (index === -1) return null;
+  deleteInvoice(companyOrUserId: string, invoiceId: string): void {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<Invoice>(DB_KEYS.INVOICES);
+    const target = all.find(
+      (i) =>
+        i.id === invoiceId &&
+        (i.companyId === cId || i.userId === cId || i.companyId === companyOrUserId || i.userId === companyOrUserId)
+    );
+    if (!target) return;
 
-    all[index] = { ...all[index], ...updates };
-    saveList(INVOICES_KEY, all);
-    return all[index];
+    // Restore stock if it was deducted
+    if (target.status !== 'draft') {
+      target.items.forEach((item) => {
+        if (item.productId) {
+          this.adjustStock(
+            cId,
+            item.productId,
+            'in',
+            item.quantity,
+            `Annulation / Suppression Facture ${target.number}`
+          );
+        }
+      });
+    }
+
+    // Delete invoice
+    setTable(
+      DB_KEYS.INVOICES,
+      all.filter((i) => i.id !== invoiceId)
+    );
+
+    // Delete associated payments
+    const payments = getTable<Payment>(DB_KEYS.PAYMENTS).filter((p) => p.invoiceId !== invoiceId);
+    setTable(DB_KEYS.PAYMENTS, payments);
   },
 
-  delete(userId: string, id: string): boolean {
-    const all = getList<Invoice>(INVOICES_KEY);
-    const filtered = all.filter((inv) => !(inv.id === id && inv.userId === userId));
-    saveList(INVOICES_KEY, filtered);
-    return true;
-  },
-};
-
-// -------------------------------------------------------------
-// Payments Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const paymentsStorage = {
-  getAll(userId: string): Payment[] {
-    const list = getList<Payment>(PAYMENTS_KEY);
-    return list.filter((p) => p.userId === userId).sort((a, b) => b.createdAt - a.createdAt);
+  // PAYMENTS (PAIEMENTS)
+  getPayments(companyOrUserId: string): Payment[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<Payment>(DB_KEYS.PAYMENTS)
+      .filter((p) => p.companyId === cId || p.userId === cId || p.companyId === companyOrUserId || p.userId === companyOrUserId)
+      .sort((a, b) => b.createdAt - a.createdAt);
   },
 
   recordPayment(
-    userId: string,
+    companyOrUserId: string,
     data: {
       invoiceId: string;
       amount: number;
@@ -582,364 +859,146 @@ export const paymentsStorage = {
       notes?: string;
       paidAt: string;
     }
-  ): { payment: Payment; invoice: Invoice } | null {
-    const invoice = invoicesStorage.getById(userId, data.invoiceId);
-    if (!invoice) return null;
+  ): Payment | null {
+    const cId = resolveCompanyId(companyOrUserId);
+    const invoices = getTable<Invoice>(DB_KEYS.INVOICES);
+    const idx = invoices.findIndex(
+      (i) =>
+        i.id === data.invoiceId &&
+        (i.companyId === cId || i.userId === cId || i.companyId === companyOrUserId || i.userId === companyOrUserId)
+    );
+    if (idx === -1) return null;
 
-    const allPayments = getList<Payment>(PAYMENTS_KEY);
-    const newPayment: Payment = {
-      id: 'pay_' + Math.random().toString(36).substring(2, 9),
-      userId,
-      invoiceId: invoice.id,
-      invoiceNumber: invoice.number,
-      clientId: invoice.clientId,
-      clientName: invoice.clientName,
-      amount: data.amount,
+    const inv = invoices[idx];
+    const cleanAmount = Math.min(Number(data.amount) || 0, inv.remainingAmount || inv.totalTtc);
+    if (cleanAmount <= 0) return null;
+
+    inv.paidAmount = (inv.paidAmount || 0) + cleanAmount;
+    inv.remainingAmount = Math.max(0, inv.totalTtc - inv.paidAmount);
+    inv.status = inv.remainingAmount === 0 ? 'paid' : 'partial';
+    invoices[idx] = inv;
+    setTable(DB_KEYS.INVOICES, invoices);
+
+    const payments = getTable<Payment>(DB_KEYS.PAYMENTS);
+    const payment: Payment = {
+      id: uid('pay'),
+      companyId: cId,
+      userId: companyOrUserId,
+      invoiceId: inv.id,
+      invoiceNumber: inv.number,
+      clientId: inv.clientId,
+      clientName: inv.clientName,
+      amount: cleanAmount,
       paymentMethod: data.paymentMethod,
-      reference: data.reference,
+      reference: data.reference || `PAY-${Math.floor(10000 + Math.random() * 90000)}`,
       notes: data.notes,
-      paidAt: data.paidAt,
+      paidAt: data.paidAt || new Date().toISOString().split('T')[0],
       createdAt: Date.now(),
     };
+    payments.push(payment);
+    setTable(DB_KEYS.PAYMENTS, payments);
 
-    allPayments.push(newPayment);
-    saveList(PAYMENTS_KEY, allPayments);
+    return payment;
+  },
 
-    // Update invoice paid & remaining amounts
-    const newPaidAmount = (invoice.paidAmount || 0) + data.amount;
-    const newRemaining = Math.max(0, invoice.totalTtc - newPaidAmount);
-    const newStatus = newRemaining === 0 ? 'paid' : newPaidAmount > 0 ? 'partial' : invoice.status;
+  // NOTIFICATIONS
+  getNotifications(companyOrUserId: string): NotificationItem[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<NotificationItem>(DB_KEYS.NOTIFICATIONS)
+      .filter((n) => n.companyId === cId || n.userId === cId || n.companyId === companyOrUserId || n.userId === companyOrUserId)
+      .sort((a, b) => b.createdAt - a.createdAt);
+  },
 
-    const updatedInvoice = invoicesStorage.update(userId, invoice.id, {
-      paidAmount: newPaidAmount,
-      remainingAmount: newRemaining,
-      status: newStatus,
-    });
-
-    notificationsStorage.addNotification({
-      userId,
-      type: 'payment',
-      title: `Paiement reçu : ${data.amount.toLocaleString('fr-FR')} FCFA 🎉`,
-      message: `Paiement enregistré pour la facture ${invoice.number} (${invoice.clientName}).`,
+  addNotification(
+    companyOrUserId: string,
+    data: Omit<NotificationItem, 'id' | 'companyId' | 'userId' | 'read' | 'createdAt'>
+  ): NotificationItem {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<NotificationItem>(DB_KEYS.NOTIFICATIONS);
+    const item: NotificationItem = {
+      id: uid('notif'),
+      companyId: cId,
+      userId: companyOrUserId,
+      ...data,
       read: false,
-    });
-
-    return { payment: newPayment, invoice: updatedInvoice! };
-  },
-
-  delete(userId: string, id: string): boolean {
-    const all = getList<Payment>(PAYMENTS_KEY);
-    const filtered = all.filter((p) => !(p.id === id && p.userId === userId));
-    saveList(PAYMENTS_KEY, filtered);
-    return true;
-  },
-};
-
-// -------------------------------------------------------------
-// Notifications Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const notificationsStorage = {
-  getAll(userId: string): NotificationItem[] {
-    const list = getList<NotificationItem>(NOTIFICATIONS_KEY);
-    return list.filter((n) => n.userId === userId).sort((a, b) => b.createdAt - a.createdAt);
-  },
-
-  addNotification(data: Omit<NotificationItem, 'id' | 'createdAt'>): NotificationItem {
-    const all = getList<NotificationItem>(NOTIFICATIONS_KEY);
-    const newNotif: NotificationItem = {
-      ...data,
-      id: 'notif_' + Math.random().toString(36).substring(2, 9),
       createdAt: Date.now(),
     };
-    all.unshift(newNotif);
-    saveList(NOTIFICATIONS_KEY, all);
-    return newNotif;
+    all.push(item);
+    setTable(DB_KEYS.NOTIFICATIONS, all);
+    return item;
   },
 
-  markAsRead(userId: string, id: string): void {
-    const all = getList<NotificationItem>(NOTIFICATIONS_KEY);
-    const target = all.find((n) => n.id === id && n.userId === userId);
-    if (target) {
-      target.read = true;
-      saveList(NOTIFICATIONS_KEY, all);
-    }
+  markAllNotificationsRead(companyOrUserId: string): void {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<NotificationItem>(DB_KEYS.NOTIFICATIONS).map((n) =>
+      n.companyId === cId || n.userId === cId || n.companyId === companyOrUserId || n.userId === companyOrUserId
+        ? { ...n, read: true }
+        : n
+    );
+    setTable(DB_KEYS.NOTIFICATIONS, all);
   },
 
-  markAllAsRead(userId: string): void {
-    const all = getList<NotificationItem>(NOTIFICATIONS_KEY);
-    all.forEach((n) => {
-      if (n.userId === userId) n.read = true;
-    });
-    saveList(NOTIFICATIONS_KEY, all);
-  },
-};
-
-// -------------------------------------------------------------
-// Team Storage (Isolated by userId)
-// -------------------------------------------------------------
-export const teamStorage = {
-  getAll(userId: string): TeamMember[] {
-    const list = getList<TeamMember>(TEAM_KEY);
-    return list.filter((t) => t.userId === userId);
+  // TEAM
+  getTeam(companyOrUserId: string): TeamMember[] {
+    const cId = resolveCompanyId(companyOrUserId);
+    return getTable<TeamMember>(DB_KEYS.TEAM).filter(
+      (t) => t.companyId === cId || t.userId === cId || t.companyId === companyOrUserId || t.userId === companyOrUserId
+    );
   },
 
-  add(userId: string, data: Omit<TeamMember, 'id' | 'userId' | 'createdAt'>): TeamMember {
-    const all = getList<TeamMember>(TEAM_KEY);
+  addTeamMember(
+    companyOrUserId: string,
+    data: { name: string; email: string; role: TeamMember['role'] }
+  ): TeamMember {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<TeamMember>(DB_KEYS.TEAM);
     const member: TeamMember = {
-      ...data,
-      id: 'team_' + Math.random().toString(36).substring(2, 9),
-      userId,
+      id: uid('tm'),
+      companyId: cId,
+      userId: companyOrUserId,
+      name: data.name.trim(),
+      email: data.email.trim(),
+      role: data.role,
+      status: 'active',
       createdAt: Date.now(),
     };
     all.push(member);
-    saveList(TEAM_KEY, all);
+    setTable(DB_KEYS.TEAM, all);
     return member;
   },
 
-  delete(userId: string, id: string): boolean {
-    const all = getList<TeamMember>(TEAM_KEY);
-    const filtered = all.filter((t) => !(t.id === id && t.userId === userId));
-    saveList(TEAM_KEY, filtered);
-    return true;
+  updateTeamMemberRole(
+    companyOrUserId: string,
+    memberId: string,
+    newRole: TeamMember['role']
+  ): TeamMember | null {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<TeamMember>(DB_KEYS.TEAM);
+    const idx = all.findIndex(
+      (t) =>
+        t.id === memberId &&
+        (t.companyId === cId || t.userId === cId || t.companyId === companyOrUserId || t.userId === companyOrUserId)
+    );
+    if (idx === -1) return null;
+    all[idx].role = newRole;
+    setTable(DB_KEYS.TEAM, all);
+    return all[idx];
+  },
+
+  removeTeamMember(companyOrUserId: string, memberId: string): void {
+    const cId = resolveCompanyId(companyOrUserId);
+    const all = getTable<TeamMember>(DB_KEYS.TEAM).filter(
+      (t) =>
+        !(
+          t.id === memberId &&
+          (t.companyId === cId || t.userId === cId || t.companyId === companyOrUserId || t.userId === companyOrUserId)
+        )
+    );
+    setTable(DB_KEYS.TEAM, all);
   },
 };
 
-// -------------------------------------------------------------
-// Real User Stats Calculator (No hardcoded fake numbers)
-// -------------------------------------------------------------
-export function computeDashboardStats(userId: string) {
-  const invoices = invoicesStorage.getAll(userId);
-  const clients = clientsStorage.getAll(userId);
-  const products = productsStorage.getAll(userId);
-  const quotes = quotesStorage.getAll(userId);
-  const payments = paymentsStorage.getAll(userId);
-
-  // Total Billed (sum of all invoices TTC except cancelled/draft if needed, but total generated TTC)
-  const totalBilled = invoices.reduce((sum, inv) => sum + inv.totalTtc, 0);
-  const totalPaid = invoices.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
-  const totalPending = Math.max(0, totalBilled - totalPaid);
-
-  const lateInvoices = invoices.filter((inv) => {
-    if (inv.status === 'paid') return false;
-    if (inv.status === 'late') return true;
-    if (inv.dueDate && new Date(inv.dueDate).getTime() < Date.now()) return true;
-    return false;
-  });
-
-  const totalLate = lateInvoices.reduce((sum, inv) => sum + (inv.remainingAmount || 0), 0);
-
-  // Status counts
-  const statusCounts = {
-    draft: invoices.filter((i) => i.status === 'draft').length,
-    sent: invoices.filter((i) => i.status === 'sent').length,
-    paid: invoices.filter((i) => i.status === 'paid').length,
-    late: lateInvoices.length,
-  };
-
-  return {
-    totalBilled,
-    totalPaid,
-    totalPending,
-    totalLate,
-    invoicesCount: invoices.length,
-    clientsCount: clients.length,
-    productsCount: products.length,
-    quotesCount: quotes.length,
-    paymentsCount: payments.length,
-    statusCounts,
-    hasData: invoices.length > 0 || clients.length > 0 || products.length > 0,
-  };
-}
-
-// -------------------------------------------------------------
-// Demo Data Loader (Optional for user convenience)
-// -------------------------------------------------------------
-export function seedDemoDataForUser(userId: string): void {
-  // Add 3 realistic clients
-  const c1 = clientsStorage.add(userId, {
-    name: 'Koffi Kouamé',
-    company: 'Kouamé & Frères SARL',
-    email: 'koffi.kouame@example.com',
-    phone: '+225 07 48 92 10 33',
-    city: 'Abidjan, Cocody',
-    address: 'Rue des Jardins',
-  });
-
-  const c2 = clientsStorage.add(userId, {
-    name: 'Awa Traoré',
-    company: 'Traoré Couture & Mode',
-    email: 'awa.couture@example.com',
-    phone: '+225 05 12 34 56 78',
-    city: 'Abidjan, Marcory',
-    address: 'Boulevard VGE',
-  });
-
-  const c3 = clientsStorage.add(userId, {
-    name: 'Mamadou Touré',
-    company: 'Global Tech Consulting',
-    email: 'm.toure@globaltech.ci',
-    phone: '+225 01 23 45 67 89',
-    city: 'Abidjan, Plateau',
-    address: 'Immeuble Kharrat',
-  });
-
-  // Add 4 products/services
-  const p1 = productsStorage.add(userId, {
-    type: 'service',
-    reference: 'SRV-WEB',
-    name: 'Création de site vitrine responsive',
-    description: 'Conception UI/UX, intégration mobile, hébergement 1 an',
-    unitPrice: 250000,
-    vatRate: 18,
-    unit: 'forfait',
-    stock: 0,
-    minStockAlert: 0,
-  });
-
-  const p2 = productsStorage.add(userId, {
-    type: 'product',
-    reference: 'MAT-IMPR',
-    name: 'Imprimante thermique tickets de caisse',
-    description: 'Modèle USB/Bluetooth haute vitesse 80mm',
-    unitPrice: 65000,
-    vatRate: 18,
-    unit: 'unité',
-    stock: 8,
-    minStockAlert: 3,
-  });
-
-  const p3 = productsStorage.add(userId, {
-    type: 'service',
-    reference: 'SRV-MAINT',
-    name: 'Maintenance informatique mensuelle',
-    description: 'Support technique et sauvegarde cloud',
-    unitPrice: 45000,
-    vatRate: 18,
-    unit: 'mois',
-    stock: 0,
-    minStockAlert: 0,
-  });
-
-  const p4 = productsStorage.add(userId, {
-    type: 'product',
-    reference: 'CON-BOB',
-    name: 'Lot de 50 bobines papier thermique',
-    description: 'Papier sans bisphénol haute longévité',
-    unitPrice: 25000,
-    vatRate: 18,
-    unit: 'lot',
-    stock: 2, // will trigger low stock alert
-    minStockAlert: 5,
-  });
-
-  // Add 1 Quote
-  quotesStorage.add(userId, {
-    number: quotesStorage.getNextNumber(userId),
-    clientId: c3.id,
-    clientName: c3.name,
-    clientEmail: c3.email,
-    clientPhone: c3.phone,
-    clientCompany: c3.company,
-    issueDate: new Date().toISOString().split('T')[0],
-    expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    items: [
-      {
-        id: 'item_1',
-        productId: p1.id,
-        description: p1.name,
-        quantity: 1,
-        unitPrice: p1.unitPrice,
-        vatRate: p1.vatRate,
-        totalHt: 250000,
-      },
-    ],
-    subtotalHt: 250000,
-    totalVat: 45000,
-    discountRate: 0,
-    totalTtc: 295000,
-    status: 'sent',
-    notes: 'Validité de l’offre : 30 jours à compter de l’émission.',
-  });
-
-  // Add 2 Invoices (1 paid, 1 pending)
-  const today = new Date().toISOString().split('T')[0];
-  const duePast = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-  const inv1 = invoicesStorage.add(userId, {
-    number: invoicesStorage.getNextNumber(userId),
-    clientId: c1.id,
-    clientName: c1.name,
-    clientEmail: c1.email,
-    clientPhone: c1.phone,
-    clientCompany: c1.company,
-    issueDate: today,
-    dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    items: [
-      {
-        id: 'item_inv_1',
-        productId: p2.id,
-        description: p2.name,
-        quantity: 1,
-        unitPrice: p2.unitPrice,
-        vatRate: p2.vatRate,
-        totalHt: 65000,
-      },
-      {
-        id: 'item_inv_2',
-        productId: p4.id,
-        description: p4.name,
-        quantity: 1,
-        unitPrice: p4.unitPrice,
-        vatRate: p4.vatRate,
-        totalHt: 25000,
-      },
-    ],
-    subtotalHt: 90000,
-    totalVat: 16200,
-    discountRate: 0,
-    totalTtc: 106200,
-    paidAmount: 106200,
-    remainingAmount: 0,
-    status: 'paid',
-  });
-
-  paymentsStorage.recordPayment(userId, {
-    invoiceId: inv1.id,
-    amount: 106200,
-    paymentMethod: 'mobile_money',
-    reference: 'WAVE-CI-99418',
-    notes: 'Paiement Wave reçu',
-    paidAt: today,
-  });
-
-  // Invoice 2: Unpaid/Pending
-  invoicesStorage.add(userId, {
-    number: invoicesStorage.getNextNumber(userId),
-    clientId: c2.id,
-    clientName: c2.name,
-    clientEmail: c2.email,
-    clientPhone: c2.phone,
-    clientCompany: c2.company,
-    issueDate: duePast,
-    dueDate: duePast,
-    items: [
-      {
-        id: 'item_inv_3',
-        productId: p3.id,
-        description: p3.name,
-        quantity: 1,
-        unitPrice: p3.unitPrice,
-        vatRate: p3.vatRate,
-        totalHt: 45000,
-      },
-    ],
-    subtotalHt: 45000,
-    totalVat: 8100,
-    discountRate: 0,
-    totalTtc: 53100,
-    paidAmount: 0,
-    remainingAmount: 53100,
-    status: 'late',
-    notes: 'Facture échue en attente de règlement.',
-  });
-}
+// Aliases for compatibility
+export const invoicesStorage = workspaceService;
+export const clientsStorage = workspaceService;
+export const productsStorage = workspaceService;

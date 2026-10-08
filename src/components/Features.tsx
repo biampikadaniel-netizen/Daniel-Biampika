@@ -1,155 +1,355 @@
+import React, { useState } from 'react';
+import {
+  FileText,
+  ArrowRightLeft,
+  Users,
+  Package,
+  Boxes,
+  Wallet,
+  MessageCircle,
+  LayoutDashboard,
+  Palette,
+  BarChart3,
+  Check,
+  ExternalLink,
+  ArrowRight,
+} from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigation, AppRoute } from '../context/NavigationContext';
+
+interface FeatureItem {
+  number: string;
+  title: string;
+  subtitle: string;
+  bullets: string[];
+  route: AppRoute;
+  ctaLabel: string;
+  icon: React.ComponentType<{ className?: string }>;
+  accent: 'blue' | 'orange' | 'green';
+  whatsappSample?: {
+    clientName: string;
+    invoiceNumber: string;
+    amount: string;
+    dueDate: string;
+    link: string;
+  };
+}
+
+const featuresList: FeatureItem[] = [
+  {
+    number: '01',
+    title: 'Devis & factures',
+    subtitle: 'Créer des devis et factures professionnels rapidement.',
+    bullets: [
+      'Calcul automatique HT, TVA, remise et Total TTC',
+      'Numérotation séquentielle automatique (FAC-2026-001)',
+      'Téléchargement PDF et impression A4 immédiate',
+    ],
+    route: '/billing',
+    ctaLabel: 'Créer une facture',
+    icon: FileText,
+    accent: 'blue',
+  },
+  {
+    number: '02',
+    title: 'Devis → facture',
+    subtitle: 'Transformer un devis accepté en facture en un clic.',
+    bullets: [
+      'Reprise automatique du client et des lignes produits',
+      'Conservation des prix, quantités, remises et TVA',
+      'Suivi des statuts : Brouillon, Envoyé, Accepté, Refusé, Expiré',
+    ],
+    route: '/quotes',
+    ctaLabel: 'Tester la conversion Devis → Facture',
+    icon: ArrowRightLeft,
+    accent: 'orange',
+  },
+  {
+    number: '03',
+    title: 'Clients & CRM',
+    subtitle: 'Centralisez toute la relation commerciale de vos clients.',
+    bullets: [
+      'Nom, téléphone, email, entreprise et adresse',
+      'Historique complet des devis, factures et paiements',
+      'Notes CRM personnalisées, import et export CSV',
+    ],
+    route: '/clients',
+    ctaLabel: 'Ouvrir le CRM Clients',
+    icon: Users,
+    accent: 'blue',
+  },
+  {
+    number: '04',
+    title: 'Catalogue',
+    subtitle: 'Gérez vos produits, prestations et tarifs sans erreur.',
+    bullets: [
+      'Produits physiques et services avec catégories',
+      'Références, descriptions, prix unitaire et taux de TVA',
+      'Actions rapides : Modifier, Dupliquer, Supprimer',
+    ],
+    route: '/products',
+    ctaLabel: 'Gérer le catalogue',
+    icon: Package,
+    accent: 'blue',
+  },
+  {
+    number: '05',
+    title: 'Gestion de stock',
+    subtitle: 'Suivez votre stock disponible et évitez toute rupture.',
+    bullets: [
+      'Stock disponible en temps réel et seuil minimum d’alerte',
+      'Entrées et sorties manuelles ou liées aux factures',
+      'Historique complet et horodaté des mouvements',
+    ],
+    route: '/stock',
+    ctaLabel: 'Contrôler les stocks',
+    icon: Boxes,
+    accent: 'orange',
+  },
+  {
+    number: '06',
+    title: 'Paiements',
+    subtitle: 'Suivez chaque règlement et solde restant en temps réel.',
+    bullets: [
+      'Statuts : Payé, Partiellement payé, Impayé, En attente',
+      'Modes : Espèces, Mobile Money (Wave, Orange, MTN), Virement, Carte',
+      'Mise à jour automatique du reste à payer sur la facture',
+    ],
+    route: '/payments',
+    ctaLabel: 'Suivre les paiements',
+    icon: Wallet,
+    accent: 'green',
+  },
+  {
+    number: '07',
+    title: 'Relances WhatsApp',
+    subtitle: 'Préparez automatiquement vos messages de relance client.',
+    bullets: [
+      'Intègre automatiquement nom client, N° facture, montant et échéance',
+      'Lien direct vers le document et message personnalisable',
+      'Envoi instantané en 1 clic vers WhatsApp Web ou Mobile',
+    ],
+    route: '/reminders',
+    ctaLabel: 'Relancer sur WhatsApp',
+    icon: MessageCircle,
+    accent: 'green',
+    whatsappSample: {
+      clientName: 'Clinique Perle (Clarisse N’Guessan)',
+      invoiceNumber: 'FAC-2026-004',
+      amount: '672 600 FCFA',
+      dueDate: '10/09/2026',
+      link: 'https://app.faktelio.com/doc/FAC-2026-004',
+    },
+  },
+  {
+    number: '08',
+    title: 'Tableau de bord',
+    subtitle: 'Pilotez votre activité avec des indicateurs clairs.',
+    bullets: [
+      'Chiffre d’affaires, montant encaissé et montant en attente',
+      'Nombre total de factures, devis et clients actifs',
+      'Évolution mensuelle et alertes opérationnelles',
+    ],
+    route: '/dashboard',
+    ctaLabel: 'Voir le tableau de bord',
+    icon: LayoutDashboard,
+    accent: 'blue',
+  },
+  {
+    number: '09',
+    title: 'Documents personnalisés',
+    subtitle: 'Des factures et devis à l’image de votre entreprise.',
+    bullets: [
+      'Logo sur mesure, couleurs de marque et coordonnées',
+      'Signature, cachet officiel et mentions légales (NIF / RCCM)',
+      'Conditions de paiement et coordonnées bancaires / Mobile Money',
+    ],
+    route: '/settings',
+    ctaLabel: 'Personnaliser mes documents',
+    icon: Palette,
+    accent: 'orange',
+  },
+  {
+    number: '10',
+    title: 'Analyses',
+    subtitle: 'Analysez vos performances commerciales en détail.',
+    bullets: [
+      'Graphiques chiffre d’affaires, ventes, paiements et factures',
+      'Évolution mensuelle comparative',
+      'Classement des meilleurs clients et produits les plus vendus',
+    ],
+    route: '/reports',
+    ctaLabel: 'Explorer les analyses',
+    icon: BarChart3,
+    accent: 'blue',
+  },
+];
+
 export function Features() {
+  const { user, loginDemo } = useAuth();
+  const { navigate } = useNavigation();
+  const [whatsappPreviewOpen, setWhatsappPreviewOpen] = useState(false);
+
+  const handleOpenFeature = (route: AppRoute) => {
+    if (!user) {
+      loginDemo();
+    }
+    navigate(route);
+  };
+
+  const triggerWhatsAppDemo = () => {
+    const message = `Bonjour Clarisse N’Guessan (Clinique Perle),\n\nSauf erreur de notre part, la facture N° FAC-2026-004 d'un montant de 672 600 FCFA (échéance le 10/09/2026) reste en attente de règlement.\n\nLien du document FAKTELIO : https://app.faktelio.com/doc/FAC-2026-004\n\nMerci de votre diligence.\nCordialement,\nEntreprise Kouassi & Associés`;
+    const url = `https://wa.me/2250102498877?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   return (
-    <section id="fonctionnalites" className="border-t border-slate-200/70 bg-slate-50/50 py-14 sm:py-20">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
-            Fonctionnalités
-          </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-            Tout ce dont vous avez besoin, rien de superflu
+    <section id="fonctionnalites" className="py-20 lg:py-28 bg-white">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1E4F91]/8 border border-[#1E4F91]/15 mb-4">
+            <span className="w-2 h-2 rounded-full bg-[#F47B20]" />
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#1E4F91]">
+              10 Modules Connectés FAKTELIO
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-extrabold text-[#101828] tracking-tight leading-tight mb-4">
+            Toutes les fonctionnalités pour facturer, encaisser et développer votre entreprise
           </h2>
-          <p className="mt-4 text-slate-600">
-            Des outils simples et efficaces pour gérer votre activité sans perdre de temps.
+          <p className="text-base sm:text-lg text-[#526581]">
+            Chaque carte ci-dessous correspond à un module réel et interactif de votre plateforme FAKTELIO. Cliquez sur n&apos;importe quelle fonctionnalité pour l&apos;utiliser directement.
           </p>
         </div>
 
-        <div className="reveal mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Feature 1 */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-                <path d="M10 9H8" />
-                <path d="M16 13H8" />
-                <path d="M16 17H8" />
-              </svg>
-            </div>
-            <h3 className="mt-4 font-bold text-slate-900">Factures &amp; Devis</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Créez des documents professionnels à vos couleurs en quelques clics. Transformez un devis accepté en
-              facture instantanément.
-            </p>
-          </div>
+        {/* 10 Feature Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-7">
+          {featuresList.map((feature) => {
+            const Icon = feature.icon;
+            const isWhatsAppCard = Boolean(feature.whatsappSample);
 
-          {/* Feature 2 */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
-              </svg>
-            </div>
-            <h3 className="mt-4 font-bold text-slate-900">Envoi &amp; Relances WhatsApp</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Partagez vos factures directement par message WhatsApp. Relancez les factures en retard en un clic avec un
-              message personnalisé.
-            </p>
-          </div>
+            const badgeColors =
+              feature.accent === 'orange'
+                ? 'bg-[#F47B20]/10 text-[#F47B20]'
+                : feature.accent === 'green'
+                ? 'bg-[#16A34A]/10 text-[#16A34A]'
+                : 'bg-[#1E4F91]/10 text-[#1E4F91]';
 
-          {/* Feature 3 */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            return (
+              <div
+                key={feature.number}
+                className={`group rounded-2xl p-6 sm:p-7 border transition-all duration-300 flex flex-col justify-between ${
+                  isWhatsAppCard
+                    ? 'md:col-span-2 lg:col-span-2 bg-gradient-to-br from-white via-white to-[#F0FDF4] border-[#BBF7D0] shadow-[0_10px_30px_-10px_rgba(22,163,74,0.14)]'
+                    : 'bg-white border-[#E2E8F0] shadow-[0_4px_20px_-4px_rgba(16,24,40,0.05)] hover:shadow-[0_16px_36px_-10px_rgba(30,79,145,0.14)] hover:border-[#1E4F91]/30 hover:-translate-y-1'
+                }`}
               >
-                <rect width="20" height="14" x="2" y="5" rx="2" />
-                <line x1="2" x2="22" y1="10" y2="10" />
-              </svg>
-            </div>
-            <h3 className="mt-4 font-bold text-slate-900">Suivi des Paiements</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Visualisez en un coup d'œil vos factures payées, en attente et en retard. Enregistrez les acomptes et
-              règlements reçus.
-            </p>
-          </div>
+                <div>
+                  {/* Card Top Header */}
+                  <div className="flex items-center justify-between mb-5">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${badgeColors}`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <span className="text-xs font-extrabold tracking-widest text-[#526581]/60 bg-[#F5F7FA] px-3 py-1 rounded-full border border-[#E2E8F0]">
+                      FONCTIONNALITÉ {feature.number}
+                    </span>
+                  </div>
 
-          {/* Feature 4 */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <h3 className="mt-4 font-bold text-slate-900">Gestion des Clients</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Gardez les coordonnées de tous vos clients au même endroit. Retrouvez l'historique complet de leurs
-              commandes et paiements.
-            </p>
-          </div>
+                  {/* Title & Subtitle */}
+                  <h3 className="text-xl font-extrabold text-[#101828] mb-2 group-hover:text-[#1E4F91] transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-[#526581] leading-relaxed mb-5">
+                    {feature.subtitle}
+                  </p>
 
-          {/* Feature 5 */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="m7.5 4.27 9 5.15" />
-                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
-                <path d="m3.3 7 8.7 5 8.7-5" />
-                <path d="M12 22V12" />
-              </svg>
-            </div>
-            <h3 className="mt-4 font-bold text-slate-900">Catalogue &amp; Stocks</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Enregistrez vos produits et services avec leurs prix pour remplir vos factures encore plus vite. Suivez
-              l'état de votre stock.
-            </p>
-          </div>
+                  {/* Bullet points */}
+                  <ul className="space-y-2.5 mb-6">
+                    {feature.bullets.map((bullet, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 text-xs sm:text-sm text-[#101828]">
+                        <span className="w-4 h-4 rounded-full bg-[#16A34A]/15 text-[#16A34A] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3 h-3 stroke-[2.5]" />
+                        </span>
+                        <span>{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-          {/* Feature 6 */}
-          <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-shadow hover:shadow-md">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-teal-100 text-teal-600">
-              <svg
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="8" r="6" />
-                <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
-              </svg>
-            </div>
-            <h3 className="mt-4 font-bold text-slate-900">Signature &amp; Cachet Pro</h3>
-            <p className="mt-2 text-sm text-slate-600">
-              Ajoutez votre logo, votre signature et le cachet de votre entreprise directement sur les documents pour un
-              rendu 100% professionnel.
-            </p>
-          </div>
+                  {/* Special Interactive WhatsApp Preview Block inside Feature 7 */}
+                  {feature.whatsappSample && (
+                    <div className="mb-6 rounded-xl bg-white border border-[#DCFCE7] p-4 shadow-xs">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#15803D]">
+                          Aperçu automatique du message WhatsApp
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setWhatsappPreviewOpen(!whatsappPreviewOpen)}
+                          className="text-[11px] font-bold text-[#1E4F91] hover:underline cursor-pointer"
+                        >
+                          {whatsappPreviewOpen ? 'Masquer détails' : 'Voir le modèle complet'}
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mb-3 bg-[#F5F7FA] p-2.5 rounded-lg">
+                        <div>
+                          <span className="text-[10px] text-[#526581] block">Client</span>
+                          <strong className="text-[#101828]">Clinique Perle</strong>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[#526581] block">N° Facture</span>
+                          <strong className="text-[#1E4F91]">{feature.whatsappSample.invoiceNumber}</strong>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[#526581] block">Montant</span>
+                          <strong className="text-[#F47B20]">{feature.whatsappSample.amount}</strong>
+                        </div>
+                        <div>
+                          <span className="text-[10px] text-[#526581] block">Échéance</span>
+                          <strong className="text-[#101828]">{feature.whatsappSample.dueDate}</strong>
+                        </div>
+                      </div>
+                      {whatsappPreviewOpen && (
+                        <div className="text-xs text-[#101828] bg-[#DCFCE7]/40 p-3 rounded-lg border border-[#BBF7D0] mb-3 font-mono leading-relaxed">
+                          &ldquo;Bonjour Clarisse N’Guessan, votre facture <strong>FAC-2026-004</strong> d&apos;un montant de <strong>672 600 FCFA</strong> arrivée à échéance le <strong>10/09/2026</strong> est disponible ici : <span className="underline text-[#1E4F91]">https://app.faktelio.com/doc/FAC-2026-004</span>&rdquo;
+                        </div>
+                      )}
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <button
+                          type="button"
+                          onClick={triggerWhatsAppDemo}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-bold shadow-xs transition-all cursor-pointer"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                          Relancer sur WhatsApp
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleOpenFeature('/reminders')}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#1E4F91]/10 hover:bg-[#1E4F91]/15 text-[#1E4F91] text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          Ouvrir le module Relances →
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Action Link */}
+                <div className="pt-4 border-t border-[#F5F7FA] flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenFeature(feature.route)}
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#1E4F91] group-hover:text-[#F47B20] transition-colors cursor-pointer"
+                  >
+                    <span>{feature.ctaLabel}</span>
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+                  <span className="text-[11px] font-semibold text-[#526581]">FAKTELIO SaaS</span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

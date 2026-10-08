@@ -1,102 +1,78 @@
-import type { FAQItem } from '../types';
+import React, { useState } from 'react';
+import { ChevronDown } from 'lucide-react';
+import { FAQItem } from '../types';
 
-const FAQ_ITEMS: FAQItem[] = [
+const faqs: FAQItem[] = [
   {
-    question: "Ai-je besoin d'une carte bancaire pour commencer ?",
+    question: 'Est-ce que je peux utiliser FAKTELIO gratuitement ?',
     answer:
-      "Non. Vous créez votre compte gratuitement, sans carte bancaire. Vous profitez en plus de 14 jours d'essai des fonctionnalités Entreprise.",
+      'Oui, vous pouvez créer votre compte FAKTELIO gratuitement à 0 FCFA sans carte bancaire et profiter de 14 jours d’essai complet sur les fonctionnalités Pro ainsi que d’une formule découverte gratuite.',
   },
   {
-    question: "Combien de temps dure l'essai gratuit ?",
+    question: 'Puis-je transformer un devis en facture automatiquement ?',
     answer:
-      "À l'inscription, vous bénéficiez de 14 jours d'essai des fonctionnalités Entreprise. À la fin, vous basculez automatiquement sur l'offre gratuite si vous ne souscrivez pas — sans blocage ni mauvaise surprise.",
+      'Absolument. Dès qu’un devis passe au statut « Accepté », un bouton « Transformer en facture » apparaît. En un clic, FAKTELIO génère la facture correspondante avec toutes les lignes, prix, remises et TVA sans aucune ressaisie.',
   },
   {
-    question: 'Puis-je utiliser Chapfacture sur mon téléphone ?',
+    question: 'Comment fonctionnent les relances clients sur WhatsApp ?',
     answer:
-      "Oui. Chapfacture fonctionne dans le navigateur de votre téléphone, tablette ou ordinateur, et peut s'installer comme une application sur votre écran d'accueil.",
+      'FAKTELIO prépare automatiquement un message personnalisé contenant le nom du client, le numéro de la facture, le montant restant à payer, la date d’échéance et la référence du document. Il vous suffit de cliquer sur « Relancer sur WhatsApp » pour l’envoyer.',
   },
   {
-    question: 'Mes données sont-elles en sécurité ?',
+    question: 'Est-ce que je peux personnaliser mes factures avec mon logo et mon cachet ?',
     answer:
-      'Vos données et celles de vos clients sont chiffrées et hébergées sur des serveurs cloud sécurisés. Chaque entreprise ne voit que ses propres données, jamais celles des autres.',
+      'Oui, depuis le menu Paramètres de votre espace FAKTELIO, vous pouvez ajouter le logo de votre entreprise, choisir votre couleur principale, configurer votre signature/cachet, vos mentions légales (NIF, RCCM) et vos conditions de règlement.',
   },
   {
-    question: 'Mes données sont-elles sauvegardées ?',
+    question: 'FAKTELIO fonctionne-t-il sur téléphone mobile et ordinateur ?',
     answer:
-      'Oui, tout est sauvegardé automatiquement dans le cloud. Un téléphone perdu ou cassé ne vous fait rien perdre : reconnectez-vous et vous retrouvez tout.',
-  },
-  {
-    question: 'Puis-je personnaliser mes factures ?',
-    answer:
-      'Oui : ajoutez votre logo et choisissez votre modèle pour des devis et factures à votre image, qui renforcent votre professionnalisme.',
-  },
-  {
-    question: 'Comment mes clients paient-ils ?',
-    answer:
-      'Vous envoyez vos factures par WhatsApp et suivez les paiements en temps réel. Le paiement Mobile Money est intégré pour vos abonnements Chapfacture.',
-  },
-  {
-    question: 'Puis-je importer mes clients existants ?',
-    answer:
-      'Oui. Vous saisissez ou ajoutez vos clients une fois ; ils sont ensuite réutilisables sur tous vos documents, sans ressaisie.',
-  },
-  {
-    question: 'Puis-je travailler à plusieurs ?',
-    answer:
-      "Oui. Avec l'offre Entreprise, le chef d'entreprise ajoute des membres de son équipe et garde une trace de qui a fait quoi.",
-  },
-  {
-    question: 'Puis-je résilier à tout moment ?',
-    answer:
-      "Oui, sans engagement. Vous changez d'offre ou arrêtez quand vous voulez, et vous conservez l'accès à l'offre gratuite.",
-  },
-  {
-    question: 'Puis-je envoyer mes factures par WhatsApp ?',
-    answer:
-      "Oui, c'est au cœur de Chapfacture : envoyez devis et factures à vos clients par WhatsApp en un clic, avec un lien propre vers le PDF.",
-  },
-  {
-    question: 'Ai-je besoin de compétences techniques ? Et pour le support ?',
-    answer:
-      'Non. Si vous savez envoyer un message WhatsApp, vous savez utiliser Chapfacture. Et notre équipe francophone vous accompagne : écrivez-nous depuis la page Contact.',
+      'Oui, FAKTELIO est une application web 100% responsive accessible 24/7 depuis n’importe quel smartphone (Android, iPhone), tablette ou ordinateur portable.',
   },
 ];
 
 export function FAQ() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
   return (
-    <section id="faq" className="border-t border-slate-200/70 bg-slate-50/50 py-14 sm:py-20">
-      <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-3xl">
-        <div className="text-center reveal">
-          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
-            FAQ
+    <section id="faq" className="py-20 bg-[#F5F7FA] border-b border-[#E2E8F0]">
+      <div className="max-w-[900px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+            Questions fréquentes
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">Questions fréquentes</h2>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight">
+            Tout savoir sur FAKTELIO
+          </h2>
         </div>
 
-        <div className="mt-12 space-y-4 reveal">
-          {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.question}
-              className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm [&_summary::-webkit-details-marker]:hidden"
-            >
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-bold text-slate-800">
-                {item.question}
-                <svg
-                  className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-open:rotate-180"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+        <div className="space-y-3.5">
+          {faqs.map((faq, idx) => {
+            const isOpen = openIndex === idx;
+            return (
+              <div
+                key={idx}
+                className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden transition-all"
+              >
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(isOpen ? null : idx)}
+                  className="w-full px-6 py-5 text-left flex items-center justify-between gap-4 hover:bg-[#F5F7FA]/50 transition-colors cursor-pointer"
                 >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </summary>
-              <p className="mt-4 text-sm leading-relaxed text-slate-600">{item.answer}</p>
-            </details>
-          ))}
+                  <span className="text-base font-extrabold text-[#101828]">{faq.question}</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-[#1E4F91] shrink-0 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {isOpen && (
+                  <div className="px-6 pb-5 text-sm text-[#526581] leading-relaxed border-t border-[#F5F7FA] pt-3">
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

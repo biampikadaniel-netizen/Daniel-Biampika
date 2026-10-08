@@ -1,294 +1,241 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { X } from 'lucide-react';
+import { Product } from '../../types';
 import { useAuth } from '../../context/AuthContext';
-import { productsStorage, settingsStorage } from '../../services/storage';
-import type { Product } from '../../types';
-import { X, Package, Tag, DollarSign, Layers, AlertCircle } from 'lucide-react';
-
-interface ProductModalProps {
-  isOpen: boolean;
-  productToEdit?: Product | null;
-  onClose: () => void;
-  onProductSaved: (product: Product) => void;
-}
+import { workspaceService } from '../../services/storage';
 
 export function ProductModal({
-  isOpen,
-  productToEdit,
+  product,
   onClose,
-  onProductSaved,
-}: ProductModalProps) {
-  const { currentUser } = useAuth();
-  if (!isOpen || !currentUser) return null;
+  onSaved,
+}: {
+  product: Product | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const { user } = useAuth();
+  const companyId = user?.companyId || user?.id || '';
 
-  const settings = settingsStorage.getSettings(currentUser.id);
+  const [type, setType] = useState<'product' | 'service'>(product?.type || 'product');
+  const [category, setCategory] = useState(product?.category || (type === 'service' ? 'Prestations' : 'Matériel'));
+  const [reference, setReference] = useState(product?.reference || `REF-${Math.floor(1000 + Math.random() * 9000)}`);
+  const [name, setName] = useState(product?.name || '');
+  const [description, setDescription] = useState(product?.description || '');
+  const [unitPrice, setUnitPrice] = useState<number | string>(product?.unitPrice ?? 0);
+  const [vatRate, setVatRate] = useState<number>(product?.vatRate ?? 18);
+  const [unit, setUnit] = useState(product?.unit || 'unité');
+  const [stock, setStock] = useState<number | string>(product?.stock ?? 0);
+  const [minStockAlert, setMinStockAlert] = useState<number | string>(product?.minStockAlert ?? 0);
+  const [error, setError] = useState('');
 
-  const [type, setType] = useState<'product' | 'service'>('product');
-  const [name, setName] = useState('');
-  const [reference, setReference] = useState('');
-  const [description, setDescription] = useState('');
-  const [unitPrice, setUnitPrice] = useState<number>(0);
-  const [vatRate, setVatRate] = useState<number>(settings.defaultVatRate || 18);
-  const [unit, setUnit] = useState('unité');
-  const [stock, setStock] = useState<number>(10);
-  const [minStockAlert, setMinStockAlert] = useState<number>(3);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (productToEdit) {
-      setType(productToEdit.type);
-      setName(productToEdit.name);
-      setReference(productToEdit.reference);
-      setDescription(productToEdit.description || '');
-      setUnitPrice(productToEdit.unitPrice);
-      setVatRate(productToEdit.vatRate);
-      setUnit(productToEdit.unit);
-      setStock(productToEdit.stock);
-      setMinStockAlert(productToEdit.minStockAlert);
-    } else {
-      setType('product');
-      setName('');
-      setReference('REF-' + Math.floor(1000 + Math.random() * 9000));
-      setDescription('');
-      setUnitPrice(5000);
-      setVatRate(settings.defaultVatRate || 18);
-      setUnit('unité');
-      setStock(10);
-      setMinStockAlert(3);
-    }
-  }, [productToEdit, settings.defaultVatRate]);
+  if (!user || !companyId) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
     if (!name.trim()) {
-      setError('Le nom du produit ou service est requis.');
-      return;
-    }
-    if (unitPrice < 0) {
-      setError('Le prix ne peut pas être négatif.');
+      setError("Le nom de l'article est requis.");
       return;
     }
 
-    if (productToEdit) {
-      const updated = productsStorage.update(currentUser.id, productToEdit.id, {
-        type,
-        name: name.trim(),
-        reference: reference.trim() || 'REF-001',
-        description: description.trim() || undefined,
-        unitPrice,
-        vatRate,
-        unit,
-        stock: type === 'product' ? stock : 0,
-        minStockAlert: type === 'product' ? minStockAlert : 0,
-      });
-      if (updated) {
-        onProductSaved(updated);
-        onClose();
-      }
-    } else {
-      const created = productsStorage.add(currentUser.id, {
-        type,
-        name: name.trim(),
-        reference: reference.trim() || 'REF-001',
-        description: description.trim() || undefined,
-        unitPrice,
-        vatRate,
-        unit,
-        stock: type === 'product' ? stock : 0,
-        minStockAlert: type === 'product' ? minStockAlert : 0,
-      });
-      onProductSaved(created);
-      onClose();
-    }
+    workspaceService.saveProduct(companyId, {
+      id: product?.id,
+      type,
+      category: category.trim() || (type === 'service' ? 'Prestations' : 'Matériel'),
+      reference: reference.trim(),
+      name: name.trim(),
+      description: description.trim(),
+      unitPrice: Number(unitPrice) || 0,
+      vatRate: Number(vatRate) || 0,
+      unit,
+      stock: type === 'service' ? 0 : Number(stock) || 0,
+      minStockAlert: type === 'service' ? 0 : Number(minStockAlert) || 0,
+    });
+
+    onSaved();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-orange-100 text-orange-700">
-              <Package className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-base">
-                {productToEdit ? 'Modifier l’article' : 'Ajouter un produit / service'}
-              </h3>
-              <p className="text-xs text-slate-500">Catalogue commercial &amp; stocks</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600">
+    <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
+        <div className="px-6 py-4 bg-[#1E4F91] text-white flex items-center justify-between">
+          <h2 className="text-base font-extrabold">
+            {product ? 'Modifier l’article du catalogue' : 'Nouvel article du catalogue'}
+          </h2>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/15 cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {error && (
-          <div className="mt-4 p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 rounded-xl bg-[#FEE2E2] text-[#DC2626] text-xs font-semibold">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
-          {/* Type Selector */}
-          <div className="grid grid-cols-2 gap-2 bg-slate-100 p-1 rounded-2xl">
+          <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              onClick={() => setType('product')}
-              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                type === 'product' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              onClick={() => {
+                setType('product');
+                if (category === 'Prestations') setCategory('Matériel');
+              }}
+              className={`py-2.5 px-4 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                type === 'product'
+                  ? 'bg-[#1E4F91] text-white border-[#1E4F91]'
+                  : 'bg-[#F5F7FA] text-[#526581] border-[#E2E8F0]'
               }`}
             >
-              📦 Produit physique
+              Produit physique (stock)
             </button>
             <button
               type="button"
-              onClick={() => setType('service')}
-              className={`py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
-                type === 'service' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500 hover:text-slate-800'
+              onClick={() => {
+                setType('service');
+                if (category === 'Matériel') setCategory('Prestations');
+              }}
+              className={`py-2.5 px-4 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                type === 'service'
+                  ? 'bg-[#1E4F91] text-white border-[#1E4F91]'
+                  : 'bg-[#F5F7FA] text-[#526581] border-[#E2E8F0]'
               }`}
             >
-              💼 Prestation / Service
+              Prestation de service
             </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Désignation <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Référence *</label>
               <input
                 type="text"
                 required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Ordinateur portable ou Audit SEO"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Référence / SKU
-              </label>
-              <input
-                type="text"
                 value={reference}
                 onChange={(e) => setReference(e.target.value)}
-                placeholder="REF-001"
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
+                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-mono"
               />
             </div>
+            <div>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Catégorie *</label>
+              <input
+                type="text"
+                required
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="Ex: Informatique, Énergie..."
+                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#101828] mb-1">Nom de l&apos;article *</label>
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setError('');
+              }}
+              placeholder="Désignation commerciale"
+              className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-[#101828] mb-1">Description</label>
+            <textarea
+              rows={2}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Détails techniques ou contenu de la prestation..."
+              className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+            />
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Prix unitaire (FCFA) <span className="text-red-500">*</span>
-              </label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Prix (FCFA) *</label>
               <input
                 type="number"
-                min="0"
-                step="500"
                 required
+                min={0}
                 value={unitPrice}
-                onChange={(e) => setUnitPrice(Math.max(0, parseInt(e.target.value) || 0))}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold text-slate-900 focus:border-teal-500 outline-none"
+                onChange={(e) => setUnitPrice(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm font-bold"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                TVA (%)
-              </label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">TVA (%)</label>
               <select
                 value={vatRate}
-                onChange={(e) => setVatRate(parseInt(e.target.value) || 0)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold focus:border-teal-500 outline-none bg-white"
+                onChange={(e) => setVatRate(Number(e.target.value))}
+                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm"
               >
-                <option value={0}>0%</option>
                 <option value={18}>18%</option>
+                <option value={9}>9%</option>
+                <option value={0}>0%</option>
               </select>
             </div>
-
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Unité
-              </label>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Unité</label>
               <select
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-bold focus:border-teal-500 outline-none bg-white"
+                className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-sm"
               >
                 <option value="unité">Unité</option>
+                <option value="forfait">Forfait</option>
                 <option value="heure">Heure</option>
                 <option value="jour">Jour</option>
-                <option value="forfait">Forfait</option>
                 <option value="lot">Lot</option>
-                <option value="kg">Kg</option>
-                <option value="mètre">Mètre</option>
               </select>
             </div>
           </div>
 
-          {/* Stock fields only for physical products */}
           {type === 'product' && (
-            <div className="grid grid-cols-2 gap-4 p-3.5 rounded-2xl bg-orange-50/60 border border-orange-200/60">
+            <div className="grid grid-cols-2 gap-4 p-3.5 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-orange-900 mb-1.5">
+                <label className="block text-xs font-bold text-[#101828] mb-1">
                   Stock initial
                 </label>
                 <input
                   type="number"
-                  min="0"
+                  min={0}
                   value={stock}
-                  onChange={(e) => setStock(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-3 py-2 rounded-xl border border-orange-300 text-xs font-bold bg-white focus:border-orange-500 outline-none"
+                  onChange={(e) => setStock(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-sm font-bold"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-orange-900 mb-1.5">
-                  Seuil d'alerte min.
+                <label className="block text-xs font-bold text-[#101828] mb-1">
+                  Seuil d&apos;alerte minimum
                 </label>
                 <input
                   type="number"
-                  min="0"
+                  min={0}
                   value={minStockAlert}
-                  onChange={(e) => setMinStockAlert(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full px-3 py-2 rounded-xl border border-orange-300 text-xs font-bold bg-white focus:border-orange-500 outline-none"
+                  onChange={(e) => setMinStockAlert(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-sm font-bold"
                 />
               </div>
             </div>
           )}
 
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-              Description (optionnel)
-            </label>
-            <textarea
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Détails techniques, garanties..."
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none"
-            />
-          </div>
-
-          <div className="pt-3 flex items-center justify-end gap-3">
+          <div className="pt-3 flex justify-end gap-2.5 border-t border-[#E2E8F0]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-xs font-extrabold text-white shadow-md shadow-orange-600/20 cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold cursor-pointer"
             >
-              {productToEdit ? 'Enregistrer les modifications' : 'Ajouter au catalogue'}
+              {product ? 'Mettre à jour' : 'Enregistrer dans le catalogue'}
             </button>
           </div>
         </form>

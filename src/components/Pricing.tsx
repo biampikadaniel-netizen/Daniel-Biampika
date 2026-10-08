@@ -1,274 +1,199 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Check, Sparkles, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '../context/NavigationContext';
 
+interface FaktelioPlan {
+  id: 'basique' | 'startup' | 'entreprise';
+  name: string;
+  subtitle: string;
+  monthlyPrice: number;
+  annualPrice: number;
+  popular?: boolean;
+  badge?: string;
+  ctaLabel: string;
+  features: string[];
+}
+
+const plans: FaktelioPlan[] = [
+  {
+    id: 'basique',
+    name: ' Gratuit / Découverte',
+    subtitle: 'Idéal pour démarrer et tester FAKTELIO sans engagement.',
+    monthlyPrice: 0,
+    annualPrice: 0,
+    badge: '0 FCFA POUR COMMENCER',
+    ctaLabel: 'Démarrer gratuitement',
+    features: [
+      'Jusqu’à 15 devis & factures / mois',
+      'Conversion Devis → Facture en 1 clic',
+      'Gestion des clients & CRM de base',
+      'Catalogue produits & services',
+      'Téléchargement PDF professionnel',
+    ],
+  },
+  {
+    id: 'startup',
+    name: 'FAKTELIO Pro',
+    subtitle: 'Pour les PME, commerçants et freelances en pleine activité.',
+    monthlyPrice: 9900,
+    annualPrice: 7900,
+    popular: true,
+    badge: 'LE PLUS POPULAIRE',
+    ctaLabel: 'Choisir FAKTELIO Pro',
+    features: [
+      'Devis et factures illimités',
+      'Relances clients WhatsApp automatiques',
+      'Gestion complète du stock & alertes seuils',
+      'Suivi des paiements partiels & Mobile Money',
+      'Documents personnalisés (logo, couleurs, cachet)',
+      'Jusqu’à 3 utilisateurs inclus',
+    ],
+  },
+  {
+    id: 'entreprise',
+    name: 'FAKTELIO Business',
+    subtitle: 'Pour les entreprises structurées et équipes multi-utilisateurs.',
+    monthlyPrice: 24900,
+    annualPrice: 19900,
+    badge: 'PERFORMANCE MAXIMALE',
+    ctaLabel: 'Choisir FAKTELIO Business',
+    features: [
+      'Tout le plan FAKTELIO Pro inclus',
+      'Utilisateurs & collaborateurs illimités',
+      'Analyses financières avancées & exports CSV',
+      'Gestion multi-dépôts & mouvements de stock',
+      'Accompagnement prioritaire & formation équipe',
+    ],
+  },
+];
+
 export function Pricing() {
-  const [billingCycle, setBillingCycle] = useState<'yearly' | 'monthly'>('yearly');
+  const [annual, setAnnual] = useState(true);
+  const { user } = useAuth();
   const { navigate } = useNavigation();
 
-  const isYearly = billingCycle === 'yearly';
+  const handleSelectPlan = (planId: FaktelioPlan['id']) => {
+    if (user) {
+      navigate('/subscription');
+    } else {
+      navigate('/register', { selectedPlan: planId });
+    }
+  };
 
   return (
-    <section id="tarifs" className="border-t border-slate-200/70 bg-slate-50/50 py-14 sm:py-20">
-      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="reveal mx-auto max-w-2xl text-center">
-          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-brand-700">
-            Tarifs
+    <section id="tarifs" className="py-20 lg:py-28 bg-white border-b border-[#E2E8F0]">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto text-center mb-12">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#1E4F91]/10 text-[#1E4F91] text-xs font-extrabold uppercase tracking-wider mb-3">
+            Tarifs transparents
           </span>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
-            Des tarifs simples et transparents
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#101828] tracking-tight mb-4">
+            Commencez à 0 FCFA et évoluez selon vos besoins
           </h2>
-          <p className="mt-4 text-slate-600">
-            Choisissez l'offre adaptée à votre activité. Commencez gratuitement et passez à la vitesse supérieure quand
-            votre entreprise grandit — sans engagement, changez ou annulez à tout moment.
+          <p className="text-base text-[#526581] mb-8">
+            Aucun frais caché. Sans carte bancaire à l&apos;inscription. Paiement flexible par Mobile Money (Wave, Orange Money, MTN) ou carte bancaire.
           </p>
-          <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-teal-200 bg-teal-50 px-4 py-1.5 text-sm font-bold text-teal-700">
-            🎁 14 jours d'essai Entreprise offerts à l'inscription
-          </div>
-        </div>
 
-        {/* Toggle Switch */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-3">
-          <button
-            type="button"
-            onClick={() => setBillingCycle('yearly')}
-            className={`text-sm font-bold transition-colors ${
-              isYearly ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            Par an
-          </button>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={!isYearly}
-            aria-label="Basculer entre facturation annuelle et mensuelle"
-            onClick={() => setBillingCycle(isYearly ? 'monthly' : 'yearly')}
-            className="relative inline-flex h-7 w-14 shrink-0 items-center rounded-full bg-slate-200 transition-colors"
-          >
-            <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-slate-700 shadow-sm transition-transform ${
-                isYearly ? 'translate-x-1' : 'translate-x-8'
+          {/* Billing Toggle */}
+          <div className="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-[#F5F7FA] border border-[#E2E8F0]">
+            <button
+              type="button"
+              onClick={() => setAnnual(false)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                !annual ? 'bg-white text-[#101828] shadow-xs' : 'text-[#526581] hover:text-[#101828]'
               }`}
-            />
-          </button>
-          <button
-            type="button"
-            onClick={() => setBillingCycle('monthly')}
-            className={`text-sm font-bold transition-colors ${
-              !isYearly ? 'text-slate-900' : 'text-slate-500 hover:text-slate-700'
-            }`}
-          >
-            Par mois
-          </button>
-          <span className="rounded-lg bg-teal-100 px-2.5 py-1 text-xs font-bold text-teal-700">
-            Économisez jusqu'à 48% 🤩
-          </span>
+            >
+              Facturation mensuelle
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnnual(true)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                annual ? 'bg-[#1E4F91] text-white shadow-xs' : 'text-[#526581] hover:text-[#101828]'
+              }`}
+            >
+              <span>Facturation annuelle</span>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F47B20] text-white">
+                -20%
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="reveal mx-auto mt-10 grid max-w-5xl gap-6 lg:grid-cols-3">
-          {/* Basique */}
-          <div className="relative flex flex-col rounded-3xl border bg-white p-7 text-center shadow-sm border-slate-200">
-            <h3 className="text-lg font-bold">Basique</h3>
-            <p className="text-xs text-slate-500">Pour démarrer</p>
-            <div className="mt-4">
-              <div className="flex items-baseline justify-center gap-1.5">
-                <span className="text-3xl font-extrabold tracking-tight">0 FCFA</span>
-              </div>
-            </div>
-            <div className="mt-1 min-h-[2.5rem]">
-              <p className="text-xs text-slate-400">Gratuit, pour toujours</p>
-            </div>
-            <ul className="mt-5 space-y-2.5 text-left text-sm">
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Jusqu'à 5 clients</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Jusqu'à 10 factures / mois</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Canal WhatsApp (basique)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Support communautaire</span>
-              </li>
-            </ul>
-            <div className="mt-7 flex flex-1 items-end pt-2">
-              <button
-                onClick={() => navigate('/register')}
-                className="block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold transition-transform hover:-translate-y-0.5 border border-slate-300 text-slate-700 hover:bg-slate-50 cursor-pointer"
+        {/* Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-7 items-stretch">
+          {plans.map((plan) => {
+            const price = annual ? plan.annualPrice : plan.monthlyPrice;
+            return (
+              <div
+                key={plan.id}
+                className={`rounded-2xl p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 ${
+                  plan.popular
+                    ? 'bg-white border-2 border-[#F47B20] shadow-[0_20px_50px_-12px_rgba(244,123,32,0.18)] relative lg:-translate-y-2'
+                    : 'bg-white border border-[#E2E8F0] shadow-xs hover:shadow-md'
+                }`}
               >
-                Commencer gratuitement
-              </button>
-            </div>
-          </div>
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span
+                      className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
+                        plan.popular
+                          ? 'bg-[#F47B20] text-white'
+                          : 'bg-[#1E4F91]/10 text-[#1E4F91]'
+                      }`}
+                    >
+                      {plan.badge}
+                    </span>
+                    {plan.popular && <Sparkles className="w-5 h-5 text-[#F47B20]" />}
+                  </div>
 
-          {/* StartUp */}
-          <div className="relative flex flex-col rounded-3xl border bg-white p-7 text-center shadow-sm border-slate-200">
-            <h3 className="text-lg font-bold">StartUp</h3>
-            <p className="text-xs text-slate-500">Pour les indépendants et TPE</p>
-            <div className="mt-4">
-              <div className="flex items-baseline justify-center gap-1.5">
-                <span className="text-3xl font-extrabold tracking-tight">
-                  {isYearly ? '1 833 F CFA' : '3 500 F CFA'}
-                </span>
-                <span className="whitespace-nowrap text-sm text-slate-400">/ mois</span>
-              </div>
-            </div>
-            <div className="mt-1 min-h-[2.5rem]">
-              {isYearly ? (
-                <>
-                  <p className="text-xs text-slate-400">22 000 F CFA / an, facturé annuellement</p>
-                  <p className="text-xs font-semibold text-teal-600">Économisez 20 000 F CFA par an</p>
-                </>
-              ) : (
-                <p className="text-xs text-slate-400">Facturé mensuellement, sans engagement</p>
-              )}
-            </div>
-            <ul className="mt-5 space-y-2.5 text-left text-sm">
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Jusqu'à 30 clients</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Jusqu'à 100 factures / mois</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Catalogue produits &amp; services</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Gestion de stock</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Canal WhatsApp (avancé)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Support email (48h)</span>
-              </li>
-            </ul>
-            <div className="mt-7 flex flex-1 items-end pt-2">
-              <button
-                onClick={() => navigate('/register')}
-                className="block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold transition-transform hover:-translate-y-0.5 bg-gradient-to-tr from-teal-600 to-teal-400 text-white shadow-md shadow-teal-500/20 cursor-pointer"
-              >
-                Commencez maintenant
-              </button>
-            </div>
-          </div>
+                  <h3 className="text-2xl font-extrabold text-[#101828]">{plan.name}</h3>
+                  <p className="text-xs sm:text-sm text-[#526581] mt-1.5 mb-6">{plan.subtitle}</p>
 
-          {/* Entreprise */}
-          <div className="relative flex flex-col rounded-3xl border bg-white p-7 text-center shadow-sm border-teal-400 ring-2 ring-teal-400/40 lg:-mt-2 lg:shadow-lg">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-tr from-teal-600 to-teal-400 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-md">
-              Le plus choisi
-            </span>
-            <h3 className="text-lg font-bold">Entreprise</h3>
-            <p className="text-xs text-slate-500">Pour les équipes</p>
-            <div className="mt-4">
-              <div className="flex items-baseline justify-center gap-1.5">
-                <span className="text-3xl font-extrabold tracking-tight">
-                  {isYearly ? '2 917 F CFA' : '5 500 F CFA'}
-                </span>
-                <span className="whitespace-nowrap text-sm text-slate-400">/ mois</span>
+                  <div className="pb-6 mb-6 border-b border-[#E2E8F0]">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-[#101828]">
+                        {price === 0 ? '0 FCFA' : `${price.toLocaleString('fr-FR')} FCFA`}
+                      </span>
+                      <span className="text-xs font-semibold text-[#526581]">/ mois</span>
+                    </div>
+                    <p className="text-xs text-[#526581] mt-1">
+                      {price === 0
+                        ? 'Gratuit sans limite de durée pour débuter'
+                        : annual
+                        ? 'Facturé annuellement • Économisez 20%'
+                        : 'Sans engagement, résiliable à tout moment'}
+                    </p>
+                  </div>
+
+                  <ul className="space-y-3 mb-8">
+                    {plan.features.map((feat, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-[#101828]">
+                        <span className="w-5 h-5 rounded-full bg-[#16A34A]/15 text-[#16A34A] flex items-center justify-center shrink-0 mt-0.5">
+                          <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                        </span>
+                        <span>{feat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectPlan(plan.id)}
+                  className={`w-full py-3.5 px-5 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
+                    plan.popular
+                      ? 'bg-[#F47B20] hover:bg-[#FF7A21] text-white shadow-[0_8px_20px_rgba(244,123,32,0.3)] hover:-translate-y-0.5'
+                      : 'bg-[#1E4F91] hover:bg-[#163C70] text-white'
+                  }`}
+                >
+                  <span>{plan.ctaLabel}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-            </div>
-            <div className="mt-1 min-h-[2.5rem]">
-              {isYearly ? (
-                <>
-                  <p className="text-xs text-slate-400">35 000 F CFA / an, facturé annuellement</p>
-                  <p className="text-xs font-semibold text-teal-600">Économisez 31 000 F CFA par an</p>
-                </>
-              ) : (
-                <p className="text-xs text-slate-400">Facturé mensuellement, sans engagement</p>
-              )}
-            </div>
-            <ul className="mt-5 space-y-2.5 text-left text-sm">
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Clients illimités</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Factures illimitées</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Catalogue produits &amp; services</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Gestion de stock</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Équipe jusqu'à 3 utilisateurs</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Signature &amp; cachet sur les documents</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Canal WhatsApp (prioritaire)</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <svg className="mt-0.5 h-4 w-4 shrink-0 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span className="text-slate-600">Support prioritaire (24h)</span>
-              </li>
-            </ul>
-            <div className="mt-7 flex flex-1 items-end pt-2">
-              <button
-                onClick={() => navigate('/register')}
-                className="block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold transition-transform hover:-translate-y-0.5 bg-gradient-to-tr from-teal-600 to-teal-400 text-white shadow-md shadow-teal-500/20 cursor-pointer"
-              >
-                Commencez maintenant
-              </button>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>

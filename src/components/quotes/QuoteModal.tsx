@@ -1,368 +1,369 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { X, Plus, Trash2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import {
-  clientsStorage,
-  productsStorage,
-  quotesStorage,
-  settingsStorage,
-} from '../../services/storage';
-import type { LineItem, Quote } from '../../types';
-import { X, Plus, Trash2, FileText, AlertCircle } from 'lucide-react';
-
-interface QuoteModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onQuoteCreated: (quote: Quote) => void;
-  onOpenNewClient: () => void;
-}
+import { workspaceService, formatFCFA, uid } from '../../services/storage';
+import { LineItem } from '../../types';
 
 export function QuoteModal({
-  isOpen,
   onClose,
-  onQuoteCreated,
-  onOpenNewClient,
-}: QuoteModalProps) {
-  const { currentUser } = useAuth();
-  if (!isOpen || !currentUser) return null;
+  onSaved,
+}: {
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const { user } = useAuth();
+  const companyId = user?.companyId || user?.id || '';
 
-  const clients = clientsStorage.getAll(currentUser.id);
-  const products = productsStorage.getAll(currentUser.id);
-  const settings = settingsStorage.getSettings(currentUser.id);
+  const clients = workspaceService.getClients(companyId);
+  const products = workspaceService.getProducts(companyId);
+  const settings = workspaceService.getSettings(companyId);
 
-  const [selectedClientId, setSelectedClientId] = useState<string>(clients[0]?.id || '');
+  const [clientId, setClientId] = useState(clients[0]?.id || 'new');
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('');
+  const [discountRate, setDiscountRate] = useState<number>(0);
+  const [notes, setNotes] = useState('Proposition commerciale valable 30 jours.');
+  const [error, setError] = useState('');
+
   const [items, setItems] = useState<LineItem[]>([
     {
-      id: 'line_' + Math.random().toString(36).substring(2, 7),
-      description: '',
+      id: uid('line'),
+      productId: products[0]?.id,
+      description: products[0]?.name || '',
       quantity: 1,
-      unitPrice: 0,
+      unitPrice: products[0]?.unitPrice || 0,
       vatRate: settings.defaultVatRate || 18,
-      totalHt: 0,
+      totalHt: products[0]?.unitPrice || 0,
     },
   ]);
-  const [discountRate, setDiscountRate] = useState<number>(0);
-  const [expiryDays, setExpiryDays] = useState<number>(30);
-  const [notes, setNotes] = useState<string>('Offre valable 30 jours à compter de la date d’émission.');
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!selectedClientId && clients.length > 0) {
-      setSelectedClientId(clients[0].id);
-    }
-  }, [clients, selectedClientId]);
+  if (!user || !companyId) return null;
 
-  const handleItemChange = (index: number, updates: Partial<LineItem>) => {
-    const next = [...items];
-    const item = { ...next[index], ...updates };
-    item.totalHt = (item.quantity || 0) * (item.unitPrice || 0);
-    next[index] = item;
-    setItems(next);
+  const handleProductSelect = (lineId: string, productId: string) => {
+    const prod = products.find((p) => p.id === productId);
+    if (!prod) return;
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === lineId
+          ? {
+              ...item,
+              productId: prod.id,
+              description: prod.name,
+              unitPrice: prod.unitPrice,
+              vatRate: prod.vatRate,
+              totalHt: (Number(item.quantity) || 1) * prod.unitPrice,
+            }
+          : item
+      )
+    );
   };
 
-  const handleSelectProduct = (index: number, productId: string) => {
-    const product = products.find((p) => p.id === productId);
-    if (!product) return;
-    handleItemChange(index, {
-      productId: product.id,
-      description: product.name,
-      unitPrice: product.unitPrice,
-      vatRate: product.vatRate,
-    });
+  const updateLine = (lineId: string, patch: Partial<LineItem>) => {
+    setItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== lineId) return item;
+        const next = { ...item, ...patch };
+        const q = Math.max(0, Number(next.quantity) || 0);
+        const p = Math.max(0, Number(next.unitPrice) || 0);
+        next.totalHt = q * p;
+        return next;
+      })
+    );
   };
 
-  const handleAddItem = () => {
-    setItems([
-      ...items,
-      {
-        id: 'line_' + Math.random().toString(36).substring(2, 7),
-        description: '',
-        quantity: 1,
-        unitPrice: 0,
-        vatRate: settings.defaultVatRate || 18,
-        totalHt: 0,
-      },
-    ]);
-  };
-
-  const handleRemoveItem = (index: number) => {
-    if (items.length <= 1) return;
-    setItems(items.filter((_, i) => i !== index));
-  };
-
-  const subtotalHt = items.reduce((sum, it) => sum + it.quantity * it.unitPrice, 0);
-  const discountAmount = (subtotalHt * (discountRate || 0)) / 100;
-  const netHt = Math.max(0, subtotalHt - discountAmount);
-  const totalVat = items.reduce(
-    (sum, it) => sum + ((it.quantity * it.unitPrice * (1 - (discountRate || 0) / 100)) * (it.vatRate || 0)) / 100,
+  const subtotalHt = items.reduce((s, i) => s + (Number(i.totalHt) || 0), 0);
+  const cleanDiscount = Math.max(0, Math.min(100, Number(discountRate) || 0));
+  const discountAmt = Math.round((subtotalHt * cleanDiscount) / 100);
+  const netHt = subtotalHt - discountAmt;
+  const rawVat = items.reduce(
+    (s, i) => s + Math.round(((Number(i.totalHt) || 0) * (Number(i.vatRate) || 0)) / 100),
     0
   );
-  const totalTtc = Math.round(netHt + totalVat);
+  const totalVat = Math.round(rawVat * (1 - cleanDiscount / 100));
+  const totalTtc = netHt + totalVat;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError('');
 
-    if (!selectedClientId) {
-      setError('Veuillez sélectionner un client.');
-      return;
+    let client = clients.find((c) => c.id === clientId);
+    if (!client || clientId === 'new') {
+      if (!newClientName.trim()) {
+        setError('Veuillez renseigner le nom du client.');
+        return;
+      }
+      client = workspaceService.saveClient(companyId, {
+        name: newClientName.trim(),
+        phone: newClientPhone.trim(),
+        city: 'Abidjan',
+      });
     }
 
-    const selectedClient = clients.find((c) => c.id === selectedClientId);
-    if (!selectedClient) {
-      setError('Client introuvable.');
-      return;
-    }
-
-    const validItems = items.filter((it) => it.description.trim() && it.quantity > 0);
-    if (validItems.length === 0) {
-      setError('Ajoutez au moins une ligne avec une désignation.');
+    if (items.length === 0 || !items.some((i) => i.description.trim())) {
+      setError('Veuillez renseigner au moins une ligne avec une désignation.');
       return;
     }
 
     const today = new Date().toISOString().split('T')[0];
-    const expiry = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const expiry = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
 
-    const nextNumber = quotesStorage.getNextNumber(currentUser.id);
-
-    const newQuote = quotesStorage.add(currentUser.id, {
-      number: nextNumber,
-      clientId: selectedClient.id,
-      clientName: selectedClient.name,
-      clientEmail: selectedClient.email,
-      clientPhone: selectedClient.phone,
-      clientCompany: selectedClient.company,
-      clientAddress: selectedClient.address,
+    workspaceService.saveQuote(companyId, {
+      number: workspaceService.getNextQuoteNumber(companyId),
+      clientId: client.id,
+      clientName: client.name,
+      clientEmail: client.email,
+      clientPhone: client.phone,
+      clientCompany: client.company,
+      clientAddress: client.address,
       issueDate: today,
       expiryDate: expiry,
-      items: validItems,
+      items: items.map((i) => ({
+        ...i,
+        description: i.description.trim() || 'Prestation / Produit',
+      })),
       subtotalHt,
       totalVat,
-      discountRate,
+      discountRate: cleanDiscount,
       totalTtc,
       status: 'sent',
       notes,
       terms: settings.paymentTerms,
     });
 
-    onQuoteCreated(newQuote);
-    onClose();
+    onSaved();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-2xl w-full my-8 shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-blue-100 text-[#295294]">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-slate-900 text-lg">Nouveau Devis</h3>
-              <p className="text-xs text-slate-500">Proposition commerciale chiffrée</p>
-            </div>
-          </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100">
+    <div className="fixed inset-0 z-50 bg-black/55 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-[#E2E8F0] overflow-hidden my-auto">
+        <div className="px-6 py-4 bg-[#1E4F91] text-white flex items-center justify-between">
+          <h2 className="text-base font-extrabold">Nouveau Devis FAKTELIO</h2>
+          <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/15 cursor-pointer">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-[#FEE2E2] text-[#DC2626] text-xs font-semibold flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+              {error}
             </div>
           )}
 
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                Client destinataire <span className="text-red-500">*</span>
-              </label>
-              <button
-                type="button"
-                onClick={onOpenNewClient}
-                className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Nouveau client
-              </button>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-bold text-[#101828] mb-1">Client *</label>
+              {clients.length === 0 ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nom complet du client *"
+                    value={newClientName}
+                    onChange={(e) => setNewClientName(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Téléphone WhatsApp"
+                    value={newClientPhone}
+                    onChange={(e) => setNewClientPhone(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm"
+                  />
+                </div>
+              ) : (
+                <select
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-semibold"
+                >
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} {c.company ? `(${c.company})` : ''} — {c.phone}
+                    </option>
+                  ))}
+                  <option value="new">+ Saisir un nouveau client</option>
+                </select>
+              )}
             </div>
-            {clients.length === 0 ? (
-              <p className="text-xs text-slate-400">Ajoutez d'abord un client.</p>
-            ) : (
-              <select
-                value={selectedClientId}
-                onChange={(e) => setSelectedClientId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:border-teal-500 outline-none bg-white"
-              >
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} {c.company ? `(${c.company})` : ''} - {c.phone}
-                  </option>
-                ))}
-              </select>
-            )}
+
+            <div>
+              <label className="block text-xs font-bold text-[#101828] mb-1">Remise (%)</label>
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={discountRate}
+                onChange={(e) => setDiscountRate(Number(e.target.value) || 0)}
+                className="w-full px-3.5 py-2 rounded-xl border border-[#E2E8F0] text-sm font-bold"
+              />
+            </div>
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                Prestations &amp; Articles
+          {clientId === 'new' && clients.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
+              <input
+                type="text"
+                required
+                placeholder="Nom du nouveau client *"
+                value={newClientName}
+                onChange={(e) => setNewClientName(e.target.value)}
+                className="px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold"
+              />
+              <input
+                type="text"
+                placeholder="Téléphone WhatsApp"
+                value={newClientPhone}
+                onChange={(e) => setNewClientPhone(e.target.value)}
+                className="px-3 py-2 rounded-lg bg-white border border-[#E2E8F0] text-xs"
+              />
+            </div>
+          )}
+
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-[#101828] uppercase">
+                Lignes du devis ({items.length})
               </label>
               <button
                 type="button"
-                onClick={handleAddItem}
-                className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
+                onClick={() =>
+                  setItems([
+                    ...items,
+                    {
+                      id: uid('line'),
+                      description: '',
+                      quantity: 1,
+                      unitPrice: 0,
+                      vatRate: settings.defaultVatRate || 18,
+                      totalHt: 0,
+                    },
+                  ])
+                }
+                className="text-xs font-bold text-[#1E4F91] inline-flex items-center gap-1 cursor-pointer"
               >
-                <Plus className="w-3.5 h-3.5" />
-                Ajouter une ligne
+                <Plus className="w-3.5 h-3.5" /> Ajouter une ligne
               </button>
             </div>
 
-            <div className="space-y-3">
-              {items.map((item, idx) => (
-                <div key={item.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
-                  <div className="flex items-center gap-2">
-                    {products.length > 0 && (
-                      <select
-                        onChange={(e) => handleSelectProduct(idx, e.target.value)}
-                        className="text-xs py-1 px-2 rounded-lg border border-slate-200 bg-white font-medium text-slate-600"
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          📦 Choisir du catalogue...
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="p-3 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] space-y-2"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                  {products.length > 0 && (
+                    <select
+                      value={item.productId || ''}
+                      onChange={(e) => handleProductSelect(item.id, e.target.value)}
+                      className="sm:col-span-4 px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold"
+                    >
+                      <option value="">-- Depuis catalogue --</option>
+                      {products.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.name} ({formatFCFA(p.unitPrice)})
                         </option>
-                        {products.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name} ({p.unitPrice.toLocaleString('fr-FR')} FCFA)
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                    <div className="flex-1" />
+                      ))}
+                    </select>
+                  )}
+                  <input
+                    type="text"
+                    required
+                    placeholder="Description de la prestation ou du produit *"
+                    value={item.description}
+                    onChange={(e) => updateLine(item.id, { description: e.target.value })}
+                    className={`${products.length > 0 ? 'sm:col-span-8' : 'sm:col-span-12'} px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold`}
+                  />
+                </div>
+
+                <div className="grid grid-cols-12 gap-2 items-center">
+                  <div className="col-span-3">
+                    <label className="text-[10px] text-[#526581] block">Quantité</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={item.quantity}
+                      onChange={(e) => updateLine(item.id, { quantity: Math.max(1, Number(e.target.value) || 1) })}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-bold"
+                    />
+                  </div>
+                  <div className="col-span-4">
+                    <label className="text-[10px] text-[#526581] block">Prix Unit. HT</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={item.unitPrice}
+                      onChange={(e) => updateLine(item.id, { unitPrice: Math.max(0, Number(e.target.value) || 0) })}
+                      className="w-full px-2.5 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-bold"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="text-[10px] text-[#526581] block">TVA %</label>
+                    <select
+                      value={item.vatRate}
+                      onChange={(e) => updateLine(item.id, { vatRate: Number(e.target.value) })}
+                      className="w-full px-2 py-1.5 rounded-lg bg-white border border-[#E2E8F0] text-xs font-semibold"
+                    >
+                      <option value={18}>18%</option>
+                      <option value={9}>9%</option>
+                      <option value={0}>0%</option>
+                    </select>
+                  </div>
+                  <div className="col-span-2 text-right">
+                    <label className="text-[10px] text-[#526581] block">Total HT</label>
+                    <div className="text-xs font-extrabold text-[#1E4F91] py-1">
+                      {formatFCFA(item.totalHt)}
+                    </div>
+                  </div>
+                  <div className="col-span-1 text-right pt-3">
                     {items.length > 1 && (
                       <button
                         type="button"
-                        onClick={() => handleRemoveItem(idx)}
-                        className="text-slate-400 hover:text-red-500 p-1"
+                        onClick={() => setItems(items.filter((i) => i.id !== item.id))}
+                        className="text-[#DC2626] p-1 cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
                   </div>
-
-                  <input
-                    type="text"
-                    required
-                    value={item.description}
-                    onChange={(e) => handleItemChange(idx, { description: e.target.value })}
-                    placeholder="Description du produit ou service..."
-                    className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium focus:border-teal-500 outline-none bg-white"
-                  />
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Quantité</span>
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) => handleItemChange(idx, { quantity: Math.max(1, parseInt(e.target.value) || 1) })}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">Prix unitaire (FCFA)</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="500"
-                        value={item.unitPrice}
-                        onChange={(e) => handleItemChange(idx, { unitPrice: Math.max(0, parseInt(e.target.value) || 0) })}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white"
-                      />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">TVA (%)</span>
-                      <select
-                        value={item.vatRate}
-                        onChange={(e) => handleItemChange(idx, { vatRate: parseInt(e.target.value) || 0 })}
-                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-bold bg-white"
-                      >
-                        <option value={0}>0% (Exonéré)</option>
-                        <option value={18}>18% (Standard)</option>
-                      </select>
-                    </div>
-                  </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Validité de l'offre
-              </label>
-              <select
-                value={expiryDays}
-                onChange={(e) => setExpiryDays(parseInt(e.target.value))}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium bg-white"
-              >
-                <option value={15}>15 jours</option>
-                <option value={30}>30 jours (Standard)</option>
-                <option value={60}>60 jours</option>
-                <option value={90}>90 jours</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                Remise globale (%)
-              </label>
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={discountRate}
-                onChange={(e) => setDiscountRate(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium bg-white"
-              />
-            </div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200/70 space-y-1.5 text-xs">
-            <div className="flex justify-between text-slate-600">
+          <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0] space-y-1 text-xs">
+            <div className="flex justify-between text-[#526581]">
               <span>Sous-total HT :</span>
-              <span className="font-bold">{subtotalHt.toLocaleString('fr-FR')} FCFA</span>
+              <strong className="text-[#101828]">{formatFCFA(subtotalHt)}</strong>
             </div>
-            {discountRate > 0 && (
-              <div className="flex justify-between text-red-600">
-                <span>Remise ({discountRate}%) :</span>
-                <span className="font-bold">-{discountAmount.toLocaleString('fr-FR')} FCFA</span>
+            {cleanDiscount > 0 && (
+              <div className="flex justify-between text-[#15803D]">
+                <span>Remise ({cleanDiscount}%) :</span>
+                <strong>-{formatFCFA(discountAmt)}</strong>
               </div>
             )}
-            <div className="flex justify-between text-slate-600">
-              <span>TVA totale :</span>
-              <span className="font-bold">{totalVat.toLocaleString('fr-FR')} FCFA</span>
+            <div className="flex justify-between text-[#526581]">
+              <span>TVA ({settings.defaultVatRate}%) :</span>
+              <strong className="text-[#101828]">{formatFCFA(totalVat)}</strong>
             </div>
-            <div className="flex justify-between text-base font-extrabold text-blue-900 pt-2 border-t border-blue-200">
-              <span>Total TTC :</span>
-              <span>{totalTtc.toLocaleString('fr-FR')} FCFA</span>
+            <div className="flex justify-between pt-1 border-t border-[#E2E8F0] text-sm">
+              <span className="font-extrabold text-[#101828]">Total Devis TTC :</span>
+              <strong className="text-[#1E4F91] font-extrabold text-base">{formatFCFA(totalTtc)}</strong>
             </div>
           </div>
 
-          <div className="pt-2 flex items-center justify-end gap-3">
+          <div className="flex justify-end gap-2.5">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-tr from-[#295294] to-blue-600 hover:opacity-90 text-xs font-extrabold text-white shadow-md shadow-blue-900/20 cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-[#F47B20] hover:bg-[#FF7A21] text-white text-xs font-extrabold cursor-pointer"
             >
               Créer le devis
             </button>
