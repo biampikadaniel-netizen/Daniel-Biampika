@@ -4,6 +4,7 @@ import { NavItem } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '../context/NavigationContext';
 import { FaktelioLogo } from './common/FaktelioLogo';
+import { Button } from './common/Button';
 
 const navItems: NavItem[] = [
   { label: 'Fonctionnalités', href: '#fonctionnalites' },
@@ -21,164 +22,224 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 12);
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Prevent background scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const handleDemoAccess = () => {
+    setMobileMenuOpen(false);
     loginDemo();
     navigate('/dashboard');
   };
 
   return (
-    <header
-      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
-        scrolled
-          ? 'bg-[#F7FAF8]/85 backdrop-blur-md border-b border-[rgba(217,231,227,0.6)] shadow-[0_4px_25px_rgba(13,43,33,0.06)] py-3'
-          : 'bg-[#F7FAF8]/90 backdrop-blur-sm border-b border-transparent py-4'
-      }`}
-    >
-      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+    <header className="sticky top-0 sm:top-2.5 z-50 w-full px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 transition-all duration-300 max-w-[1340px] mx-auto">
+      {/* ==============================================================
+          GLASSMORPHIC FLOATING NAVBAR (OCEANIC GREEN DESIGN SYSTEM)
+         ============================================================== */}
+      <div
+        className={`w-full rounded-2xl sm:rounded-3xl transition-all duration-300 px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between ${
+          scrolled
+            ? 'shadow-[0_16px_45px_rgba(13,43,33,0.12)]'
+            : 'shadow-[0_12px_40px_rgba(13,43,33,0.08)]'
+        }`}
+        style={{
+          background: scrolled ? 'rgba(247, 250, 248, 0.88)' : 'rgba(247, 250, 248, 0.72)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          border: '1px solid rgba(169, 189, 188, 0.35)',
+        }}
+      >
         {/* Left: FAKTELIO Brand Logo */}
         <a
           href="#"
-          className="flex items-center gap-2.5 group focus:outline-none"
+          className="flex items-center gap-2.5 group focus:outline-none shrink-0"
           aria-label="FAKTELIO Accueil"
         >
           <FaktelioLogo size="md" className="transition-transform duration-200 group-hover:scale-[1.02]" />
         </a>
 
-        {/* Center: Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-8" aria-label="Navigation principale">
+        {/* Center: Desktop Navigation Links */}
+        <nav className="hidden lg:flex items-center gap-7 xl:gap-8" aria-label="Navigation principale">
           {navItems.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-semibold text-[#4A635A] hover:text-[#215C46] transition-colors duration-200 py-1"
+              className="text-sm font-semibold text-[#10241D]/80 hover:text-[#215C46] transition-colors duration-200 py-1 relative group"
             >
               {item.label}
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#215C46] rounded-full transition-all duration-200 group-hover:w-full" />
             </a>
           ))}
         </nav>
 
         {/* Right: Actions */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2.5 lg:gap-3 shrink-0">
           {user ? (
-            <button
+            <Button
+              variant="primary"
+              size="md"
+              shape="capsule"
               onClick={() => navigate('/dashboard')}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] rounded-xl shadow-[0_6px_20px_rgba(33,92,70,0.25)] hover:shadow-[0_10px_28px_rgba(33,92,70,0.35)] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+              icon={<LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />}
             >
-              <LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />
               Mon Espace ({user.name.split(' ')[0]})
-            </button>
+            </Button>
           ) : (
             <>
-              <button
+              {/* Démo directe */}
+              <Button
+                variant="glass"
+                size="sm"
+                shape="capsule"
                 onClick={handleDemoAccess}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-[#215C46] bg-[#A9BDBC]/15 hover:bg-[#A9BDBC]/30 border border-[#D9E7E3] rounded-lg transition-all duration-200 cursor-pointer"
+                icon={<Sparkles className="w-3.5 h-3.5 text-[#215C46]" />}
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#215C46]" />
                 Démo directe
-              </button>
-              <button
+              </Button>
+
+              {/* Connexion */}
+              <Button
+                variant="ghost"
+                size="md"
+                shape="capsule"
                 onClick={() => navigate('/login')}
-                className="px-4 py-2.5 text-sm font-semibold text-[#10241D] hover:text-[#215C46] transition-colors duration-200 cursor-pointer"
               >
                 Connexion
-              </button>
-              <button
+              </Button>
+
+              {/* Créer mon compte */}
+              <Button
+                variant="primary"
+                size="md"
+                shape="capsule"
                 onClick={() => navigate('/register')}
-                className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] rounded-xl shadow-[0_8px_24px_rgba(33,92,70,0.25)] hover:shadow-[0_12px_30px_rgba(33,92,70,0.35)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-250 cursor-pointer group"
+                iconRight={<ArrowRight className="w-4 h-4 text-[#D9E7E3]" />}
               >
                 Créer mon compte
-                <ArrowRight className="w-4 h-4 text-[#D9E7E3] transition-transform duration-200 group-hover:translate-x-0.5" />
-              </button>
+              </Button>
             </>
           )}
         </div>
 
-        {/* Mobile Right CTA + Hamburger */}
+        {/* Mobile Hamburger & Quick Action */}
         <div className="flex items-center gap-2 lg:hidden">
           {!user && (
-            <button
+            <Button
+              variant="primary"
+              size="sm"
+              shape="capsule"
               onClick={() => navigate('/register')}
-              className="inline-flex md:hidden items-center justify-center px-3.5 py-2 text-xs font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] rounded-lg shadow-sm transition-all duration-200 cursor-pointer"
+              className="sm:hidden text-xs py-1.5 px-3"
             >
-              Créer mon compte
-            </button>
+              Inscription
+            </Button>
           )}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex items-center justify-center p-2.5 rounded-xl text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/15 transition-colors focus:outline-none"
+            className="inline-flex items-center justify-center w-11 h-11 rounded-2xl text-[#10241D] hover:text-[#215C46] bg-white/70 hover:bg-[#A9BDBC]/20 border border-[rgba(169,189,188,0.3)] shadow-xs transition-all active:scale-95 focus:outline-none cursor-pointer"
             aria-expanded={mobileMenuOpen}
-            aria-label="Menu principal"
+            aria-label="Ouvrir le menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Dropdown */}
+      {/* Mobile Drawer Navigation with backdrop blur */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#F7FAF8] border-b border-[#D9E7E3] px-4 pt-3 pb-6 space-y-3 shadow-xl animate-fade-in-up">
+        <div className="lg:hidden fixed inset-x-3 top-20 z-50 bg-[#F7FAF8]/95 backdrop-blur-2xl border border-[rgba(169,189,188,0.4)] rounded-3xl p-5 shadow-[0_20px_50px_rgba(13,43,33,0.18)] max-h-[calc(100vh-6rem)] overflow-y-auto animate-fade-in-up">
+          <div className="flex items-center justify-between pb-3 border-b border-[#D9E7E3]/60 mb-2">
+            <FaktelioLogo size="sm" />
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-1.5 rounded-xl text-gray-500 hover:text-[#10241D] hover:bg-gray-100"
+              aria-label="Fermer le menu"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
           <nav className="flex flex-col space-y-1">
             {navItems.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-3.5 py-2.5 rounded-xl text-base font-semibold text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/10 transition-colors"
+                className="px-4 py-3 rounded-xl text-base font-semibold text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/12 transition-colors"
               >
                 {item.label}
               </a>
             ))}
           </nav>
-          <div className="pt-3 border-t border-[#D9E7E3] flex flex-col gap-2.5">
+
+          <div className="pt-4 mt-2 border-t border-[#D9E7E3] flex flex-col gap-3">
             {user ? (
-              <button
+              <Button
+                variant="primary"
+                size="lg"
+                shape="capsule"
+                fullWidth
                 onClick={() => {
                   setMobileMenuOpen(false);
                   navigate('/dashboard');
                 }}
-                className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] flex items-center justify-center gap-2 shadow-sm"
+                icon={<LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />}
               >
-                <LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />
                 Accéder au Dashboard
-              </button>
+              </Button>
             ) : (
               <>
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    handleDemoAccess();
-                  }}
-                  className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-[#215C46] bg-[#A9BDBC]/15 border border-[#D9E7E3] flex items-center justify-center gap-1.5"
+                <Button
+                  variant="glass"
+                  size="md"
+                  shape="capsule"
+                  fullWidth
+                  onClick={handleDemoAccess}
+                  icon={<Sparkles className="w-4 h-4 text-[#215C46]" />}
                 >
-                  <Sparkles className="w-3.5 h-3.5" />
                   Tester la démo instantanée
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  shape="capsule"
+                  fullWidth
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigate('/login');
                   }}
-                  className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/10 text-center"
                 >
                   Connexion
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="primary"
+                  size="lg"
+                  shape="capsule"
+                  fullWidth
                   onClick={() => {
                     setMobileMenuOpen(false);
                     navigate('/register');
                   }}
-                  className="w-full py-3 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] shadow-md flex items-center justify-center gap-2"
+                  iconRight={<ArrowRight className="w-4 h-4 text-[#D9E7E3]" />}
                 >
                   Créer mon compte gratuitement
-                  <ArrowRight className="w-4 h-4 text-[#D9E7E3]" />
-                </button>
+                </Button>
               </>
             )}
           </div>

@@ -20,6 +20,7 @@ import { workspaceService } from '../../services/storage';
 import { Invoice, Client, Product, Payment } from '../../types';
 import { InvoiceDetailModal } from '../invoices/InvoiceDetailModal';
 import { PaymentModal } from '../payments/PaymentModal';
+import { Button } from '../common/Button';
 
 interface DashboardOverviewProps {
   onOpenFastInvoice: () => void;
@@ -171,30 +172,34 @@ export function DashboardOverview({
           </p>
         </div>
 
-        {/* Action Buttons Group */}
+        {/* Action Buttons Group with 3D tactile buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Button: Facturation */}
-          <button
+          <Button
+            variant="secondary"
+            size="md"
+            shape="capsule"
             onClick={() => navigate('/billing')}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-emerald-50/50 border border-emerald-200/90 text-[#0E5C44] text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+            icon={<FilePlus2 className="w-4 h-4 text-[#215C46]" />}
           >
-            <FilePlus2 className="w-4 h-4 text-[#0E5C44]" />
             Facturation
-          </button>
+          </Button>
 
           {/* Button: + Nouvelle Facture */}
-          <button
+          <Button
+            variant="primary"
+            size="md"
+            shape="capsule"
             onClick={onOpenFastInvoice}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            icon={<Plus className="w-4 h-4" />}
           >
-            <Plus className="w-4 h-4" />
-            + Nouvelle Facture
-          </button>
+            Nouvelle Facture
+          </Button>
 
           {/* Circular Bell Button with notification dot */}
           <button
             onClick={() => navigate('/reminders')}
-            className="w-9 h-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center text-gray-600 hover:text-[#0E5C44] hover:border-gray-300 relative cursor-pointer shadow-2xs transition-colors"
+            className="w-10 h-10 rounded-full btn-3d-secondary flex items-center justify-center text-gray-700 hover:text-[#215C46] relative cursor-pointer"
             title="Relances et alertes"
           >
             <Bell className="w-4 h-4" />
@@ -204,13 +209,15 @@ export function DashboardOverview({
           </button>
 
           {/* Button: ⚡ Facture Express (+30s) */}
-          <button
+          <Button
+            variant="primary"
+            size="md"
+            shape="capsule"
             onClick={onOpenFastInvoice}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+            icon={<Zap className="w-3.5 h-3.5 text-[#D9E7E3]" />}
           >
-            <Zap className="w-3.5 h-3.5 text-[#D9E7E3]" />
             Facture Express (+30s)
-          </button>
+          </Button>
         </div>
       </div>
 

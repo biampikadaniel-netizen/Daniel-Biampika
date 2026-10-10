@@ -33,10 +33,15 @@ import { TeamView } from './components/team/TeamView';
 import { SubscriptionView } from './components/subscription/SubscriptionView';
 import { SettingsView } from './components/settings/SettingsView';
 import { FastInvoiceModal } from './components/invoices/FastInvoiceModal';
+import { CookieConsentBanner } from './components/common/CookieConsentBanner';
+import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
+import { LegalNoticePage } from './components/legal/LegalNoticePage';
+import { PrivacyPolicyPage } from './components/legal/PrivacyPolicyPage';
+import { CookiePolicyPage } from './components/legal/CookiePolicyPage';
 
 function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7FAF8] text-[#10241D] selection:bg-[#215C46] selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#F7FAF8] text-[#10241D] selection:bg-[#215C46] selection:text-white">
       <Header />
       <main className="flex-grow">
         <Hero />
@@ -75,6 +80,18 @@ function AppRouter() {
 
   if (route === '/register') {
     return <RegisterPage />;
+  }
+
+  if (route === '/mentions-legales') {
+    return <LegalNoticePage />;
+  }
+
+  if (route === '/politique-confidentialite') {
+    return <PrivacyPolicyPage />;
+  }
+
+  if (route === '/politique-cookies') {
+    return <CookiePolicyPage />;
   }
 
   // Protected SaaS routes
@@ -135,6 +152,8 @@ export default function App() {
     <AuthProvider>
       <NavigationProvider>
         <AppRouter />
+        <CookieConsentBanner />
+        <PwaInstallPrompt />
       </NavigationProvider>
     </AuthProvider>
   );

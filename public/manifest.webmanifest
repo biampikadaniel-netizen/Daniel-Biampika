@@ -1,21 +1,41 @@
 {
+  "id": "/",
   "name": "FAKTELIO",
   "short_name": "FAKTELIO",
-  "description": "Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur.",
-  "start_url": "/dashboard",
+  "description": "Logiciel de facturation, devis et gestion commerciale pour PME, commerçants et freelances.",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1E4F91",
+  "orientation": "portrait-primary",
+  "background_color": "#F7FAF8",
+  "theme_color": "#215C46",
   "lang": "fr",
   "dir": "ltr",
-  "categories": ["business", "productivity", "finance"],
+  "categories": ["business", "finance", "productivity"],
   "icons": [
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
     {
       "src": "/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

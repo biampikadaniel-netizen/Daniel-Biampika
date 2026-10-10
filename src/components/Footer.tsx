@@ -2,6 +2,7 @@ import React from 'react';
 import { FaktelioLogo } from './common/FaktelioLogo';
 import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
+import { openCookiePreferencesModal } from './common/CookieConsentBanner';
 
 export function Footer() {
   const { navigate } = useNavigation();
@@ -143,13 +144,34 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom Credits */}
+        {/* Bottom Credits & Legal Links */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#A9BDBC]/70">
           <p>© {new Date().getFullYear()} FAKTELIO. Tous droits réservés. Plateforme de facturation et gestion commerciale.</p>
-          <div className="flex items-center gap-6">
-            <span className="hover:text-white transition-colors cursor-pointer">Conditions générales</span>
-            <span className="hover:text-white transition-colors cursor-pointer">Confidentialité</span>
-            <span className="hover:text-white transition-colors cursor-pointer">Mentions légales</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <button
+              onClick={() => navigate('/politique-confidentialite')}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Confidentialité
+            </button>
+            <button
+              onClick={() => navigate('/mentions-legales')}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Mentions légales
+            </button>
+            <button
+              onClick={() => navigate('/politique-cookies')}
+              className="hover:text-white transition-colors cursor-pointer"
+            >
+              Politique cookies
+            </button>
+            <button
+              onClick={() => openCookiePreferencesModal()}
+              className="hover:text-white transition-colors cursor-pointer text-[#D9E7E3] font-semibold underline underline-offset-2"
+            >
+              Gestion des cookies
+            </button>
           </div>
         </div>
       </div>

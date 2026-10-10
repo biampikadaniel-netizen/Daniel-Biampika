@@ -15,6 +15,8 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '../context/NavigationContext';
 import { FaktelioLogo } from './common/FaktelioLogo';
+import { DynamicHeroText } from './hero/DynamicHeroText';
+import { Button } from './common/Button';
 
 export function Hero() {
   const { user, loginDemo } = useAuth();
@@ -138,18 +140,15 @@ export function Hero() {
             </span>
           </div>
 
-          {/* Main H1 Title: subtle translateY */}
+          {/* Main H1 Title: subtle translateY with clamp responsive font size */}
           <h1
-            className="text-4xl sm:text-5xl lg:text-[60px] font-extrabold text-[#10241D] tracking-tight leading-[1.1] mb-6 transition-transform duration-150"
+            className="text-[30px] min-[400px]:text-[34px] sm:text-5xl lg:text-[58px] font-extrabold text-[#10241D] tracking-tight leading-[1.18] sm:leading-[1.14] mb-6 transition-transform duration-150"
             style={{
               transform: `translateY(${scrollProgress * 10}px)`,
             }}
           >
             Créez vos devis et factures <br className="hidden sm:inline" />
-            en{' '}
-            <span className="bg-gradient-to-r from-[#215C46] via-[#2F7358] to-[#123A2C] bg-clip-text text-transparent">
-              quelques secondes.
-            </span>
+            <DynamicHeroText />
           </h1>
 
           {/* Subtitle */}
@@ -158,27 +157,33 @@ export function Hero() {
             commerciale depuis votre téléphone ou votre ordinateur.
           </p>
 
-          {/* CTA Buttons: subtle scroll-driven response */}
+          {/* CTA Buttons: subtle scroll-driven response with 3D tactile buttons */}
           <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 mb-7 transition-transform duration-150"
+            className="flex flex-col sm:flex-row items-center justify-center gap-3.5 sm:gap-4 mb-7 transition-transform duration-150 w-full sm:w-auto"
             style={{
               transform: `translateY(${-scrollProgress * 6}px)`,
             }}
           >
-            <button
+            <Button
+              variant="primary"
+              size="lg"
+              shape="capsule"
               onClick={handlePrimaryAction}
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 text-base font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] rounded-xl shadow-[0_10px_30px_rgba(33,92,70,0.32)] hover:shadow-[0_14px_36px_rgba(33,92,70,0.42)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-250 cursor-pointer group"
+              className="w-full sm:w-auto text-base px-8 py-3.5 shadow-[0_10px_30px_rgba(33,92,70,0.32)]"
+              iconRight={<ArrowRight className="w-4 h-4 text-[#D9E7E3]" />}
             >
-              {user ? 'Accéder à mon Dashboard →' : 'Créer mon compte gratuitement →'}
-              <ArrowRight className="w-4 h-4 text-[#D9E7E3] transition-transform duration-200 group-hover:translate-x-0.5" />
-            </button>
+              {user ? 'Accéder à mon Dashboard' : 'Créer mon compte gratuitement'}
+            </Button>
 
-            <a
+            <Button
+              variant="secondary"
+              size="lg"
+              shape="capsule"
               href="#fonctionnalites"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-4 text-base font-bold text-[#10241D] bg-white/90 hover:bg-white border border-[#D9E7E3] hover:border-[#215C46] rounded-xl shadow-xs transition-all duration-200 hover:-translate-y-0.5"
+              className="w-full sm:w-auto text-base px-7 py-3.5"
             >
               Voir les fonctionnalités
-            </a>
+            </Button>
           </div>
 
           {/* Reassurance Checks under Buttons */}
