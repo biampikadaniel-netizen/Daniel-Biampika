@@ -70,17 +70,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     // Variants with 3D tactile glassmorphism styling
     const variantClasses = {
       primary:
-        'btn-3d-primary text-white font-extrabold focus-visible:ring-[#215C46]',
+        'btn-3d-primary text-white font-extrabold focus-visible:ring-[#176B4D]',
       secondary:
-        'btn-3d-secondary text-[#10241D] font-bold focus-visible:ring-[#215C46]',
+        'btn-3d-secondary text-[#104B38] font-bold focus-visible:ring-[#176B4D]',
       glass:
-        'btn-3d-glass text-[#10241D] font-bold focus-visible:ring-[#215C46]',
+        'btn-3d-glass text-[#17231D] font-bold focus-visible:ring-[#176B4D]',
       outline:
-        'btn-3d-outline text-[#215C46] font-bold focus-visible:ring-[#215C46]',
+        'btn-3d-outline text-[#176B4D] font-bold focus-visible:ring-[#176B4D]',
       ghost:
-        'btn-3d-ghost text-[#10241D] font-semibold hover:text-[#215C46] focus-visible:ring-[#215C46]',
+        'btn-3d-ghost text-[#17231D] font-semibold hover:text-[#176B4D] focus-visible:ring-[#176B4D]',
       success:
-        'btn-3d-success text-white font-extrabold focus-visible:ring-[#215C46]',
+        'btn-3d-success text-white font-extrabold focus-visible:ring-[#176B4D]',
       danger:
         'btn-3d-danger text-white font-bold focus-visible:ring-[#DC2626]',
     }[variant];

@@ -62,7 +62,7 @@ export function StockList() {
         <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
           Gestion de Stock &amp; Mouvements FAKTELIO
         </h1>
-        <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+        <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
           Stock disponible, seuils minimums, alertes de rupture, entrées, sorties et historique horodaté.
         </p>
       </div>
@@ -75,7 +75,7 @@ export function StockList() {
             <p className="font-extrabold text-[#101828]">
               {lowStock.length} article(s) ont atteint le seuil d&apos;alerte minimum :
             </p>
-            <p className="text-[#526581]">
+            <p className="text-[#4A635A]">
               {lowStock
                 .map((p) => `${p.name} (Stock: ${p.stock} / Seuil: ${p.minStockAlert})`)
                 .join(' • ')}
@@ -99,7 +99,7 @@ export function StockList() {
                 <p className="text-xs font-bold text-[#101828]">
                   Aucun produit physique dans le catalogue
                 </p>
-                <p className="text-[11px] text-[#526581] mt-1 mb-3">
+                <p className="text-[11px] text-[#4A635A] mt-1 mb-3">
                   Pour gérer le stock, ajoutez un article physique avec une quantité initiale.
                 </p>
                 <button
@@ -134,7 +134,7 @@ export function StockList() {
                     className={`py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 border cursor-pointer ${
                       moveType === 'in'
                         ? 'bg-[#DCFCE7] text-[#15803D] border-[#16A34A]'
-                        : 'bg-[#F5F7FA] text-[#526581] border-[#E2E8F0]'
+                        : 'bg-[#F5F7FA] text-[#4A635A] border-[#E2E8F0]'
                     }`}
                   >
                     <ArrowDownCircle className="w-4 h-4" />
@@ -146,7 +146,7 @@ export function StockList() {
                     className={`py-2.5 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 border cursor-pointer ${
                       moveType === 'out'
                         ? 'bg-[#FEE2E2] text-[#DC2626] border-[#DC2626]'
-                        : 'bg-[#F5F7FA] text-[#526581] border-[#E2E8F0]'
+                        : 'bg-[#F5F7FA] text-[#4A635A] border-[#E2E8F0]'
                     }`}
                   >
                     <ArrowUpCircle className="w-4 h-4" />
@@ -191,7 +191,7 @@ export function StockList() {
           <div className="bg-white rounded-2xl p-6 border border-[#E2E8F0] shadow-xs space-y-3">
             <h3 className="text-sm font-extrabold text-[#101828]">État des stocks par produit</h3>
             {products.length === 0 ? (
-              <p className="text-xs text-[#526581] italic">Aucun produit physique dans le catalogue.</p>
+              <p className="text-xs text-[#4A635A] italic">Aucun produit physique dans le catalogue.</p>
             ) : (
               products.map((p) => {
                 const alert = p.stock <= p.minStockAlert;
@@ -202,7 +202,7 @@ export function StockList() {
                   >
                     <div>
                       <p className="text-xs font-extrabold text-[#101828]">{p.name}</p>
-                      <p className="text-[11px] text-[#526581]">
+                      <p className="text-[11px] text-[#4A635A]">
                         Réf: {p.reference} • Seuil minimum : {p.minStockAlert}
                       </p>
                     </div>
@@ -231,7 +231,7 @@ export function StockList() {
             <div className="py-12 px-4 text-center">
               <History className="w-10 h-10 text-[#CBD5E1] mx-auto mb-2.5" />
               <p className="text-sm font-bold text-[#101828]">Aucun mouvement de stock</p>
-              <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1">
+              <p className="text-xs text-[#4A635A] max-w-sm mx-auto mt-1">
                 Toutes les entrées, sorties manuelles et ventes facturées s&apos;afficheront ici automatiquement.
               </p>
             </div>
@@ -255,13 +255,13 @@ export function StockList() {
                       </span>
                       <span className="text-xs font-extrabold text-[#101828]">{m.productName}</span>
                     </div>
-                    <p className="text-xs text-[#526581] mt-1">{m.reason}</p>
+                    <p className="text-xs text-[#4A635A] mt-1">{m.reason}</p>
                   </div>
                   <div className="text-right text-xs">
                     <div className="font-extrabold text-[#215C46]">
                       Stock : {m.previousStock} → {m.newStock}
                     </div>
-                    <div className="text-[10px] text-[#526581]">
+                    <div className="text-[10px] text-[#4A635A]">
                       {new Date(m.createdAt).toLocaleDateString('fr-FR')}
                     </div>
                   </div>

@@ -1,39 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  /* Official Oceanic Green Design Tokens */
-  --color-primary: #215C46;
-  --color-primary-dark: #123A2C;
-  --color-deep: #0D2B21;
-  --color-mint: #A9BDBC;
-  --color-light-mint: #D9E7E3;
-  --color-background: #F7FAF8;
-  --color-text: #10241D;
+  /* Official Faktelio Green Design Tokens */
+  --color-primary: #176B4D;
+  --color-primary-dark: #104B38;
+  --color-primary-light: #E8F3ED;
+  --color-accent: #2E8B57;
+  --color-background: #F7F9F7;
+  --color-surface: #FFFFFF;
+  --color-text: #17231D;
+  --color-text-secondary: #65736B;
+  --color-border: #DCE5DE;
 
   /* Aliases & System Variables */
-  --primary: #215C46;
-  --primary-hover: #3F7A65;
-  --primary-dark: #123A2C;
-  --secondary: #A9BDBC;
-  --secondary-hover: #D9E7E3;
-  --deep: #0D2B21;
-  --background: #F7FAF8;
+  --primary: #176B4D;
+  --primary-hover: #104B38;
+  --primary-dark: #104B38;
+  --primary-light: #E8F3ED;
+  --secondary: #E8F3ED;
+  --secondary-hover: #DCE5DE;
+  --accent: #2E8B57;
+  --deep: #104B38;
+  --background: #F7F9F7;
   --surface: #FFFFFF;
-  --surface-secondary: #F0F5F3;
-  --text: #10241D;
-  --text-secondary: #4A635A;
-  --muted: #7E968E;
-  --border: #D9E7E3;
-  --border-light: rgba(217, 231, 227, 0.4);
-  --success: #215C46;
+  --surface-secondary: #E8F3ED;
+  --text: #17231D;
+  --text-secondary: #65736B;
+  --muted: #65736B;
+  --border: #DCE5DE;
+  --border-light: rgba(220, 229, 222, 0.6);
+  --success: #176B4D;
   --danger: #DC2626;
 
   /* Glassmorphism System Tokens */
-  --glass-bg: rgba(169, 189, 188, 0.10);
-  --glass-border: rgba(217, 231, 227, 0.22);
+  --glass-bg: rgba(232, 243, 237, 0.45);
+  --glass-border: rgba(220, 229, 222, 0.65);
   --glass-blur: 18px;
-  --glass-shadow: 0 20px 60px rgba(13, 43, 33, 0.15);
-  --glass-glow: 0 0 35px rgba(169, 189, 188, 0.25);
+  --glass-shadow: 0 20px 60px rgba(16, 75, 56, 0.10);
+  --glass-glow: 0 0 35px rgba(46, 139, 87, 0.20);
 
   --font-sans: "Manrope", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -43,28 +47,39 @@
   --font-sans: "Manrope", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Oceanic Green Palette (replacing legacy brand blue) */
-  --color-oceanic-50: #f0f7f4;
-  --color-oceanic-100: #d9e7e3;
-  --color-oceanic-200: #c1dad3;
-  --color-oceanic-300: #a9bdbc;
-  --color-oceanic-400: #5f9780;
-  --color-oceanic-500: #3f7a65;
-  --color-oceanic-600: #215c46;
-  --color-oceanic-700: #1a4937;
-  --color-oceanic-800: #123a2c;
-  --color-oceanic-900: #0d2b21;
-  --color-oceanic-950: #071712;
+  /* Faktelio Green Palette */
+  --color-primary: #176B4D;
+  --color-primary-dark: #104B38;
+  --color-primary-light: #E8F3ED;
+  --color-accent: #2E8B57;
+  --color-surface: #FFFFFF;
+  --color-background: #F7F9F7;
+  --color-text-main: #17231D;
+  --color-text-muted: #65736B;
+  --color-border-subtle: #DCE5DE;
+
+  /* Scale */
+  --color-oceanic-50: #f4faf7;
+  --color-oceanic-100: #e8f3ed;
+  --color-oceanic-200: #dce5de;
+  --color-oceanic-300: #a5c7b8;
+  --color-oceanic-400: #5fa486;
+  --color-oceanic-500: #2e8b57;
+  --color-oceanic-600: #176b4d;
+  --color-oceanic-700: #145940;
+  --color-oceanic-800: #104b38;
+  --color-oceanic-900: #0c392b;
+  --color-oceanic-950: #07221a;
 
   /* Mint accents */
-  --color-mint-50: #f4faf8;
-  --color-mint-100: #e5f1ee;
-  --color-mint-200: #d9e7e3;
-  --color-mint-300: #c0d8d3;
+  --color-mint-50: #f4faf7;
+  --color-mint-100: #e8f3ed;
+  --color-mint-200: #dce5de;
+  --color-mint-300: #c2ddd4;
   --color-mint-400: #a9bdbc;
-  --color-mint-500: #88a6a4;
-  --color-mint-600: #688e8c;
-  --color-mint-700: #4e6f6d;
+  --color-mint-500: #2e8b57;
+  --color-mint-600: #176b4d;
+  --color-mint-700: #104b38;
 }
 
 /* Base Body Style */
@@ -76,80 +91,81 @@ body {
 
 /* Glassmorphism utility classes */
 .glass-panel {
-  background: rgba(169, 189, 188, 0.10);
-  border: 1px solid rgba(217, 231, 227, 0.22);
+  background: rgba(232, 243, 237, 0.45);
+  border: 1px solid rgba(220, 229, 222, 0.65);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 20px 60px rgba(13, 43, 33, 0.15);
+  box-shadow: 0 20px 60px rgba(16, 75, 56, 0.10);
 }
 
 .glass-panel-dark {
-  background: rgba(13, 43, 33, 0.65);
-  border: 1px solid rgba(169, 189, 188, 0.20);
+  background: rgba(16, 75, 56, 0.85);
+  border: 1px solid rgba(220, 229, 222, 0.25);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 24px 70px rgba(13, 43, 33, 0.35);
+  box-shadow: 0 24px 70px rgba(12, 57, 43, 0.45);
 }
 
 .glass-panel-light {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(217, 231, 227, 0.60);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(220, 229, 222, 0.80);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 10px 40px rgba(13, 43, 33, 0.06);
+  box-shadow: 0 10px 40px rgba(16, 75, 56, 0.05);
 }
 
 /* ==============================================================
-   3D TACTILE GLASS BUTTON SYSTEM (FAKTELIO OCEANIC GREEN)
+   3D TACTILE GLASS BUTTON SYSTEM (FAKTELIO GREEN HARMONIZED)
    ============================================================== */
 .btn-3d-perspective {
   perspective: 1000px;
 }
 
-/* Primary Button: 3D Gradient + Inset Highlights + Ambient Glow */
+/* Primary Button: Vert principal (#176B4D) -> Vert foncé (#104B38) */
 .btn-3d-primary,
 .glass-button-primary {
-  background: linear-gradient(135deg, #215C46 0%, #3F7A65 100%);
+  background: linear-gradient(135deg, #176B4D 0%, #2E8B57 100%);
   color: #FFFFFF;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.35),
     inset 0 -2px 4px rgba(0, 0, 0, 0.16),
-    0 8px 25px rgba(18, 58, 44, 0.25);
+    0 8px 25px rgba(16, 75, 56, 0.25);
   transform: translateZ(0);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-3d-primary:hover,
 .glass-button-primary:hover {
-  background: linear-gradient(135deg, #1D543F 0%, #376F5B 100%);
+  background: linear-gradient(135deg, #104B38 0%, #176B4D 100%);
   transform: translateY(-2px) scale(1.02);
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.50),
     inset 0 -2px 4px rgba(0, 0, 0, 0.20),
-    0 12px 30px rgba(18, 58, 44, 0.35),
-    0 0 25px rgba(63, 122, 101, 0.25);
+    0 12px 30px rgba(16, 75, 56, 0.35),
+    0 0 25px rgba(46, 139, 87, 0.25);
 }
 
 .btn-3d-primary:active,
 .glass-button-primary:active {
+  background: #104B38;
   transform: translateY(1px) scale(0.98);
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.20),
     inset 0 -1px 2px rgba(0, 0, 0, 0.25),
-    0 4px 12px rgba(18, 58, 44, 0.20);
+    0 4px 12px rgba(16, 75, 56, 0.20);
 }
 
-/* Secondary Button: Clean 3D Light Glass */
+/* Secondary Button: Fond blanc (#FFFFFF), texte vert foncé (#104B38), bordure #DCE5DE */
 .btn-3d-secondary,
 .glass-button-secondary {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(247, 250, 248, 0.90));
-  color: #10241D;
-  border: 1px solid rgba(169, 189, 188, 0.45);
+  background: #FFFFFF;
+  color: #104B38;
+  border: 1px solid #DCE5DE;
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.85),
-    inset 0 -1px 2px rgba(13, 43, 33, 0.05),
-    0 4px 16px rgba(13, 43, 33, 0.06);
+    inset 0 -1px 2px rgba(16, 75, 56, 0.05),
+    0 4px 16px rgba(16, 75, 56, 0.06);
   transform: translateZ(0);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -157,44 +173,46 @@ body {
 .btn-3d-secondary:hover,
 .glass-button-secondary:hover {
   background: #FFFFFF;
-  border-color: rgba(33, 92, 70, 0.5);
-  color: #215C46;
+  border-color: #176B4D;
+  color: #176B4D;
   transform: translateY(-2px) scale(1.02);
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.95),
-    inset 0 -1px 2px rgba(13, 43, 33, 0.08),
-    0 8px 24px rgba(13, 43, 33, 0.10);
+    inset 0 -1px 2px rgba(16, 75, 56, 0.08),
+    0 8px 24px rgba(16, 75, 56, 0.12);
 }
 
 .btn-3d-secondary:active,
 .glass-button-secondary:active {
+  background: #E8F3ED;
+  color: #104B38;
   transform: translateY(1px) scale(0.98);
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.6),
-    0 2px 8px rgba(13, 43, 33, 0.04);
+    0 2px 8px rgba(16, 75, 56, 0.04);
 }
 
 /* Glass Variant */
 .btn-3d-glass {
-  background: rgba(169, 189, 188, 0.16);
-  color: #10241D;
-  border: 1px solid rgba(217, 231, 227, 0.5);
+  background: rgba(232, 243, 237, 0.55);
+  color: #17231D;
+  border: 1px solid #DCE5DE;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.4),
-    0 4px 16px rgba(13, 43, 33, 0.05);
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    0 4px 16px rgba(16, 75, 56, 0.05);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-3d-glass:hover {
-  background: rgba(169, 189, 188, 0.26);
-  border-color: #215C46;
-  color: #215C46;
+  background: #E8F3ED;
+  border-color: #176B4D;
+  color: #176B4D;
   transform: translateY(-2px) scale(1.02);
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.6),
-    0 8px 24px rgba(33, 92, 70, 0.12);
+    inset 0 1px 2px rgba(255, 255, 255, 0.7),
+    0 8px 24px rgba(23, 107, 77, 0.14);
 }
 
 .btn-3d-glass:active {
@@ -204,17 +222,18 @@ body {
 /* Outline Variant */
 .btn-3d-outline {
   background: transparent;
-  color: #215C46;
-  border: 1.5px solid rgba(33, 92, 70, 0.35);
+  color: #176B4D;
+  border: 1.5px solid #176B4D;
   box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-3d-outline:hover {
-  background: rgba(33, 92, 70, 0.08);
-  border-color: #215C46;
+  background: #E8F3ED;
+  border-color: #104B38;
+  color: #104B38;
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(33, 92, 70, 0.12);
+  box-shadow: 0 6px 20px rgba(23, 107, 77, 0.12);
 }
 
 .btn-3d-outline:active {
@@ -224,13 +243,13 @@ body {
 /* Ghost Variant */
 .btn-3d-ghost {
   background: transparent;
-  color: #10241D;
+  color: #17231D;
   transition: all 0.2s ease;
 }
 
 .btn-3d-ghost:hover {
-  background: rgba(169, 189, 188, 0.15);
-  color: #215C46;
+  background: #E8F3ED;
+  color: #176B4D;
   transform: translateY(-1px);
 }
 
@@ -240,13 +259,13 @@ body {
 
 /* Success Button */
 .btn-3d-success {
-  background: linear-gradient(135deg, #1A6B4F 0%, #2E8B67 100%);
+  background: linear-gradient(135deg, #176B4D 0%, #2E8B57 100%);
   color: #FFFFFF;
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.35),
     inset 0 -2px 4px rgba(0, 0, 0, 0.16),
-    0 8px 24px rgba(26, 107, 79, 0.3);
+    0 8px 24px rgba(23, 107, 77, 0.3);
   transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

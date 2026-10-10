@@ -63,7 +63,7 @@ export function InvoiceDetailModal({
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-[#526581] hover:text-[#101828] hover:bg-[#E2E8F0]/50 cursor-pointer"
+              className="p-2 rounded-xl text-[#4A635A] hover:text-[#101828] hover:bg-[#E2E8F0]/50 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -90,7 +90,7 @@ export function InvoiceDetailModal({
                 )}
               </div>
               <p className="text-base font-extrabold text-[#101828]">{settings.name}</p>
-              <div className="text-xs text-[#526581] mt-1.5 space-y-0.5">
+              <div className="text-xs text-[#4A635A] mt-1.5 space-y-0.5">
                 <p>
                   {settings.address}, {settings.city} — {settings.country}
                 </p>
@@ -109,10 +109,10 @@ export function InvoiceDetailModal({
                 FACTURE
               </div>
               <p className="text-xl font-extrabold text-[#101828]">{invoice.number}</p>
-              <p className="text-xs text-[#526581] mt-1">
+              <p className="text-xs text-[#4A635A] mt-1">
                 Date d&apos;émission : <strong>{formatDateFr(invoice.issueDate)}</strong>
               </p>
-              <p className="text-xs text-[#526581]">
+              <p className="text-xs text-[#4A635A]">
                 Date d&apos;échéance : <strong>{formatDateFr(invoice.dueDate)}</strong>
               </p>
             </div>
@@ -121,7 +121,7 @@ export function InvoiceDetailModal({
           {/* Client Box & Payment Status */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div className="p-4 rounded-xl bg-[#F5F7FA] border border-[#E2E8F0]">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#526581] mb-1">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#4A635A] mb-1">
                 Facturé à :
               </p>
               <p className="text-sm font-extrabold text-[#101828]">{invoice.clientName}</p>
@@ -129,19 +129,19 @@ export function InvoiceDetailModal({
                 <p className="text-xs font-semibold text-[#215C46]">{invoice.clientCompany}</p>
               )}
               {invoice.clientAddress && (
-                <p className="text-xs text-[#526581] mt-1">{invoice.clientAddress}</p>
+                <p className="text-xs text-[#4A635A] mt-1">{invoice.clientAddress}</p>
               )}
               {invoice.clientPhone && (
-                <p className="text-xs text-[#526581]">Tél : {invoice.clientPhone}</p>
+                <p className="text-xs text-[#4A635A]">Tél : {invoice.clientPhone}</p>
               )}
               {invoice.clientEmail && (
-                <p className="text-xs text-[#526581]">Email : {invoice.clientEmail}</p>
+                <p className="text-xs text-[#4A635A]">Email : {invoice.clientEmail}</p>
               )}
             </div>
 
             <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#526581]">Statut du règlement</span>
+                <span className="text-xs font-bold text-[#4A635A]">Statut du règlement</span>
                 {invoice.remainingAmount === 0 ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#215C46]/15 text-[#123A2C]">
                     <CheckCircle2 className="w-3.5 h-3.5 text-[#215C46]" /> PAYÉE
@@ -153,7 +153,7 @@ export function InvoiceDetailModal({
                 )}
               </div>
               <div className="mt-3 pt-3 border-t border-[#D9E7E3] flex items-baseline justify-between">
-                <span className="text-xs text-[#526581]">Solde restant :</span>
+                <span className="text-xs text-[#4A635A]">Solde restant :</span>
                 <span className="text-lg font-black text-[#215C46]">
                   {formatFCFA(invoice.remainingAmount)}
                 </span>
@@ -182,11 +182,11 @@ export function InvoiceDetailModal({
                     <td className="py-3.5 px-4 font-semibold text-[#101828]">
                       {item.description}
                     </td>
-                    <td className="py-3.5 px-4 text-center text-[#526581]">{item.quantity}</td>
-                    <td className="py-3.5 px-4 text-right text-[#526581]">
+                    <td className="py-3.5 px-4 text-center text-[#4A635A]">{item.quantity}</td>
+                    <td className="py-3.5 px-4 text-right text-[#4A635A]">
                       {formatFCFA(item.unitPrice)}
                     </td>
-                    <td className="py-3.5 px-4 text-center text-[#526581]">{item.vatRate}%</td>
+                    <td className="py-3.5 px-4 text-center text-[#4A635A]">{item.vatRate}%</td>
                     <td className="py-3.5 px-4 text-right font-bold text-[#101828]">
                       {formatFCFA(item.totalHt)}
                     </td>
@@ -198,7 +198,7 @@ export function InvoiceDetailModal({
 
           {/* Summary & Totals + Signature/Stamp */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-            <div className="space-y-3 text-xs text-[#526581]">
+            <div className="space-y-3 text-xs text-[#4A635A]">
               <div>
                 <p className="font-bold text-[#101828] uppercase tracking-wider mb-1">
                   Conditions &amp; Moyens de paiement
@@ -230,7 +230,7 @@ export function InvoiceDetailModal({
             </div>
 
             <div className="bg-[#F7FAF8] p-5 rounded-xl border border-[#D9E7E3] space-y-2.5 text-sm">
-              <div className="flex justify-between text-[#526581]">
+              <div className="flex justify-between text-[#4A635A]">
                 <span>Sous-total HT</span>
                 <span className="font-bold text-[#10241D]">{formatFCFA(invoice.subtotalHt)}</span>
               </div>
@@ -242,7 +242,7 @@ export function InvoiceDetailModal({
                   </span>
                 </div>
               )}
-              <div className="flex justify-between text-[#526581]">
+              <div className="flex justify-between text-[#4A635A]">
                 <span>Total TVA</span>
                 <span className="font-bold text-[#10241D]">{formatFCFA(invoice.totalVat)}</span>
               </div>
@@ -262,7 +262,7 @@ export function InvoiceDetailModal({
           </div>
 
           {/* Document Footer */}
-          <div className="pt-6 border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#526581]">
+          <div className="pt-6 border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#4A635A]">
             <span>
               Document généré électroniquement via <strong>FAKTELIO</strong> (www.faktelio.com)
             </span>

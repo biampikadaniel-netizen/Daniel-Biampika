@@ -61,7 +61,7 @@ export function SubscriptionView() {
           <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
             Mon Abonnement FAKTELIO
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             Gérez votre formule FAKTELIO et vos moyens de règlement Mobile Money ou Carte.
           </p>
         </div>
@@ -114,7 +114,7 @@ export function SubscriptionView() {
                 onClick={() => handleSelectPlan(p.id, p.name)}
                 className={`w-full py-2.5 px-4 rounded-xl text-xs font-extrabold transition-all ${
                   isCurrent
-                    ? 'bg-[#F7FAF8] text-[#526581] border border-[#D9E7E3] cursor-default'
+                    ? 'bg-[#F7FAF8] text-[#4A635A] border border-[#D9E7E3] cursor-default'
                     : 'bg-[#215C46] hover:bg-[#123A2C] text-white cursor-pointer shadow-sm hover:shadow-md'
                 }`}
               >

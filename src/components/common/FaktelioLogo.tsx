@@ -45,7 +45,7 @@ export function FaktelioLogo({
           width="104"
           height="104"
           rx="26"
-          fill={isWhite ? '#FFFFFF' : '#0E7051'}
+          fill={isWhite ? '#FFFFFF' : '#176B4D'}
         />
         <rect
           x="12"
@@ -53,19 +53,19 @@ export function FaktelioLogo({
           width="96"
           height="96"
           rx="22"
-          stroke={isWhite ? '#0E7051' : '#A9BDBC'}
+          stroke={isWhite ? '#176B4D' : '#E8F3ED'}
           strokeWidth="2"
-          strokeOpacity={isWhite ? 1 : 0.35}
+          strokeOpacity={isWhite ? 1 : 0.45}
         />
         <path
           d="M36 32C36 28.6863 38.6863 26 42 26H78C81.3137 26 84 28.6863 84 32V38C84 40.2091 82.2091 42 80 42H50V54H72C74.2091 54 76 55.7909 76 58V64C76 66.2091 74.2091 68 72 68H50V88C50 91.3137 47.3137 94 44 94H42C38.6863 94 36 91.3137 36 88V32Z"
-          fill={isWhite ? '#0E7051' : '#FFFFFF'}
+          fill={isWhite ? '#176B4D' : '#FFFFFF'}
         />
         <circle
           cx="80"
           cy="80"
           r="20"
-          fill={isWhite ? '#0E7051' : '#3F7A65'}
+          fill={isWhite ? '#176B4D' : '#2E8B57'}
         />
         <path
           d="M72 80.5L77.5 86L89 74.5"
@@ -79,11 +79,11 @@ export function FaktelioLogo({
       {!iconOnly && (
         <span className={`font-black tracking-tight leading-none ${textSizes[size]}`}>
           {isAdmin ? (
-            <span className="text-[#0E1A16] font-black">FAKTELIO</span>
+            <span className="text-[#17231D] font-black">FAKTELIO</span>
           ) : (
             <>
-              <span className={isWhite ? 'text-white' : 'text-[#123A2C]'}>FAKTE</span>
-              <span className={isWhite ? 'text-[#A9BDBC]' : 'text-[#215C46]'}>LIO</span>
+              <span className={isWhite ? 'text-white' : 'text-[#104B38]'}>FAKTE</span>
+              <span className={isWhite ? 'text-[#E8F3ED]' : 'text-[#176B4D]'}>LIO</span>
             </>
           )}
         </span>

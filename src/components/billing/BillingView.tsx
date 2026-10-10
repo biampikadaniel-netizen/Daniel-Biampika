@@ -259,7 +259,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
           <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
             Créer une nouvelle facture professionnelle
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             Suivez les 5 étapes ci-dessous. Tous les calculs (Sous-total, TVA, Remise, Total TTC) sont automatiques.
           </p>
         </div>
@@ -318,7 +318,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
             {!isNewClient ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-[#526581] uppercase mb-1.5">
+                  <label className="block text-xs font-bold text-[#4A635A] uppercase mb-1.5">
                     Client destinataire *
                   </label>
                   <select
@@ -382,7 +382,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
             {/* Numéro & Dates */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
               <div>
-                <label className="block text-xs font-bold text-[#526581] uppercase mb-1">
+                <label className="block text-xs font-bold text-[#4A635A] uppercase mb-1">
                   Numéro de facture
                 </label>
                 <input
@@ -393,11 +393,11 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#526581] uppercase mb-1">
+                <label className="block text-xs font-bold text-[#4A635A] uppercase mb-1">
                   Date d&apos;émission
                 </label>
                 <div className="relative">
-                  <Calendar className="w-4 h-4 text-[#526581] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Calendar className="w-4 h-4 text-[#4A635A] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="date"
                     value={issueDate}
@@ -407,11 +407,11 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#526581] uppercase mb-1">
+                <label className="block text-xs font-bold text-[#4A635A] uppercase mb-1">
                   Date d&apos;échéance
                 </label>
                 <div className="relative">
-                  <Calendar className="w-4 h-4 text-[#526581] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Calendar className="w-4 h-4 text-[#4A635A] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="date"
                     value={dueDate}
@@ -434,7 +434,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   <h2 className="text-base font-extrabold text-[#101828]">
                     Étapes 2 à 5 : Produits/Services, Quantités, Prix &amp; TVA
                   </h2>
-                  <p className="text-xs text-[#526581]">
+                  <p className="text-xs text-[#4A635A]">
                     Sélectionnez depuis votre catalogue ou saisissez librement vos lignes
                   </p>
                 </div>
@@ -475,7 +475,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   {/* Step 2: Catalogue selector + Description */}
                   <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
                     <div className="sm:col-span-5">
-                      <label className="block text-[11px] font-bold text-[#526581] mb-1">
+                      <label className="block text-[11px] font-bold text-[#4A635A] mb-1">
                         Étape 2 : Choisir dans le catalogue
                       </label>
                       <select
@@ -493,7 +493,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                     </div>
 
                     <div className="sm:col-span-7">
-                      <label className="block text-[11px] font-bold text-[#526581] mb-1">
+                      <label className="block text-[11px] font-bold text-[#4A635A] mb-1">
                         Désignation sur la facture *
                       </label>
                       <input
@@ -509,7 +509,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                   {/* Steps 3, 4, 5: Quantity, Price, VAT, Subtotal */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
                     <div>
-                      <label className="block text-[11px] font-bold text-[#526581] mb-1">
+                      <label className="block text-[11px] font-bold text-[#4A635A] mb-1">
                         Étape 3 : Quantité
                       </label>
                       <input
@@ -524,7 +524,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-[#526581] mb-1">
+                      <label className="block text-[11px] font-bold text-[#4A635A] mb-1">
                         Étape 4 : Prix Unitaire (FCFA)
                       </label>
                       <input
@@ -540,7 +540,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-[#526581] mb-1">
+                      <label className="block text-[11px] font-bold text-[#4A635A] mb-1">
                         Étape 5 : TVA (%)
                       </label>
                       <select
@@ -555,7 +555,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-[#526581] mb-1">
+                      <label className="block text-[11px] font-bold text-[#4A635A] mb-1">
                         Total Ligne HT
                       </label>
                       <div className="w-full px-3 py-2 rounded-lg bg-[#215C46]/8 border border-[#215C46]/15 text-xs font-extrabold text-[#215C46]">
@@ -575,11 +575,11 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#526581] mb-1">
+                <label className="block text-xs font-bold text-[#4A635A] mb-1">
                   Remise commerciale (%)
                 </label>
                 <div className="relative">
-                  <Percent className="w-4 h-4 text-[#526581] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Percent className="w-4 h-4 text-[#4A635A] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="number"
                     min={0}
@@ -608,7 +608,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#526581] mb-1">
+                <label className="block text-xs font-bold text-[#4A635A] mb-1">
                   Conditions de paiement
                 </label>
                 <textarea
@@ -620,7 +620,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-[#526581] mb-1">
+                <label className="block text-xs font-bold text-[#4A635A] mb-1">
                   Notes ou mentions particulières
                 </label>
                 <textarea
@@ -649,7 +649,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
             </div>
 
             <div className="space-y-3 text-sm">
-              <div className="flex justify-between text-[#526581]">
+              <div className="flex justify-between text-[#4A635A]">
                 <span>Sous-total HT</span>
                 <span className="font-bold text-[#101828]">{formatFCFA(subtotalHt)}</span>
               </div>
@@ -659,7 +659,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                 <span className="font-bold">-{formatFCFA(discountAmount)}</span>
               </div>
 
-              <div className="flex justify-between text-[#526581]">
+              <div className="flex justify-between text-[#4A635A]">
                 <span>TVA cumulée</span>
                 <span className="font-bold text-[#101828]">{formatFCFA(totalVat)}</span>
               </div>
@@ -714,7 +714,7 @@ export function BillingView({ onSaved }: { onSaved?: () => void }) {
                 <button
                   type="button"
                   onClick={handleSaveDraft}
-                  className="py-2.5 px-3 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F5F7FA] text-[#526581] hover:text-[#101828] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  className="py-2.5 px-3 rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F5F7FA] text-[#4A635A] hover:text-[#101828] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Enregistrer brouillon

@@ -130,7 +130,7 @@ export function Hero() {
 
                 {/* Star Rating & Stat */}
                 <div className="flex items-center gap-1">
-                  <div className="flex items-center text-[#F59E0B]">
+                  <div className="flex items-center text-[#215C46]">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-3.5 h-3.5 fill-current" />
                     ))}

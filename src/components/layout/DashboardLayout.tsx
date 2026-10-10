@@ -170,28 +170,28 @@ export function DashboardLayout({
                   }}
                   className={`relative w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs transition-all cursor-pointer group ${
                     active
-                      ? 'bg-[#E8F4F0] text-[#0D2B21] font-extrabold'
-                      : 'text-gray-600 hover:text-[#0D2B21] hover:bg-gray-50/80 font-semibold'
+                      ? 'bg-[#E8F3ED] text-[#104B38] font-extrabold'
+                      : 'text-[#65736B] hover:text-[#104B38] hover:bg-[#E8F3ED]/50 font-semibold'
                   }`}
                 >
                   {/* Active Indicator on far left */}
                   {active && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#0E7051] rounded-r-full" />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-6 bg-[#176B4D] rounded-r-full" />
                   )}
 
                   <span className="flex items-center gap-3">
                     <Icon
                       className={`w-4 h-4 transition-colors ${
                         active
-                          ? 'text-[#0E7051]'
-                          : 'text-gray-400 group-hover:text-gray-600'
+                          ? 'text-[#176B4D]'
+                          : 'text-[#65736B] group-hover:text-[#17231D]'
                       }`}
                     />
                     <span className="truncate">{item.label}</span>
                   </span>
 
                   {item.badge && (
-                    <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-[#0E7051] text-white shrink-0">
+                    <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-[#176B4D] text-white shrink-0">
                       {item.badge}
                     </span>
                   )}
@@ -203,16 +203,16 @@ export function DashboardLayout({
 
         {/* Bottom Card: "Besoin d'aide ?" & Decorative Wave */}
         <div className="relative z-10 pt-2 pb-2">
-          <div className="mx-4 mb-3 p-3.5 rounded-2xl bg-[#F8FAF9] border border-gray-100 shadow-xs relative z-10">
+          <div className="mx-4 mb-3 p-3.5 rounded-2xl bg-[#F7F9F7] border border-[#DCE5DE] shadow-xs relative z-10">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-white border border-gray-100/90 text-[#0E7051] flex items-center justify-center shrink-0 shadow-2xs">
+              <div className="w-8 h-8 rounded-full bg-white border border-[#DCE5DE] text-[#176B4D] flex items-center justify-center shrink-0 shadow-2xs">
                 <Headphones className="w-4 h-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-[#0E1A16] leading-tight">
+                <p className="text-xs font-bold text-[#17231D] leading-tight">
                   Besoin d&apos;aide ?
                 </p>
-                <p className="text-[10px] text-gray-400 leading-tight mt-0.5 truncate">
+                <p className="text-[10px] text-[#65736B] leading-tight mt-0.5 truncate">
                   Notre équipe est là pour vous.
                 </p>
               </div>
@@ -220,7 +220,7 @@ export function DashboardLayout({
 
             <button
               onClick={() => setSupportModalOpen(true)}
-              className="w-full mt-3 py-2 px-3 rounded-xl bg-[#0E5C44] hover:bg-[#0B4D39] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+              className="w-full mt-3 py-2 px-3 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
             >
               Contacter le support →
             </button>
@@ -237,11 +237,11 @@ export function DashboardLayout({
             >
               <path
                 d="M0 24 C 70 8, 140 36, 210 18 C 245 10, 265 16, 280 20 L 280 48 L 0 48 Z"
-                fill="#E8F4F0"
+                fill="#E8F3ED"
               />
               <path
                 d="M0 34 C 80 22, 170 42, 280 28 L 280 48 L 0 48 Z"
-                fill="#D0E8DF"
+                fill="#DCE5DE"
                 fillOpacity="0.4"
               />
             </svg>
@@ -258,17 +258,17 @@ export function DashboardLayout({
            ============================================================== */}
         <header className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Left / Search Pill Card */}
-          <div className="flex-1 bg-white rounded-2xl sm:rounded-full border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] px-4 py-2 flex items-center justify-between gap-3">
+          <div className="flex-1 bg-white rounded-2xl sm:rounded-full border border-[#DCE5DE] shadow-[0_2px_12px_rgba(0,0,0,0.02)] px-4 py-2 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="lg:hidden p-1.5 -ml-1 rounded-xl text-gray-600 hover:bg-gray-100 cursor-pointer shrink-0"
+                className="lg:hidden p-1.5 -ml-1 rounded-xl text-[#65736B] hover:bg-[#E8F3ED] cursor-pointer shrink-0"
                 aria-label="Ouvrir le menu"
               >
                 <Menu className="w-4 h-4" />
               </button>
 
-              <Search className="w-4 h-4 text-gray-400 shrink-0" />
+              <Search className="w-4 h-4 text-[#65736B] shrink-0" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -277,19 +277,19 @@ export function DashboardLayout({
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
                 placeholder="Rechercher une tâche, un client..."
-                className="bg-transparent border-0 outline-none text-xs sm:text-sm text-[#0E1A16] placeholder:text-gray-400 w-full focus:ring-0 leading-normal"
+                className="bg-transparent border-0 outline-none text-xs sm:text-sm text-[#17231D] placeholder:text-[#65736B] w-full focus:ring-0 leading-normal"
               />
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-mono font-medium bg-gray-100 text-gray-400 rounded-md border border-gray-200/60 shrink-0 select-none">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 text-[11px] font-mono font-medium bg-[#E8F3ED] text-[#65736B] rounded-md border border-[#DCE5DE] shrink-0 select-none">
                 ⌘ K
               </kbd>
             </div>
 
             {/* Quick Action Icons inside Search Card */}
-            <div className="flex items-center gap-2 shrink-0 pl-2 border-l border-gray-100">
+            <div className="flex items-center gap-2 shrink-0 pl-2 border-l border-[#DCE5DE]">
               <button
                 onClick={() => navigate('/reminders')}
                 title="Messages & Relances"
-                className="w-9 h-9 rounded-full border border-gray-100/90 flex items-center justify-center text-gray-500 hover:text-[#0E5C44] hover:bg-gray-50 transition-colors cursor-pointer"
+                className="w-9 h-9 rounded-full border border-[#DCE5DE] flex items-center justify-center text-[#65736B] hover:text-[#176B4D] hover:bg-[#E8F3ED] transition-colors cursor-pointer"
               >
                 <Mail className="w-4 h-4" />
               </button>
@@ -299,35 +299,33 @@ export function DashboardLayout({
                 <button
                   onClick={() => setNotifOpen(!notifOpen)}
                   title="Notifications"
-                  className="w-9 h-9 rounded-full border border-gray-100/90 flex items-center justify-center text-gray-500 hover:text-[#0E5C44] hover:bg-gray-50 transition-colors relative cursor-pointer"
+                  className="w-9 h-9 rounded-full border border-[#DCE5DE] flex items-center justify-center text-[#65736B] hover:text-[#176B4D] hover:bg-[#E8F3ED] transition-colors relative cursor-pointer"
                 >
                   <Bell className="w-4 h-4" />
-                  {unreadCount > 0 ? (
-                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#0E7051]" />
-                  ) : (
-                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#0E7051]" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#176B4D]" />
                   )}
                 </button>
 
                 {/* Notifications Popup */}
                 {notifOpen && (
-                  <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-100 py-3 z-50">
-                    <div className="px-4 pb-2.5 border-b border-gray-100 flex items-center justify-between">
-                      <span className="text-xs font-black text-[#0E1A16] uppercase tracking-wider">
+                  <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#DCE5DE] py-3 z-50">
+                    <div className="px-4 pb-2.5 border-b border-[#DCE5DE] flex items-center justify-between">
+                      <span className="text-xs font-black text-[#17231D] uppercase tracking-wider">
                         Notifications ({unreadCount})
                       </span>
                       {unreadCount > 0 && (
                         <button
                           onClick={handleMarkRead}
-                          className="text-[11px] font-bold text-[#0E7051] hover:underline cursor-pointer"
+                          className="text-[11px] font-bold text-[#176B4D] hover:underline cursor-pointer"
                         >
                           Tout marquer comme lu
                         </button>
                       )}
                     </div>
-                    <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+                    <div className="max-h-80 overflow-y-auto divide-y divide-[#DCE5DE]">
                       {notifications.length === 0 ? (
-                        <p className="p-4 text-xs text-gray-400 text-center">
+                        <p className="p-4 text-xs text-[#65736B] text-center">
                           Aucune notification pour le moment.
                         </p>
                       ) : (
@@ -338,17 +336,17 @@ export function DashboardLayout({
                               setNotifOpen(false);
                               if (n.link) navigate(n.link as AppRoute);
                             }}
-                            className={`p-3.5 hover:bg-gray-50 transition-colors cursor-pointer ${
-                              !n.read ? 'bg-[#E8F4F0]/40' : ''
+                            className={`p-3.5 hover:bg-[#E8F3ED]/40 transition-colors cursor-pointer ${
+                              !n.read ? 'bg-[#E8F3ED]/60' : ''
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <p className="text-xs font-bold text-[#0E1A16]">{n.title}</p>
+                              <p className="text-xs font-bold text-[#17231D]">{n.title}</p>
                               {!n.read && (
-                                <span className="w-2 h-2 rounded-full bg-[#0E7051] shrink-0" />
+                                <span className="w-2 h-2 rounded-full bg-[#176B4D] shrink-0" />
                               )}
                             </div>
-                            <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+                            <p className="text-[11px] text-[#65736B] mt-1 leading-relaxed">
                               {n.message}
                             </p>
                           </div>
@@ -365,31 +363,31 @@ export function DashboardLayout({
           <div className="relative shrink-0">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="w-full sm:w-auto bg-white rounded-2xl sm:rounded-full border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] px-3 py-1.5 flex items-center justify-between sm:justify-start gap-3 hover:border-gray-200 transition-colors cursor-pointer text-left"
+              className="w-full sm:w-auto bg-white rounded-2xl sm:rounded-full border border-[#DCE5DE] shadow-[0_2px_12px_rgba(0,0,0,0.02)] px-3 py-1.5 flex items-center justify-between sm:justify-start gap-3 hover:border-[#176B4D]/40 transition-colors cursor-pointer text-left"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-[#0E5C44] text-white font-black text-xs flex items-center justify-center tracking-tight shrink-0 shadow-2xs">
+                <div className="w-9 h-9 rounded-full bg-[#176B4D] text-white font-black text-xs flex items-center justify-center tracking-tight shrink-0 shadow-2xs">
                   {userInitials}
                 </div>
                 <div className="min-w-0 pr-1">
-                  <p className="text-xs font-bold text-[#0E1A16] leading-tight truncate">
+                  <p className="text-xs font-bold text-[#17231D] leading-tight truncate">
                     {user.name}
                   </p>
-                  <p className="text-[10px] text-gray-400 leading-tight capitalize">
+                  <p className="text-[10px] text-[#65736B] leading-tight capitalize">
                     {user.role === 'admin' ? 'Admin' : user.role}
                   </p>
                 </div>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <ChevronDown className="w-3.5 h-3.5 text-[#65736B] shrink-0" />
             </button>
 
             {/* Profile Dropdown */}
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-gray-100 py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-xs font-bold text-[#0E1A16] truncate">{user.companyName}</p>
-                  <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
-                  <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F4F0] text-[#0E7051] text-[10px] font-bold">
+              <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-[#DCE5DE] py-2 z-50">
+                <div className="px-4 py-2 border-b border-[#DCE5DE]">
+                  <p className="text-xs font-bold text-[#17231D] truncate">{user.companyName}</p>
+                  <p className="text-[10px] text-[#65736B] truncate">{user.email}</p>
+                  <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#E8F3ED] text-[#176B4D] text-[10px] font-bold">
                     Plan {user.plan.toUpperCase()} • {trialDaysLeft}j essai
                   </div>
                 </div>
@@ -400,9 +398,9 @@ export function DashboardLayout({
                       setUserMenuOpen(false);
                       navigate('/settings');
                     }}
-                    className="w-full px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                    className="w-full px-4 py-2 text-left text-xs text-[#17231D] hover:bg-[#E8F3ED] flex items-center gap-2 cursor-pointer"
                   >
-                    <Settings className="w-3.5 h-3.5 text-gray-400" />
+                    <Settings className="w-3.5 h-3.5 text-[#65736B]" />
                     Paramètres de l&apos;entreprise
                   </button>
                   <button
@@ -410,9 +408,9 @@ export function DashboardLayout({
                       setUserMenuOpen(false);
                       navigate('/subscription');
                     }}
-                    className="w-full px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                    className="w-full px-4 py-2 text-left text-xs text-[#17231D] hover:bg-[#E8F3ED] flex items-center gap-2 cursor-pointer"
                   >
-                    <Clock className="w-3.5 h-3.5 text-gray-400" />
+                    <Clock className="w-3.5 h-3.5 text-[#65736B]" />
                     Gérer mon abonnement
                   </button>
                   <button
@@ -420,14 +418,14 @@ export function DashboardLayout({
                       setUserMenuOpen(false);
                       navigate('/');
                     }}
-                    className="w-full px-4 py-2 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer"
+                    className="w-full px-4 py-2 text-left text-xs text-[#17231D] hover:bg-[#E8F3ED] flex items-center gap-2 cursor-pointer"
                   >
-                    <Globe className="w-3.5 h-3.5 text-gray-400" />
+                    <Globe className="w-3.5 h-3.5 text-[#65736B]" />
                     Site vitrine public
                   </button>
                 </div>
 
-                <div className="pt-1 border-t border-gray-100">
+                <div className="pt-1 border-t border-[#DCE5DE]">
                   <button
                     onClick={() => {
                       setUserMenuOpen(false);

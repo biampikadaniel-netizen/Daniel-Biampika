@@ -83,7 +83,7 @@ export function ProductModal({
               className={`py-2.5 px-4 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
                 type === 'product'
                   ? 'bg-[#215C46] text-white border-[#215C46] shadow-xs'
-                  : 'bg-[#F7FAF8] text-[#526581] border-[#D9E7E3] hover:text-[#10241D]'
+                  : 'bg-[#F7FAF8] text-[#4A635A] border-[#D9E7E3] hover:text-[#10241D]'
               }`}
             >
               Produit physique (stock)
@@ -97,7 +97,7 @@ export function ProductModal({
               className={`py-2.5 px-4 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
                 type === 'service'
                   ? 'bg-[#215C46] text-white border-[#215C46] shadow-xs'
-                  : 'bg-[#F7FAF8] text-[#526581] border-[#D9E7E3] hover:text-[#10241D]'
+                  : 'bg-[#F7FAF8] text-[#4A635A] border-[#D9E7E3] hover:text-[#10241D]'
               }`}
             >
               Prestation de service
@@ -227,7 +227,7 @@ export function ProductModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] hover:bg-[#F7FAF8] cursor-pointer"
             >
               Annuler
             </button>

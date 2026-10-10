@@ -47,7 +47,7 @@ export function RemindersList() {
           <h1 className="text-2xl font-black text-[#10241D] tracking-tight">
             Relances Clients sur WhatsApp
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             FAKTELIO prépare automatiquement vos messages avec le nom du client, le numéro de facture, le montant, la date d&apos;échéance et le lien du document.
           </p>
         </div>
@@ -61,7 +61,7 @@ export function RemindersList() {
           <h2 className="text-lg font-black text-[#10241D]">
             {invoices.length === 0 ? 'Aucune facture impayée à relancer' : 'Toutes vos factures sont réglées !'}
           </h2>
-          <p className="text-sm text-[#526581] max-w-md mx-auto mt-1">
+          <p className="text-sm text-[#4A635A] max-w-md mx-auto mt-1">
             {invoices.length === 0
               ? 'Vos factures en attente de paiement apparaîtront ici automatiquement avec un message WhatsApp pré-rempli pour vos clients.'
               : 'Aucune facture en attente ou en retard ne nécessite de relance WhatsApp pour le moment.'}
@@ -93,20 +93,20 @@ export function RemindersList() {
                         )}
                       </div>
                       <p className="text-sm font-extrabold text-[#10241D] mt-1">{inv.clientName}</p>
-                      <p className="text-xs text-[#526581]">
+                      <p className="text-xs text-[#4A635A]">
                         {inv.clientCompany ? `${inv.clientCompany} • ` : ''}
                         {inv.clientPhone || 'Téléphone non renseigné'}
                       </p>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[11px] font-bold text-[#526581] uppercase block">
+                      <span className="text-[11px] font-bold text-[#4A635A] uppercase block">
                         Reste à payer
                       </span>
                       <span className="text-lg font-black text-[#215C46]">
                         {formatFCFA(inv.remainingAmount)}
                       </span>
-                      <span className="text-[11px] text-[#526581] block">
+                      <span className="text-[11px] text-[#4A635A] block">
                         Échéance : {formatDateFr(inv.dueDate)}
                       </span>
                     </div>
@@ -145,7 +145,7 @@ export function RemindersList() {
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5 text-[#526581]" />
+                        <Copy className="w-3.5 h-3.5 text-[#4A635A]" />
                         Copier le texte
                       </>
                     )}

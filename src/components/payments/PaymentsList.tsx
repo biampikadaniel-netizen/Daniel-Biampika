@@ -74,10 +74,10 @@ export function PaymentsList() {
 
         <div className="bg-white p-5 rounded-2xl border border-[#D9E7E3] shadow-xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-extrabold uppercase text-[#92400E]">
+            <span className="text-xs font-extrabold uppercase text-[#2E7D5C]">
               Partiellement payé
             </span>
-            <Wallet className="w-4 h-4 text-[#B45309]" />
+            <Wallet className="w-4 h-4 text-[#215C46]" />
           </div>
           <p className="text-xl font-extrabold text-[#10241D]">
             {invoices.filter((i) => i.status === 'partial').length} facture(s)

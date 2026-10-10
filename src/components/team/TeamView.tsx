@@ -41,7 +41,7 @@ export function TeamView() {
         <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
           Équipe &amp; Collaborateurs FAKTELIO
         </h1>
-        <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+        <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
           Invitez vos commerciaux, comptables ou gestionnaires sur votre espace FAKTELIO.
         </p>
       </div>
@@ -111,7 +111,7 @@ export function TeamView() {
               >
                 <div>
                   <p className="text-sm font-extrabold text-[#101828]">{m.name}</p>
-                  <p className="text-xs text-[#526581] flex items-center gap-1 mt-0.5">
+                  <p className="text-xs text-[#4A635A] flex items-center gap-1 mt-0.5">
                     <Mail className="w-3.5 h-3.5 text-[#215C46]" /> {m.email}
                   </p>
                 </div>

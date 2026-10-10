@@ -220,7 +220,7 @@ export function ClientsList() {
           <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
             Clients &amp; CRM
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             Centralisez vos contacts, coordonnées, historique des factures et notes commerciales.
           </p>
         </div>
@@ -273,7 +273,7 @@ export function ClientsList() {
       {clients.length > 0 && (
         <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-[#D9E7E3] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#4A635A] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={search}
@@ -297,7 +297,7 @@ export function ClientsList() {
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   filterType === f.id
                     ? 'bg-[#215C46] text-white shadow-xs'
-                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#10241D] hover:bg-[#D9E7E3]/40'
+                    : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#10241D] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 {f.label}
@@ -315,7 +315,7 @@ export function ClientsList() {
             <h3 className="text-base font-extrabold text-[#101828]">
               Vous n&apos;avez encore aucun client.
             </h3>
-            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-5">
+            <p className="text-xs text-[#4A635A] max-w-sm mx-auto mt-1 mb-5">
               Ajoutez les coordonnées de vos clients pour commencer à leur éditer des devis et des factures.
             </p>
             <button
@@ -373,14 +373,14 @@ export function ClientsList() {
                             {client.name}
                           </div>
                           {client.company && (
-                            <div className="text-xs text-[#526581]">{client.company}</div>
+                            <div className="text-xs text-[#4A635A]">{client.company}</div>
                           )}
                         </button>
                       </td>
                       <td className="py-3.5 px-5 text-xs font-semibold text-[#10241D]">
                         {client.phone || '—'}
                       </td>
-                      <td className="py-3.5 px-5 text-xs text-[#526581]">
+                      <td className="py-3.5 px-5 text-xs text-[#4A635A]">
                         {client.email || '—'}
                       </td>
                       <td className="py-3.5 px-5 text-center">
@@ -391,7 +391,7 @@ export function ClientsList() {
                       <td className="py-3.5 px-5 font-black text-[#10241D]">
                         {formatFCFA(stats.totalBilled)}
                       </td>
-                      <td className="py-3.5 px-5 text-xs text-[#526581]">
+                      <td className="py-3.5 px-5 text-xs text-[#4A635A]">
                         {stats.lastActivity}
                       </td>
                       <td className="py-3.5 px-5 text-right">
@@ -410,7 +410,7 @@ export function ClientsList() {
                               setModalOpen(true);
                             }}
                             title="Modifier"
-                            className="p-1.5 rounded-lg bg-[#F5F7FA] hover:bg-[#E2E8F0] text-[#526581] hover:text-[#101828] cursor-pointer"
+                            className="p-1.5 rounded-lg bg-[#F5F7FA] hover:bg-[#E2E8F0] text-[#4A635A] hover:text-[#101828] cursor-pointer"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
@@ -431,7 +431,7 @@ export function ClientsList() {
           </div>
 
           {filteredClients.length > itemsPerPage && (
-            <div className="px-6 py-4 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 text-xs text-[#526581]">
+            <div className="px-6 py-4 border-t border-[#E2E8F0] flex flex-wrap items-center justify-between gap-3 text-xs text-[#4A635A]">
               <span>
                 Affichage de {(currentPage - 1) * itemsPerPage + 1} à{' '}
                 {Math.min(currentPage * itemsPerPage, filteredClients.length)} sur{' '}
@@ -483,14 +483,14 @@ export function ClientsList() {
               <AlertTriangle className="w-6 h-6 shrink-0" />
               <h3 className="text-base font-extrabold text-[#101828]">Confirmer la suppression</h3>
             </div>
-            <p className="text-xs text-[#526581] leading-relaxed">
+            <p className="text-xs text-[#4A635A] leading-relaxed">
               Êtes-vous sûr de vouloir supprimer le client <strong>{deletingClient.name}</strong> ? Cette action est irréversible.
             </p>
             <div className="flex justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 onClick={() => setDeletingClient(null)}
-                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#4A635A] cursor-pointer"
               >
                 Annuler
               </button>
@@ -550,7 +550,7 @@ export function ClientsList() {
                     className={`px-3.5 py-2.5 text-xs font-extrabold rounded-t-xl inline-flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap cursor-pointer ${
                       active
                         ? 'bg-white text-[#215C46] border-[#215C46]'
-                        : 'text-[#526581] border-transparent hover:text-[#10241D]'
+                        : 'text-[#4A635A] border-transparent hover:text-[#10241D]'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -570,19 +570,19 @@ export function ClientsList() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                          <p className="text-[11px] font-bold text-[#526581] uppercase">Chiffre d&apos;affaires</p>
+                          <p className="text-[11px] font-bold text-[#4A635A] uppercase">Chiffre d&apos;affaires</p>
                           <p className="text-lg font-black text-[#215C46] mt-1">
                             {formatFCFA(st.totalBilled)}
                           </p>
                         </div>
                         <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                          <p className="text-[11px] font-bold text-[#526581] uppercase">Factures &amp; Devis</p>
+                          <p className="text-[11px] font-bold text-[#4A635A] uppercase">Factures &amp; Devis</p>
                           <p className="text-lg font-extrabold text-[#10241D] mt-1">
                             {st.invoicesCount} factures • {st.quotesCount} devis
                           </p>
                         </div>
                         <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                          <p className="text-[11px] font-bold text-[#526581] uppercase">Dernière activité</p>
+                          <p className="text-[11px] font-bold text-[#4A635A] uppercase">Dernière activité</p>
                           <p className="text-sm font-extrabold text-[#10241D] mt-1">
                             {st.lastActivity}
                           </p>
@@ -591,15 +591,15 @@ export function ClientsList() {
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 text-sm">
                         <div className="p-4 rounded-xl border border-[#D9E7E3] space-y-2">
-                          <div className="flex items-center gap-2 text-[#526581]">
+                          <div className="flex items-center gap-2 text-[#4A635A]">
                             <Phone className="w-4 h-4 text-[#215C46]" />
                             <span className="font-bold text-[#10241D]">{selectedClient.phone || 'Non renseigné'}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#526581]">
+                          <div className="flex items-center gap-2 text-[#4A635A]">
                             <Mail className="w-4 h-4 text-[#215C46]" />
                             <span>{selectedClient.email || 'Non renseigné'}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[#526581]">
+                          <div className="flex items-center gap-2 text-[#4A635A]">
                             <MapPin className="w-4 h-4 text-[#215C46]" />
                             <span>
                               {selectedClient.address ? `${selectedClient.address}, ` : ''}{selectedClient.city || 'Abidjan'} ({selectedClient.country || "Côte d'Ivoire"})
@@ -608,7 +608,7 @@ export function ClientsList() {
                         </div>
 
                         <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                          <p className="text-xs font-extrabold uppercase text-[#526581] mb-1">
+                          <p className="text-xs font-extrabold uppercase text-[#4A635A] mb-1">
                             Notes CRM enregistrées
                           </p>
                           <p className="text-xs text-[#10241D] leading-relaxed">
@@ -623,11 +623,11 @@ export function ClientsList() {
                 if (ficheTab === 'history') {
                   return (
                     <div className="space-y-3">
-                      <p className="text-xs font-bold text-[#526581] uppercase">
+                      <p className="text-xs font-bold text-[#4A635A] uppercase">
                         Chronologie des opérations avec {selectedClient.name}
                       </p>
                       {st.clientInvoices.length === 0 && st.clientQuotes.length === 0 ? (
-                        <p className="text-sm text-[#526581] py-4 text-center">Aucun document pour le moment.</p>
+                        <p className="text-sm text-[#4A635A] py-4 text-center">Aucun document pour le moment.</p>
                       ) : (
                         <div className="space-y-2.5">
                           {st.clientInvoices.map((inv) => (
@@ -639,7 +639,7 @@ export function ClientsList() {
                                 <span className="font-extrabold text-[#215C46]">
                                   Facture {inv.number}
                                 </span>
-                                <span className="text-[#526581] ml-2">
+                                <span className="text-[#4A635A] ml-2">
                                   Émise le {formatDateFr(inv.issueDate)}
                                 </span>
                               </div>
@@ -657,7 +657,7 @@ export function ClientsList() {
                                 <span className="font-extrabold text-[#123A2C]">
                                   Devis {quo.number}
                                 </span>
-                                <span className="text-[#526581] ml-2">
+                                <span className="text-[#4A635A] ml-2">
                                   Émis le {formatDateFr(quo.issueDate)}
                                 </span>
                               </div>
@@ -676,7 +676,7 @@ export function ClientsList() {
                   return (
                     <div className="space-y-2.5">
                       {st.clientInvoices.length === 0 ? (
-                        <p className="text-sm text-[#526581] text-center py-4">Aucune facture pour ce client.</p>
+                        <p className="text-sm text-[#4A635A] text-center py-4">Aucune facture pour ce client.</p>
                       ) : (
                         st.clientInvoices.map((inv) => (
                           <div
@@ -685,11 +685,11 @@ export function ClientsList() {
                           >
                             <div>
                               <p className="font-extrabold text-[#215C46]">{inv.number}</p>
-                              <p className="text-[#526581]">Échéance : {formatDateFr(inv.dueDate)}</p>
+                              <p className="text-[#4A635A]">Échéance : {formatDateFr(inv.dueDate)}</p>
                             </div>
                             <div className="text-right">
                               <p className="font-extrabold text-[#10241D]">{formatFCFA(inv.totalTtc)}</p>
-                              <p className="text-[11px] text-[#526581]">
+                              <p className="text-[11px] text-[#4A635A]">
                                 Reste : {formatFCFA(inv.remainingAmount)}
                               </p>
                             </div>
@@ -704,7 +704,7 @@ export function ClientsList() {
                   return (
                     <div className="space-y-2.5">
                       {st.clientQuotes.length === 0 ? (
-                        <p className="text-sm text-[#526581] text-center py-4">Aucun devis pour ce client.</p>
+                        <p className="text-sm text-[#4A635A] text-center py-4">Aucun devis pour ce client.</p>
                       ) : (
                         st.clientQuotes.map((q) => (
                           <div
@@ -713,7 +713,7 @@ export function ClientsList() {
                           >
                             <div>
                               <p className="font-extrabold text-[#10241D]">{q.number}</p>
-                              <p className="text-[#526581]">Validité : {formatDateFr(q.expiryDate)}</p>
+                              <p className="text-[#4A635A]">Validité : {formatDateFr(q.expiryDate)}</p>
                             </div>
                             <div className="text-right">
                               <p className="font-black text-[#215C46]">{formatFCFA(q.totalTtc)}</p>
@@ -732,7 +732,7 @@ export function ClientsList() {
                   return (
                     <div className="space-y-2.5">
                       {st.clientPayments.length === 0 ? (
-                        <p className="text-sm text-[#526581] text-center py-4">Aucun règlement enregistré pour ce client.</p>
+                        <p className="text-sm text-[#4A635A] text-center py-4">Aucun règlement enregistré pour ce client.</p>
                       ) : (
                         st.clientPayments.map((p) => (
                           <div
@@ -743,9 +743,9 @@ export function ClientsList() {
                               <p className="font-extrabold text-[#215C46]">
                                 +{formatFCFA(p.amount)} ({p.invoiceNumber})
                               </p>
-                              <p className="text-[#526581]">Réf : {p.reference || '—'}</p>
+                              <p className="text-[#4A635A]">Réf : {p.reference || '—'}</p>
                             </div>
-                            <span className="text-[#526581]">{formatDateFr(p.paidAt)}</span>
+                            <span className="text-[#4A635A]">{formatDateFr(p.paidAt)}</span>
                           </div>
                         ))
                       )}
@@ -800,12 +800,12 @@ export function ClientsList() {
               </h3>
               <button
                 onClick={() => setImportModalOpen(false)}
-                className="p-1.5 rounded-lg text-[#526581] hover:text-[#101828]"
+                className="p-1.5 rounded-lg text-[#4A635A] hover:text-[#101828]"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-xs text-[#526581]">
+            <p className="text-xs text-[#4A635A]">
               Collez vos lignes au format :{' '}
               <code className="bg-[#D9E7E3]/40 px-1.5 py-0.5 rounded font-mono text-[#215C46]">
                 Nom;Entreprise;Email;Téléphone;Adresse;Ville
@@ -824,7 +824,7 @@ export function ClientsList() {
                 <button
                   type="button"
                   onClick={() => setImportModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8]"
+                  className="px-4 py-2 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] hover:bg-[#F7FAF8]"
                 >
                   Annuler
                 </button>

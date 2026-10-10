@@ -75,7 +75,7 @@ export function InvoicesList({
         );
       case 'draft':
         return (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#F7FAF8] text-[#526581] border border-[#E2E8F0]">
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#F7FAF8] text-[#4A635A] border border-[#E2E8F0]">
             BROUILLON
           </span>
         );
@@ -106,7 +106,7 @@ export function InvoicesList({
           <h1 className="text-2xl font-black text-[#10241D] tracking-tight">
             Factures FAKTELIO
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             Consultez, téléchargez en PDF, encaissez et partagez vos factures sur WhatsApp.
           </p>
         </div>
@@ -132,7 +132,7 @@ export function InvoicesList({
       {/* Filters & Search */}
       <div className="bg-white/90 backdrop-blur-md rounded-2xl p-4 border border-[#D9E7E3] shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-[#4A635A] absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={search}
@@ -159,7 +159,7 @@ export function InvoicesList({
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 statusFilter === f.id
                   ? 'bg-[#215C46] text-white shadow-xs'
-                  : 'bg-[#F7FAF8] text-[#526581] hover:text-[#10241D] hover:bg-[#D9E7E3]/40'
+                  : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#10241D] hover:bg-[#D9E7E3]/40'
               }`}
             >
               {f.label}
@@ -178,7 +178,7 @@ export function InvoicesList({
             <h3 className="text-base font-extrabold text-[#10241D]">
               Vous n&apos;avez encore aucune facture.
             </h3>
-            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-5">
+            <p className="text-xs text-[#4A635A] max-w-sm mx-auto mt-1 mb-5">
               Créez votre première facture en quelques secondes avec le studio de facturation ou la création express.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -234,10 +234,10 @@ export function InvoicesList({
                     <td className="py-3.5 px-5">
                       <div className="font-bold text-[#10241D]">{inv.clientName}</div>
                       {inv.clientCompany && (
-                        <div className="text-xs text-[#526581]">{inv.clientCompany}</div>
+                        <div className="text-xs text-[#4A635A]">{inv.clientCompany}</div>
                       )}
                     </td>
-                    <td className="py-3.5 px-5 text-xs text-[#526581]">
+                    <td className="py-3.5 px-5 text-xs text-[#4A635A]">
                       <div>Émise : {formatDateFr(inv.issueDate)}</div>
                       <div>Échéance : {formatDateFr(inv.dueDate)}</div>
                     </td>

@@ -208,8 +208,8 @@ export function FaktelioIntroLoader({ onComplete }: FaktelioIntroLoaderProps) {
       <div className="relative shrink-0 h-7 sm:h-8 md:h-9 bg-[#123A2C]/95 border-b border-[#215C46]/50 flex items-center px-2 sm:px-3 gap-1.5 sm:gap-2 select-none">
         {/* Boutons fenêtre macOS */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#EF4444]/90 shadow-xs" />
-          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#F59E0B]/90 shadow-xs" />
+          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#EF4444]/80 shadow-xs" />
+          <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#D9E7E3]/80 shadow-xs" />
           <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#10B981]/90 shadow-xs" />
         </div>
 

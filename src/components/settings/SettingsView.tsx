@@ -33,7 +33,7 @@ export function SettingsView() {
           <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
             Paramètres &amp; Documents Personnalisés FAKTELIO
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             Personnalisez le logo, les couleurs, les informations entreprise, la signature, le cachet et les conditions de paiement de vos factures PDF.
           </p>
         </div>
@@ -64,12 +64,12 @@ export function SettingsView() {
                     {settings.logoUrl ? (
                       <img src={settings.logoUrl} alt="Logo entreprise" className="max-w-full max-h-full object-contain" />
                     ) : (
-                      <span className="text-[10px] font-bold text-[#526581] text-center">Aucun logo</span>
+                      <span className="text-[10px] font-bold text-[#4A635A] text-center">Aucun logo</span>
                     )}
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-[#101828]">Logo officiel de l&apos;entreprise</label>
-                    <p className="text-[11px] text-[#526581] mt-0.5">
+                    <p className="text-[11px] text-[#4A635A] mt-0.5">
                       S&apos;affichera sur vos factures PDF certifiées et vos devis.
                     </p>
                   </div>
@@ -286,7 +286,7 @@ export function SettingsView() {
 
         {/* Live Document Preview Card */}
         <div className="lg:col-span-4 bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-[#D9E7E3] shadow-xs space-y-4">
-          <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#526581]">
+          <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#4A635A]">
             Aperçu en direct de vos documents
           </h3>
 
@@ -298,7 +298,7 @@ export function SettingsView() {
               <div>
                 <FaktelioLogo size="sm" />
                 <p className="text-xs font-extrabold text-[#101828] mt-1">{settings.name}</p>
-                <p className="text-[10px] text-[#526581]">{settings.city}</p>
+                <p className="text-[10px] text-[#4A635A]">{settings.city}</p>
               </div>
               <span
                 className="px-2 py-0.5 rounded text-[10px] font-extrabold text-white"
@@ -308,7 +308,7 @@ export function SettingsView() {
               </span>
             </div>
 
-            <div className="text-[11px] text-[#526581] space-y-1">
+            <div className="text-[11px] text-[#4A635A] space-y-1">
               <p>
                 <strong>Conditions :</strong> {settings.paymentTerms}
               </p>

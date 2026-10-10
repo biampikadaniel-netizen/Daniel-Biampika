@@ -81,7 +81,7 @@ export function ProductsList() {
           <h1 className="text-2xl font-extrabold text-[#101828] tracking-tight">
             Catalogue Produits, Services &amp; Catégories
           </h1>
-          <p className="text-xs sm:text-sm text-[#526581] mt-0.5">
+          <p className="text-xs sm:text-sm text-[#4A635A] mt-0.5">
             Gérez vos références, tarifs, stocks réels et alertes de seuil minimum.
           </p>
         </div>
@@ -123,7 +123,7 @@ export function ProductsList() {
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'all'
                     ? 'bg-[#215C46] text-white shadow-xs'
-                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
+                    : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 Tout ({products.length})
@@ -133,7 +133,7 @@ export function ProductsList() {
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                   activeTab === 'product'
                     ? 'bg-[#215C46] text-white shadow-xs'
-                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
+                    : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 <Package className="w-3.5 h-3.5" />
@@ -144,7 +144,7 @@ export function ProductsList() {
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                   activeTab === 'service'
                     ? 'bg-[#215C46] text-white shadow-xs'
-                    : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
+                    : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                 }`}
               >
                 <Briefcase className="w-3.5 h-3.5" />
@@ -156,7 +156,7 @@ export function ProductsList() {
                   className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 transition-all cursor-pointer ${
                     activeTab === 'categories'
                       ? 'bg-[#123A2C] text-white shadow-xs'
-                      : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
+                      : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                   }`}
                 >
                   <Tag className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export function ProductsList() {
             </div>
 
             <div className="relative w-full md:w-72">
-              <Search className="w-4 h-4 text-[#526581] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#4A635A] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={search}
@@ -179,7 +179,7 @@ export function ProductsList() {
 
           {categories.length > 0 && (
             <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[#D9E7E3]">
-              <span className="text-[11px] font-bold text-[#526581] uppercase">Filtrer par catégorie :</span>
+              <span className="text-[11px] font-bold text-[#4A635A] uppercase">Filtrer par catégorie :</span>
               {['Toutes', ...categories].map((cat) => (
                 <button
                   key={cat}
@@ -187,7 +187,7 @@ export function ProductsList() {
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     selectedCategory === cat
                       ? 'bg-[#215C46]/15 text-[#215C46] font-bold border border-[#215C46]/20'
-                      : 'bg-[#F7FAF8] text-[#526581] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
+                      : 'bg-[#F7FAF8] text-[#4A635A] hover:text-[#101828] hover:bg-[#D9E7E3]/40'
                   }`}
                 >
                   {cat}
@@ -206,7 +206,7 @@ export function ProductsList() {
             <h3 className="text-base font-extrabold text-[#101828]">
               Votre catalogue est vide.
             </h3>
-            <p className="text-xs text-[#526581] max-w-sm mx-auto mt-1 mb-5">
+            <p className="text-xs text-[#4A635A] max-w-sm mx-auto mt-1 mb-5">
               Ajoutez vos premiers produits ou services pour créer des factures et devis en 1 clic.
             </p>
             <button
@@ -261,26 +261,26 @@ export function ProductsList() {
                       <td className="py-3.5 px-5 max-w-xs">
                         <div className="font-extrabold text-[#101828]">{item.name}</div>
                         {item.description && (
-                          <div className="text-xs text-[#526581] truncate mt-0.5">
+                          <div className="text-xs text-[#4A635A] truncate mt-0.5">
                             {item.description}
                           </div>
                         )}
                       </td>
                       <td className="py-3.5 px-5">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#F7FAF8] text-[#526581] border border-[#D9E7E3]">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#F7FAF8] text-[#4A635A] border border-[#D9E7E3]">
                           {item.category || (item.type === 'service' ? 'Prestation' : 'Marchandise')}
                         </span>
                       </td>
                       <td className="py-3.5 px-5 font-black text-[#101828]">
                         {formatFCFA(item.unitPrice)}
-                        <span className="text-[11px] font-normal text-[#526581]"> / {item.unit}</span>
+                        <span className="text-[11px] font-normal text-[#4A635A]"> / {item.unit}</span>
                       </td>
-                      <td className="py-3.5 px-5 text-center text-xs font-bold text-[#526581]">
+                      <td className="py-3.5 px-5 text-center text-xs font-bold text-[#4A635A]">
                         {item.vatRate}%
                       </td>
                       <td className="py-3.5 px-5">
                         {item.type === 'service' ? (
-                          <span className="text-xs font-semibold text-[#526581]">
+                          <span className="text-xs font-semibold text-[#4A635A]">
                             Prestation de service
                           </span>
                         ) : (
@@ -295,7 +295,7 @@ export function ProductsList() {
                               {item.stock} en stock
                             </span>
                             {item.minStockAlert > 0 && (
-                              <span className="text-[11px] text-[#526581]">
+                              <span className="text-[11px] text-[#4A635A]">
                                 (Seuil : {item.minStockAlert})
                               </span>
                             )}
@@ -348,14 +348,14 @@ export function ProductsList() {
               <AlertTriangle className="w-6 h-6 shrink-0" />
               <h3 className="text-base font-extrabold text-[#101828]">Confirmer la suppression</h3>
             </div>
-            <p className="text-xs text-[#526581] leading-relaxed">
+            <p className="text-xs text-[#4A635A] leading-relaxed">
               Êtes-vous sûr de vouloir supprimer l&apos;article <strong>{deletingProduct.name}</strong> ?
             </p>
             <div className="flex justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 onClick={() => setDeletingProduct(null)}
-                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#526581] cursor-pointer"
+                className="px-4 py-2 rounded-xl border border-[#E2E8F0] text-xs font-bold text-[#4A635A] cursor-pointer"
               >
                 Annuler
               </button>

@@ -262,7 +262,7 @@ export function FastInvoiceModal({
               Payée immédiatement (Espèces / Mobile Money)
             </label>
             <div className="text-right">
-              <span className="text-xs text-[#526581] mr-2">Total TTC :</span>
+              <span className="text-xs text-[#4A635A] mr-2">Total TTC :</span>
               <span className="text-lg font-black text-[#215C46]">{formatFCFA(totalTtc)}</span>
             </div>
           </div>
@@ -271,7 +271,7 @@ export function FastInvoiceModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#526581] hover:bg-[#F7FAF8] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] hover:bg-[#F7FAF8] cursor-pointer"
             >
               Annuler
             </button>

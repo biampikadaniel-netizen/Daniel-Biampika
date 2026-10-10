@@ -19,7 +19,7 @@ const statusLabels: Record<QuoteStatus, { label: string; badge: string }> = {
   sent: { label: 'Envoyé', badge: 'bg-[#A9BDBC]/20 text-[#123A2C] border border-[#A9BDBC]/30' },
   accepted: { label: 'Accepté', badge: 'bg-[#215C46]/12 text-[#215C46] border border-[#215C46]/20' },
   rejected: { label: 'Refusé', badge: 'bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA]' },
-  expired: { label: 'Expiré', badge: 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]' },
+  expired: { label: 'Expiré', badge: 'bg-[#F0F5F3] text-[#4A635A] border border-[#D9E7E3]' },
 };
 
 export function QuotesList({ onConverted }: { onConverted?: () => void }) {

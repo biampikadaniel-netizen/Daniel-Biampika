@@ -279,7 +279,7 @@ export function QuoteModal({
 
                 <div className="grid grid-cols-12 gap-2 items-center">
                   <div className="col-span-3">
-                    <label className="text-[10px] text-[#526581] block">Quantité</label>
+                    <label className="text-[10px] text-[#4A635A] block">Quantité</label>
                     <input
                       type="number"
                       min={1}
@@ -289,7 +289,7 @@ export function QuoteModal({
                     />
                   </div>
                   <div className="col-span-4">
-                    <label className="text-[10px] text-[#526581] block">Prix Unit. HT</label>
+                    <label className="text-[10px] text-[#4A635A] block">Prix Unit. HT</label>
                     <input
                       type="number"
                       min={0}
@@ -299,7 +299,7 @@ export function QuoteModal({
                     />
                   </div>
                   <div className="col-span-2">
-                    <label className="text-[10px] text-[#526581] block">TVA %</label>
+                    <label className="text-[10px] text-[#4A635A] block">TVA %</label>
                     <select
                       value={item.vatRate}
                       onChange={(e) => updateLine(item.id, { vatRate: Number(e.target.value) })}
