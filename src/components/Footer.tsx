@@ -172,6 +172,19 @@ export function Footer() {
             >
               Gestion des cookies
             </button>
+            <button
+              onClick={() => {
+                try {
+                  sessionStorage.removeItem('faktelio_intro_seen');
+                } catch {}
+                window.dispatchEvent(new CustomEvent('faktelio_replay_intro'));
+              }}
+              className="inline-flex items-center gap-1 hover:text-[#A9BDBC] text-white/70 transition-colors cursor-pointer text-xs"
+              title="Relancer l'introduction cinématique Faktelio"
+            >
+              <span>🎬</span>
+              <span>Revoir l&apos;intro</span>
+            </button>
           </div>
         </div>
       </div>

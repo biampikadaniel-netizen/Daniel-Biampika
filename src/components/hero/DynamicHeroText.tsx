@@ -116,7 +116,7 @@ export function DynamicHeroText() {
 
   return (
     <span
-      className="inline-block relative min-h-[1.25em] align-baseline overflow-visible"
+      className="inline-block relative min-h-[2.35em] sm:min-h-[1.25em] w-full sm:w-auto align-baseline overflow-visible"
       aria-live="polite"
       aria-atomic="true"
     >

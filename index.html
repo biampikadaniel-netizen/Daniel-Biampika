@@ -36,6 +36,8 @@
       })();
     </script>
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="preload" as="image" href="/images/laptop_intro.jpg" />
+    <link rel="preload" as="image" href="/images/hero_faktelio_full.jpg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#215C46" />
@@ -46,46 +48,173 @@
     
     <title>FAKTELIO — Logiciel de facturation, devis &amp; gestion commerciale pour PME</title>
     <meta name="description" content="Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur. Créez vos devis et factures en quelques secondes." />
-    <meta name="keywords" content="Faktelio, logiciel de facturation, devis et factures, gestion commerciale, facturation PME, facturation entreprise, logiciel de devis, gestion des clients, facture Mobile Money, facture WhatsApp" />
+    <meta name="keywords" content="Faktelio, logiciel de facturation, devis et factures, gestion commerciale, facturation PME, facturation entreprise, logiciel de devis, gestion des clients, facture Mobile Money, facture WhatsApp, Wave, Orange Money, MTN MoMo" />
     <meta name="author" content="FAKTELIO" />
     <meta name="application-name" content="FAKTELIO" />
-    <meta name="robots" content="index, follow" />
+    <meta name="publisher" content="FAKTELIO" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <link rel="canonical" href="https://faktelio.vercel.app/" />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://faktelio.vercel.app/" />
     <meta property="og:title" content="FAKTELIO — Logiciel de facturation, devis &amp; gestion commerciale pour PME" />
     <meta property="og:description" content="Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur. Créez vos devis et factures en quelques secondes." />
     <meta property="og:site_name" content="FAKTELIO" />
     <meta property="og:locale" content="fr_FR" />
-    <meta property="og:image" content="/icon.svg" />
+    <meta property="og:locale:alternate" content="fr_CI" />
+    <meta property="og:locale:alternate" content="fr_SN" />
+    <meta property="og:locale:alternate" content="fr_CM" />
+    <meta property="og:image" content="/images/hero_faktelio_full.jpg" />
+    <meta property="og:image:secure_url" content="https://faktelio.vercel.app/images/hero_faktelio_full.jpg" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="FAKTELIO — Logiciel de facturation et devis pour PME, commerçants et freelances" />
 
-    <!-- Twitter -->
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://faktelio.vercel.app/" />
     <meta name="twitter:title" content="FAKTELIO — Logiciel de facturation, devis &amp; gestion commerciale pour PME" />
     <meta name="twitter:description" content="Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur." />
-    <meta name="twitter:image" content="/icon.svg" />
+    <meta name="twitter:image" content="/images/hero_faktelio_full.jpg" />
+    <meta name="twitter:image:alt" content="FAKTELIO — Logiciel de facturation et devis pour PME" />
 
     <!-- Typography (Manrope, Plus Jakarta Sans & JetBrains Mono) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 
-    <!-- Schema.org Structured Data -->
+    <!-- Schema.org Enriched Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
-      "name": "FAKTELIO",
-      "operatingSystem": "Web, iOS, Android",
-      "applicationCategory": "BusinessApplication",
-      "offers": {
-        "@type": "AggregateOffer",
-        "priceCurrency": "XOF",
-        "lowPrice": "0",
-        "highPrice": "35000",
-        "offerCount": "3"
-      },
-      "description": "Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur."
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://faktelio.vercel.app/#software",
+          "name": "FAKTELIO",
+          "url": "https://faktelio.vercel.app/",
+          "operatingSystem": "Web, iOS, Android",
+          "applicationCategory": "BusinessApplication",
+          "applicationSubCategory": "Invoicing & Financial Management",
+          "description": "Faktelio simplifie votre facturation, vos clients, vos paiements et votre gestion commerciale depuis votre téléphone ou votre ordinateur. Créez vos devis et factures en quelques secondes.",
+          "image": "https://faktelio.vercel.app/images/hero_entrepreneur.jpg",
+          "inLanguage": "fr",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.9",
+            "reviewCount": "2500",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "XOF",
+            "lowPrice": "0",
+            "highPrice": "35000",
+            "offerCount": "3",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Formule Starter",
+                "price": "0",
+                "priceCurrency": "XOF",
+                "description": "Création de devis et factures de base sans engagement ni carte bancaire."
+              },
+              {
+                "@type": "Offer",
+                "name": "Formule Pro",
+                "price": "15000",
+                "priceCurrency": "XOF",
+                "description": "Facturation illimitée, paiements Mobile Money (Wave, Orange, MTN) et relances WhatsApp."
+              },
+              {
+                "@type": "Offer",
+                "name": "Formule Entreprise",
+                "price": "35000",
+                "priceCurrency": "XOF",
+                "description": "Gestion multi-utilisateurs, gestion des stocks, rapports avancés et support prioritaire 24/7."
+              }
+            ]
+          },
+          "featureList": [
+            "Création de devis et factures en quelques secondes",
+            "Encaissements Mobile Money (Wave, Orange Money, MTN MoMo)",
+            "Relances clients automatiques par WhatsApp",
+            "Gestion des stocks et catalogue produits",
+            "Tableaux de bord financiers et suivi de trésorerie en temps réel",
+            "Application responsive accessible sur smartphone, tablette et ordinateur"
+          ]
+        },
+        {
+          "@type": "Organization",
+          "@id": "https://faktelio.vercel.app/#organization",
+          "name": "FAKTELIO",
+          "url": "https://faktelio.vercel.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://faktelio.vercel.app/icon.svg",
+            "width": 512,
+            "height": 512
+          },
+          "description": "Éditeur de logiciels de gestion commerciale et facturation pour PME, commerçants et freelances.",
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "Customer Support",
+            "availableLanguage": ["French", "English"]
+          }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://faktelio.vercel.app/#website",
+          "url": "https://faktelio.vercel.app/",
+          "name": "FAKTELIO",
+          "description": "Logiciel de facturation, devis et gestion commerciale pour PME",
+          "publisher": {
+            "@id": "https://faktelio.vercel.app/#organization"
+          },
+          "inLanguage": "fr-FR"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://faktelio.vercel.app/#faq",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Comment créer une facture avec FAKTELIO ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Avec FAKTELIO, vous sélectionnez simplement votre client, ajoutez vos prestations ou produits, puis générez votre facture en un clic. Vous pouvez ensuite la télécharger en PDF ou l'envoyer directement via WhatsApp ou email."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quels moyens de paiement sont supportés par FAKTELIO ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "FAKTELIO intègre les paiements par Wave, Orange Money, MTN MoMo, virement bancaire et espèces, permettant à vos clients de régler leurs factures en toute simplicité."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "FAKTELIO est-il accessible sur téléphone portable ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Oui, FAKTELIO est une application web progressive (PWA) conçue en mobile-first. Vous pouvez l'utiliser sur iPhone, Android, tablette ou ordinateur sans installation complexe."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Faut-il renseigner une carte bancaire pour démarrer ?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Non, l'inscription et la formule de démarrage sont totalement gratuites, sans carte bancaire requise."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
   </head>

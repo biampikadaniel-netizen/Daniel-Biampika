@@ -38,6 +38,7 @@ import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
 import { LegalNoticePage } from './components/legal/LegalNoticePage';
 import { PrivacyPolicyPage } from './components/legal/PrivacyPolicyPage';
 import { CookiePolicyPage } from './components/legal/CookiePolicyPage';
+import { FaktelioIntroLoader } from './components/intro/FaktelioIntroLoader';
 
 function LandingPage() {
   return (
@@ -151,6 +152,7 @@ export default function App() {
   return (
     <AuthProvider>
       <NavigationProvider>
+        <FaktelioIntroLoader />
         <AppRouter />
         <CookieConsentBanner />
         <PwaInstallPrompt />
