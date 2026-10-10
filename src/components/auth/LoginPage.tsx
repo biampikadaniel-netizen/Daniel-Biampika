@@ -97,42 +97,42 @@ export function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="nom@entreprise.com"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#D9E7E3] focus:outline-none focus:border-[#215C46] text-[#10241D]"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#DCE5DE] focus:outline-none focus:border-[#176B4D] focus:ring-1 focus:ring-[#176B4D] text-[#17231D]"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#10241D] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#17231D] uppercase tracking-wider mb-1.5">
                 Mot de passe
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-[#4A635A] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#65736B] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#D9E7E3] focus:outline-none focus:border-[#215C46] text-[#10241D]"
+                  className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl border border-[#DCE5DE] focus:outline-none focus:border-[#176B4D] focus:ring-1 focus:ring-[#176B4D] text-[#17231D]"
                 />
               </div>
             </div>
 
             <button
               type="submit"
-              className="w-full py-3 px-5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] shadow-[0_8px_24px_rgba(33,92,70,0.28)] hover:shadow-[0_12px_30px_rgba(33,92,70,0.38)] hover:-translate-y-0.5 transition-all cursor-pointer"
+              className="w-full py-3 px-5 rounded-xl text-sm font-bold text-white bg-[#176B4D] hover:bg-[#104B38] shadow-[0_8px_24px_rgba(23,107,77,0.25)] hover:shadow-[0_12px_30px_rgba(23,107,77,0.35)] hover:-translate-y-0.5 transition-all cursor-pointer"
             >
               Se connecter à FAKTELIO
             </button>
           </form>
 
-          <div className="mt-6 pt-6 border-t border-[#D9E7E3] text-center">
-            <p className="text-xs text-[#4A635A]">
+          <div className="mt-6 pt-6 border-t border-[#DCE5DE] text-center">
+            <p className="text-xs text-[#65736B]">
               Pas encore de compte FAKTELIO ?{' '}
               <button
                 onClick={() => navigate('/register')}
-                className="font-bold text-[#215C46] hover:underline cursor-pointer"
+                className="font-bold text-[#176B4D] hover:underline cursor-pointer"
               >
                 Créer mon compte gratuitement (14 jours d&apos;essai)
               </button>

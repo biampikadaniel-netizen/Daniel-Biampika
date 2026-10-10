@@ -82,26 +82,26 @@ export function Pricing() {
   };
 
   return (
-    <section id="tarifs" className="py-20 lg:py-28 bg-[#F7FAF8] border-b border-[#D9E7E3]">
+    <section id="tarifs" className="py-20 lg:py-28 bg-[#F7F9F7] border-b border-[#DCE5DE]">
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto text-center mb-12">
-          <span className="inline-block px-3.5 py-1 rounded-full bg-[#215C46]/10 text-[#215C46] border border-[#D9E7E3] text-xs font-extrabold uppercase tracking-wider mb-3">
+          <span className="inline-block px-3.5 py-1 rounded-full bg-[#E8F3ED] text-[#176B4D] border border-[#DCE5DE] text-xs font-extrabold uppercase tracking-wider mb-3">
             Tarifs transparents
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#10241D] tracking-tight mb-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#17231D] tracking-tight mb-4">
             Commencez à 0 FCFA et évoluez selon vos besoins
           </h2>
-          <p className="text-base text-[#4A635A] mb-8">
+          <p className="text-base text-[#65736B] mb-8">
             Aucun frais caché. Sans carte bancaire à l&apos;inscription. Paiement flexible par Mobile Money (Wave, Orange Money, MTN) ou carte bancaire.
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-white border border-[#D9E7E3] shadow-xs">
+          <div className="inline-flex items-center gap-3 p-1.5 rounded-2xl bg-white border border-[#DCE5DE] shadow-xs">
             <button
               type="button"
               onClick={() => setAnnual(false)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                !annual ? 'bg-[#215C46] text-white shadow-xs' : 'text-[#4A635A] hover:text-[#10241D]'
+                !annual ? 'bg-[#176B4D] text-white shadow-xs' : 'text-[#65736B] hover:text-[#17231D]'
               }`}
             >
               Facturation mensuelle
@@ -110,11 +110,13 @@ export function Pricing() {
               type="button"
               onClick={() => setAnnual(true)}
               className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                annual ? 'bg-[#215C46] text-white shadow-xs' : 'text-[#4A635A] hover:text-[#10241D]'
+                annual ? 'bg-[#176B4D] text-white shadow-xs' : 'text-[#65736B] hover:text-[#17231D]'
               }`}
             >
               <span>Facturation annuelle</span>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#A9BDBC] text-[#0D2B21]">
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                annual ? 'bg-[#104B38] text-white' : 'bg-[#E8F3ED] text-[#176B4D]'
+              }`}>
                 -20%
               </span>
             </button>
@@ -130,8 +132,8 @@ export function Pricing() {
                 key={plan.id}
                 className={`rounded-2xl p-7 sm:p-8 flex flex-col justify-between transition-all duration-300 backdrop-blur-md ${
                   plan.popular
-                    ? 'bg-white border-2 border-[#215C46] shadow-[0_20px_50px_rgba(33,92,70,0.18)] relative lg:-translate-y-2'
-                    : 'bg-white/95 border border-[#D9E7E3] shadow-xs hover:shadow-[0_14px_35px_rgba(33,92,70,0.1)]'
+                    ? 'bg-white border-2 border-[#176B4D] shadow-[0_20px_50px_rgba(23,107,77,0.18)] relative lg:-translate-y-2'
+                    : 'bg-white/95 border border-[#DCE5DE] shadow-xs hover:shadow-[0_14px_35px_rgba(23,107,77,0.1)]'
                 }`}
               >
                 <div>
@@ -139,26 +141,26 @@ export function Pricing() {
                     <span
                       className={`px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${
                         plan.popular
-                          ? 'bg-[#215C46] text-white'
-                          : 'bg-[#215C46]/10 text-[#215C46]'
+                          ? 'bg-[#176B4D] text-white'
+                          : 'bg-[#E8F3ED] text-[#176B4D] border border-[#DCE5DE]'
                       }`}
                     >
                       {plan.badge}
                     </span>
-                    {plan.popular && <Sparkles className="w-5 h-5 text-[#215C46]" />}
+                    {plan.popular && <Sparkles className="w-5 h-5 text-[#2E8B57]" />}
                   </div>
 
-                  <h3 className="text-2xl font-extrabold text-[#10241D]">{plan.name}</h3>
-                  <p className="text-xs sm:text-sm text-[#4A635A] mt-1.5 mb-6">{plan.subtitle}</p>
+                  <h3 className="text-2xl font-extrabold text-[#17231D]">{plan.name}</h3>
+                  <p className="text-xs sm:text-sm text-[#65736B] mt-1.5 mb-6">{plan.subtitle}</p>
 
-                  <div className="pb-6 mb-6 border-b border-[#D9E7E3]">
+                  <div className="pb-6 mb-6 border-b border-[#DCE5DE]">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl sm:text-4xl font-extrabold text-[#10241D]">
+                      <span className="text-3xl sm:text-4xl font-extrabold text-[#17231D]">
                         {price === 0 ? '0 FCFA' : `${price.toLocaleString('fr-FR')} FCFA`}
                       </span>
-                      <span className="text-xs font-semibold text-[#4A635A]">/ mois</span>
+                      <span className="text-xs font-semibold text-[#65736B]">/ mois</span>
                     </div>
-                    <p className="text-xs text-[#4A635A] mt-1">
+                    <p className="text-xs text-[#65736B] mt-1">
                       {price === 0
                         ? 'Gratuit sans limite de durée pour débuter'
                         : annual
@@ -169,8 +171,8 @@ export function Pricing() {
 
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feat, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-sm text-[#10241D]">
-                        <span className="w-5 h-5 rounded-full bg-[#215C46]/15 text-[#215C46] flex items-center justify-center shrink-0 mt-0.5">
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-[#17231D]">
+                        <span className="w-5 h-5 rounded-full bg-[#E8F3ED] text-[#176B4D] flex items-center justify-center shrink-0 mt-0.5">
                           <Check className="w-3.5 h-3.5 stroke-[2.5]" />
                         </span>
                         <span>{feat}</span>
@@ -182,14 +184,14 @@ export function Pricing() {
                 <button
                   type="button"
                   onClick={() => handleSelectPlan(plan.id)}
-                  className={`w-full py-3.5 px-5 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer ${
+                  className={`w-full py-3.5 px-5 rounded-xl text-sm font-bold inline-flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#176B4D] ${
                     plan.popular
-                      ? 'bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white shadow-[0_8px_24px_rgba(33,92,70,0.3)] hover:-translate-y-0.5'
-                      : 'bg-[#123A2C] hover:bg-[#0D2B21] text-white shadow-xs'
+                      ? 'bg-[#176B4D] hover:bg-[#104B38] text-white shadow-[0_8px_24px_rgba(23,107,77,0.25)] hover:-translate-y-0.5'
+                      : 'bg-white hover:bg-[#E8F3ED] text-[#104B38] border border-[#DCE5DE] shadow-xs hover:border-[#176B4D]'
                   }`}
                 >
                   <span>{plan.ctaLabel}</span>
-                  <ArrowRight className="w-4 h-4 text-[#D9E7E3]" />
+                  <ArrowRight className="w-4 h-4 text-current" />
                 </button>
               </div>
             );

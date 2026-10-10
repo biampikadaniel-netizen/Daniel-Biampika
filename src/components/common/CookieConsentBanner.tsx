@@ -121,24 +121,24 @@ export function CookieConsentBanner() {
           aria-label="Consentement aux cookies"
           className="fixed bottom-4 left-4 right-4 sm:left-6 sm:right-6 md:left-auto md:right-8 md:max-w-2xl z-50 animate-fade-in-up"
         >
-          <div className="bg-[#F7FAF8]/95 backdrop-blur-2xl border border-[rgba(169,189,188,0.5)] shadow-[0_20px_60px_rgba(13,43,33,0.18)] rounded-3xl p-5 sm:p-6 text-[#10241D]">
+          <div className="bg-[#F7F9F7]/95 backdrop-blur-2xl border border-[#DCE5DE] shadow-[0_20px_60px_rgba(16,75,56,0.18)] rounded-3xl p-5 sm:p-6 text-[#17231D]">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-[#215C46]/10 text-[#215C46] flex items-center justify-center shrink-0 mt-0.5">
+              <div className="w-10 h-10 rounded-2xl bg-[#E8F3ED] text-[#176B4D] flex items-center justify-center shrink-0 mt-0.5">
                 <Cookie className="w-5 h-5" />
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm sm:text-base font-extrabold text-[#10241D] leading-tight">
+                <h3 className="text-sm sm:text-base font-extrabold text-[#17231D] leading-tight">
                   Gestion des cookies &amp; Confidentialité
                 </h3>
-                <p className="text-xs sm:text-sm text-[#4A635A] mt-1.5 leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#65736B] mt-1.5 leading-relaxed">
                   Nous utilisons des cookies pour améliorer votre expérience sur FAKTELIO, mesurer l&apos;utilisation du site et personnaliser certains contenus.
                 </p>
 
                 <div className="mt-2">
                   <button
                     onClick={() => navigate('/politique-confidentialite')}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-[#215C46] hover:underline cursor-pointer"
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#176B4D] hover:underline cursor-pointer"
                   >
                     En savoir plus
                     <ExternalLink className="w-3 h-3" />
@@ -148,24 +148,24 @@ export function CookieConsentBanner() {
             </div>
 
             {/* Actions Buttons */}
-            <div className="mt-5 pt-4 border-t border-[#D9E7E3]/60 flex flex-wrap items-center justify-end gap-2.5">
+            <div className="mt-5 pt-4 border-t border-[#DCE5DE] flex flex-wrap items-center justify-end gap-2.5">
               <button
                 onClick={() => setShowPreferences(true)}
-                className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#D9E7E3]/30 border border-[#D9E7E3] text-[#10241D] text-xs font-bold transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-white hover:bg-[#E8F3ED] border border-[#DCE5DE] text-[#17231D] text-xs font-bold transition-all cursor-pointer"
               >
                 Personnaliser
               </button>
 
               <button
                 onClick={handleRefuseAll}
-                className="px-4 py-2.5 rounded-xl bg-[#D9E7E3]/40 hover:bg-[#D9E7E3]/70 text-[#10241D] text-xs font-bold transition-all cursor-pointer"
+                className="px-4 py-2.5 rounded-xl bg-[#E8F3ED] hover:bg-[#DCE5DE] text-[#17231D] text-xs font-bold transition-all cursor-pointer"
               >
                 Refuser
               </button>
 
               <button
                 onClick={handleAcceptAll}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white text-xs font-extrabold shadow-[0_4px_16px_rgba(33,92,70,0.25)] hover:shadow-[0_6px_20px_rgba(33,92,70,0.35)] transition-all cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-extrabold shadow-[0_4px_16px_rgba(23,107,77,0.25)] hover:shadow-[0_6px_20px_rgba(23,107,77,0.35)] transition-all cursor-pointer"
               >
                 Accepter
               </button>

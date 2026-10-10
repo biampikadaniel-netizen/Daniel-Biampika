@@ -1,5 +1,5 @@
-// FAKTELIO Service Worker v2.0.0 (Green Visual Identity Update)
-const CACHE_NAME = 'faktelio-cache-v2';
+// FAKTELIO Service Worker v2.1.0 (Harmonized Green Visual Identity & Auto-Update)
+const CACHE_NAME = 'faktelio-cache-v2.1';
 
 const PRECACHE_ASSETS = [
   '/',

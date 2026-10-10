@@ -332,24 +332,24 @@ export function QuoteModal({
             ))}
           </div>
 
-          <div className="p-4 rounded-xl bg-[#F7FAF8] border border-[#D9E7E3] space-y-1 text-xs">
-            <div className="flex justify-between text-[#4A635A]">
+          <div className="p-4 rounded-xl bg-[#F7F9F7] border border-[#DCE5DE] space-y-1 text-xs">
+            <div className="flex justify-between text-[#65736B]">
               <span>Sous-total HT :</span>
-              <strong className="text-[#10241D]">{formatFCFA(subtotalHt)}</strong>
+              <strong className="text-[#17231D]">{formatFCFA(subtotalHt)}</strong>
             </div>
             {cleanDiscount > 0 && (
-              <div className="flex justify-between text-[#215C46]">
+              <div className="flex justify-between text-[#176B4D]">
                 <span>Remise ({cleanDiscount}%) :</span>
                 <strong>-{formatFCFA(discountAmt)}</strong>
               </div>
             )}
-            <div className="flex justify-between text-[#4A635A]">
+            <div className="flex justify-between text-[#65736B]">
               <span>TVA ({settings.defaultVatRate}%) :</span>
-              <strong className="text-[#10241D]">{formatFCFA(totalVat)}</strong>
+              <strong className="text-[#17231D]">{formatFCFA(totalVat)}</strong>
             </div>
-            <div className="flex justify-between pt-1 border-t border-[#D9E7E3] text-sm">
-              <span className="font-extrabold text-[#10241D]">Total Devis TTC :</span>
-              <strong className="text-[#215C46] font-extrabold text-base">{formatFCFA(totalTtc)}</strong>
+            <div className="flex justify-between pt-1 border-t border-[#DCE5DE] text-sm">
+              <span className="font-extrabold text-[#17231D]">Total Devis TTC :</span>
+              <strong className="text-[#176B4D] font-extrabold text-base">{formatFCFA(totalTtc)}</strong>
             </div>
           </div>
 
@@ -357,13 +357,13 @@ export function QuoteModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] cursor-pointer"
+              className="px-4 py-2 rounded-xl border border-[#DCE5DE] text-xs font-bold text-[#65736B] hover:bg-[#F7F9F7] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white text-xs font-extrabold shadow-sm cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer"
             >
               Créer le devis
             </button>

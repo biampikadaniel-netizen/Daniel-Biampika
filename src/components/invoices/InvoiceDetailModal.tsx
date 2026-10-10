@@ -16,7 +16,7 @@ export function InvoiceDetailModal({
   if (!user) return null;
 
   const settings = workspaceService.getSettings(user.id);
-  const accentColor = settings.accentColor || '#215C46';
+  const accentColor = settings.accentColor || '#176B4D';
 
   const handlePrint = () => {
     window.print();
@@ -34,14 +34,14 @@ export function InvoiceDetailModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#D9E7E3] overflow-hidden my-auto max-h-[92vh] flex flex-col">
+      <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-[#DCE5DE] overflow-hidden my-auto max-h-[92vh] flex flex-col">
         {/* Modal Action Bar (Hidden in Print) */}
-        <div className="px-6 py-4 bg-[#F7FAF8] border-b border-[#D9E7E3] flex flex-wrap items-center justify-between gap-3 print:hidden">
+        <div className="px-6 py-4 bg-[#F7F9F7] border-b border-[#DCE5DE] flex flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="flex items-center gap-2.5">
-            <span className="text-sm font-extrabold text-[#10241D]">
+            <span className="text-sm font-extrabold text-[#17231D]">
               Aperçu Facture {invoice.number}
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#215C46]/10 text-[#215C46]">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#E8F3ED] text-[#176B4D] border border-[#DCE5DE]">
               Document Certifié FAKTELIO
             </span>
           </div>
@@ -49,14 +49,14 @@ export function InvoiceDetailModal({
           <div className="flex items-center gap-2">
             <button
               onClick={handleWhatsApp}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-bold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#25D366] hover:bg-[#1EBE5B] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
             >
               <MessageCircle className="w-3.5 h-3.5" />
               Partager WhatsApp
             </button>
             <button
               onClick={handlePrint}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-bold transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
             >
               <Download className="w-3.5 h-3.5" />
               Télécharger PDF / Imprimer

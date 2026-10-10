@@ -63,7 +63,7 @@ export function Testimonials() {
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-1 text-[#A9BDBC]">
                     {[...Array(5)].map((_, idx) => (
-                      <Star key={idx} className="w-4 h-4 fill-current text-[#D9E7E3]" />
+                      <Star key={idx} className="w-4 h-4 fill-current text-[#2E8B57]" />
                     ))}
                   </div>
                   <QuoteIcon className="w-6 h-6 text-[#A9BDBC]/30" />

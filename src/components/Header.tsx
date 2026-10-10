@@ -79,10 +79,10 @@ export function Header() {
             <a
               key={item.href}
               href={item.href}
-              className="text-sm font-semibold text-[#10241D]/80 hover:text-[#215C46] transition-colors duration-200 py-1 relative group"
+              className="text-sm font-semibold text-[#17231D]/80 hover:text-[#176B4D] transition-colors duration-200 py-1 relative group"
             >
               {item.label}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#215C46] rounded-full transition-all duration-200 group-hover:w-full" />
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#176B4D] rounded-full transition-all duration-200 group-hover:w-full" />
             </a>
           ))}
         </nav>
@@ -95,7 +95,7 @@ export function Header() {
               size="md"
               shape="capsule"
               onClick={() => navigate('/dashboard')}
-              icon={<LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />}
+              icon={<LayoutDashboard className="w-4 h-4 text-[#E8F3ED]" />}
             >
               Mon Espace ({user.name.split(' ')[0]})
             </Button>
@@ -107,7 +107,7 @@ export function Header() {
                 size="sm"
                 shape="capsule"
                 onClick={handleDemoAccess}
-                icon={<Sparkles className="w-3.5 h-3.5 text-[#215C46]" />}
+                icon={<Sparkles className="w-3.5 h-3.5 text-[#2E8B57]" />}
               >
                 Démo directe
               </Button>
@@ -128,7 +128,7 @@ export function Header() {
                 size="md"
                 shape="capsule"
                 onClick={() => navigate('/register')}
-                iconRight={<ArrowRight className="w-4 h-4 text-[#D9E7E3]" />}
+                iconRight={<ArrowRight className="w-4 h-4 text-[#E8F3ED]" />}
               >
                 Créer mon compte
               </Button>
@@ -152,7 +152,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="inline-flex items-center justify-center w-11 h-11 rounded-2xl text-[#10241D] hover:text-[#215C46] bg-white/70 hover:bg-[#A9BDBC]/20 border border-[rgba(169,189,188,0.3)] shadow-xs transition-all active:scale-95 focus:outline-none cursor-pointer"
+            className="inline-flex items-center justify-center w-11 h-11 rounded-2xl text-[#17231D] hover:text-[#176B4D] bg-white/80 hover:bg-[#E8F3ED]/40 border border-[#DCE5DE] shadow-xs transition-all active:scale-95 focus:outline-none cursor-pointer"
             aria-expanded={mobileMenuOpen}
             aria-label="Ouvrir le menu"
           >
@@ -163,12 +163,12 @@ export function Header() {
 
       {/* Mobile Drawer Navigation with backdrop blur */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-3 top-20 z-50 bg-[#F7FAF8]/95 backdrop-blur-2xl border border-[rgba(169,189,188,0.4)] rounded-3xl p-5 shadow-[0_20px_50px_rgba(13,43,33,0.18)] max-h-[calc(100vh-6rem)] overflow-y-auto animate-fade-in-up">
-          <div className="flex items-center justify-between pb-3 border-b border-[#D9E7E3]/60 mb-2">
+        <div className="lg:hidden fixed inset-x-3 top-20 z-50 bg-[#F7F9F7]/95 backdrop-blur-2xl border border-[#DCE5DE] rounded-3xl p-5 shadow-[0_20px_50px_rgba(16,75,56,0.18)] max-h-[calc(100vh-6rem)] overflow-y-auto animate-fade-in-up">
+          <div className="flex items-center justify-between pb-3 border-b border-[#DCE5DE] mb-2">
             <FaktelioLogo size="sm" />
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-1.5 rounded-xl text-gray-500 hover:text-[#10241D] hover:bg-gray-100"
+              className="p-1.5 rounded-xl text-gray-500 hover:text-[#17231D] hover:bg-gray-100"
               aria-label="Fermer le menu"
             >
               <X className="w-5 h-5" />
@@ -181,14 +181,14 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-base font-semibold text-[#10241D] hover:text-[#215C46] hover:bg-[#A9BDBC]/12 transition-colors"
+                className="px-4 py-3 rounded-xl text-base font-semibold text-[#17231D] hover:text-[#176B4D] hover:bg-[#E8F3ED]/50 transition-colors"
               >
                 {item.label}
               </a>
             ))}
           </nav>
 
-          <div className="pt-4 mt-2 border-t border-[#D9E7E3] flex flex-col gap-3">
+          <div className="pt-4 mt-2 border-t border-[#DCE5DE] flex flex-col gap-3">
             {user ? (
               <Button
                 variant="primary"
@@ -199,7 +199,7 @@ export function Header() {
                   setMobileMenuOpen(false);
                   navigate('/dashboard');
                 }}
-                icon={<LayoutDashboard className="w-4 h-4 text-[#D9E7E3]" />}
+                icon={<LayoutDashboard className="w-4 h-4 text-[#E8F3ED]" />}
               >
                 Accéder au Dashboard
               </Button>
@@ -211,7 +211,7 @@ export function Header() {
                   shape="capsule"
                   fullWidth
                   onClick={handleDemoAccess}
-                  icon={<Sparkles className="w-4 h-4 text-[#215C46]" />}
+                  icon={<Sparkles className="w-4 h-4 text-[#2E8B57]" />}
                 >
                   Tester la démo instantanée
                 </Button>

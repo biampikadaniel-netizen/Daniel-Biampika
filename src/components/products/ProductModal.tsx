@@ -223,17 +223,17 @@ export function ProductModal({
             </div>
           )}
 
-          <div className="pt-3 flex justify-end gap-2.5 border-t border-[#D9E7E3]">
+          <div className="pt-3 flex justify-end gap-2.5 border-t border-[#DCE5DE]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] hover:bg-[#F7FAF8] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#DCE5DE] text-xs font-bold text-[#65736B] hover:bg-[#F7F9F7] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
+              className="px-5 py-2.5 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
             >
               {product ? 'Mettre à jour' : 'Enregistrer dans le catalogue'}
             </button>

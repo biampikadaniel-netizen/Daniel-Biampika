@@ -178,16 +178,16 @@ export function PwaInstallPrompt() {
           <div className="mt-4 pt-3 border-t border-[#D9E7E3]/60 flex items-center justify-end gap-2.5">
             <button
               onClick={handleDismiss}
-              className="px-3.5 py-2 rounded-xl text-xs font-bold text-[#4A635A] hover:text-[#10241D] hover:bg-gray-100 transition-colors cursor-pointer"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-[#65736B] hover:text-[#17231D] hover:bg-gray-100 transition-colors cursor-pointer"
             >
               Plus tard
             </button>
 
             <button
               onClick={handleInstallClick}
-              className="inline-flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-gradient-to-r from-[#215C46] to-[#3F7A65] hover:from-[#1A4937] hover:to-[#356B58] text-white text-xs font-extrabold shadow-[0_4px_14px_rgba(33,92,70,0.28)] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4.5 py-2 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-extrabold shadow-[0_4px_14px_rgba(23,107,77,0.28)] transition-all cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#D9E7E3]" />
+              <Download className="w-3.5 h-3.5 text-[#E8F3ED]" />
               Installer
             </button>
           </div>
@@ -212,12 +212,12 @@ function InstructionsModal({
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 bg-[#0D2B21]/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-[#D9E7E3] p-6 text-[#10241D] my-auto animate-scale-in">
-        <div className="flex items-center justify-between pb-4 border-b border-[#D9E7E3]/70 mb-4">
+    <div className="fixed inset-0 z-50 bg-[#104B38]/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-[#DCE5DE] p-6 text-[#17231D] my-auto animate-scale-in">
+        <div className="flex items-center justify-between pb-4 border-b border-[#DCE5DE] mb-4">
           <div className="flex items-center gap-2.5">
             <FaktelioLogo size="sm" />
-            <h3 className="text-base font-extrabold text-[#10241D]">
+            <h3 className="text-base font-extrabold text-[#17231D]">
               Installer l&apos;application FAKTELIO
             </h3>
           </div>
@@ -231,34 +231,34 @@ function InstructionsModal({
 
         {isIOS ? (
           <div className="space-y-4">
-            <p className="text-xs sm:text-sm text-[#4A635A]">
+            <p className="text-xs sm:text-sm text-[#65736B]">
               Sur iPhone &amp; iPad (Safari), l&apos;installation s&apos;effectue en 3 étapes simples :
             </p>
 
-            <ol className="space-y-3 text-xs sm:text-sm text-[#10241D]">
-              <li className="flex items-start gap-3 p-3 rounded-2xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                <span className="w-6 h-6 rounded-full bg-[#215C46] text-white text-xs font-bold flex items-center justify-center shrink-0">
+            <ol className="space-y-3 text-xs sm:text-sm text-[#17231D]">
+              <li className="flex items-start gap-3 p-3 rounded-2xl bg-[#F7F9F7] border border-[#DCE5DE]">
+                <span className="w-6 h-6 rounded-full bg-[#176B4D] text-white text-xs font-bold flex items-center justify-center shrink-0">
                   1
                 </span>
                 <span>
                   Appuyez sur le bouton <strong>Partager</strong>{' '}
-                  <Share2 className="w-4 h-4 inline-block text-[#215C46] mx-1 align-sub" /> (icône en bas de Safari).
+                  <Share2 className="w-4 h-4 inline-block text-[#176B4D] mx-1 align-sub" /> (icône en bas de Safari).
                 </span>
               </li>
 
-              <li className="flex items-start gap-3 p-3 rounded-2xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                <span className="w-6 h-6 rounded-full bg-[#215C46] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              <li className="flex items-start gap-3 p-3 rounded-2xl bg-[#F7F9F7] border border-[#DCE5DE]">
+                <span className="w-6 h-6 rounded-full bg-[#176B4D] text-white text-xs font-bold flex items-center justify-center shrink-0">
                   2
                 </span>
                 <span>
                   Faites défiler le menu et sélectionnez{' '}
-                  <strong className="text-[#215C46]">Sur l&apos;écran d&apos;accueil</strong>{' '}
-                  <PlusSquare className="w-4 h-4 inline-block text-[#215C46] mx-1 align-sub" />.
+                  <strong className="text-[#176B4D]">Sur l&apos;écran d&apos;accueil</strong>{' '}
+                  <PlusSquare className="w-4 h-4 inline-block text-[#176B4D] mx-1 align-sub" />.
                 </span>
               </li>
 
-              <li className="flex items-start gap-3 p-3 rounded-2xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                <span className="w-6 h-6 rounded-full bg-[#215C46] text-white text-xs font-bold flex items-center justify-center shrink-0">
+              <li className="flex items-start gap-3 p-3 rounded-2xl bg-[#F7F9F7] border border-[#DCE5DE]">
+                <span className="w-6 h-6 rounded-full bg-[#176B4D] text-white text-xs font-bold flex items-center justify-center shrink-0">
                   3
                 </span>
                 <span>
@@ -269,38 +269,38 @@ function InstructionsModal({
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-xs sm:text-sm text-[#4A635A]">
+            <p className="text-xs sm:text-sm text-[#65736B]">
               Pour installer FAKTELIO sur votre téléphone ou votre ordinateur :
             </p>
 
             <div className="space-y-3 text-xs sm:text-sm">
-              <div className="p-3.5 rounded-2xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                <div className="flex items-center gap-2 font-bold text-[#10241D] mb-1">
-                  <Smartphone className="w-4 h-4 text-[#215C46]" />
+              <div className="p-3.5 rounded-2xl bg-[#F7F9F7] border border-[#DCE5DE]">
+                <div className="flex items-center gap-2 font-bold text-[#17231D] mb-1">
+                  <Smartphone className="w-4 h-4 text-[#176B4D]" />
                   Sur Android (Chrome / Samsung) :
                 </div>
-                <p className="text-xs text-[#4A635A]">
+                <p className="text-xs text-[#65736B]">
                   Ouvrez le menu navigateur (les 3 points verticaux <strong>⋮</strong>) et cliquez sur <strong>« Installer l&apos;application »</strong> ou <strong>« Ajouter à l&apos;écran d&apos;accueil »</strong>.
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-[#F7FAF8] border border-[#D9E7E3]">
-                <div className="flex items-center gap-2 font-bold text-[#10241D] mb-1">
-                  <Monitor className="w-4 h-4 text-[#215C46]" />
+              <div className="p-3.5 rounded-2xl bg-[#F7F9F7] border border-[#DCE5DE]">
+                <div className="flex items-center gap-2 font-bold text-[#17231D] mb-1">
+                  <Monitor className="w-4 h-4 text-[#176B4D]" />
                   Sur ordinateur (Chrome, Edge, Brave) :
                 </div>
-                <p className="text-xs text-[#4A635A]">
-                  Cliquez sur l&apos;icône <strong>Installer</strong> <Download className="w-3.5 h-3.5 inline-block text-[#215C46]" /> située à droite dans la barre d&apos;adresse de votre navigateur.
+                <p className="text-xs text-[#65736B]">
+                  Cliquez sur l&apos;icône <strong>Installer</strong> <Download className="w-3.5 h-3.5 inline-block text-[#176B4D]" /> située à droite dans la barre d&apos;adresse de votre navigateur.
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="mt-6 pt-4 border-t border-[#D9E7E3] flex justify-end">
+        <div className="mt-6 pt-4 border-t border-[#DCE5DE] flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-bold cursor-pointer transition-colors"
+            className="px-5 py-2.5 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-bold cursor-pointer transition-colors"
           >
             J&apos;ai compris
           </button>

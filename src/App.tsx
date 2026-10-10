@@ -35,6 +35,7 @@ import { SettingsView } from './components/settings/SettingsView';
 import { FastInvoiceModal } from './components/invoices/FastInvoiceModal';
 import { CookieConsentBanner } from './components/common/CookieConsentBanner';
 import { PwaInstallPrompt } from './components/common/PwaInstallPrompt';
+import { PwaUpdateToast } from './components/common/PwaUpdateToast';
 import { LegalNoticePage } from './components/legal/LegalNoticePage';
 import { PrivacyPolicyPage } from './components/legal/PrivacyPolicyPage';
 import { CookiePolicyPage } from './components/legal/CookiePolicyPage';
@@ -42,7 +43,7 @@ import { FaktelioIntroLoader } from './components/intro/FaktelioIntroLoader';
 
 function LandingPage() {
   return (
-    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#F7FAF8] text-[#10241D] selection:bg-[#215C46] selection:text-white">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden flex flex-col bg-[#F7F9F7] text-[#17231D] selection:bg-[#176B4D] selection:text-white">
       <Header />
       <main className="flex-grow">
         <Hero />
@@ -156,6 +157,7 @@ export default function App() {
         <AppRouter />
         <CookieConsentBanner />
         <PwaInstallPrompt />
+        <PwaUpdateToast />
       </NavigationProvider>
     </AuthProvider>
   );

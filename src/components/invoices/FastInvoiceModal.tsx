@@ -251,19 +251,19 @@ export function FastInvoiceModal({
             ))}
           </div>
 
-          <div className="p-4 rounded-xl bg-[#D9E7E3]/35 border border-[#215C46]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <label className="inline-flex items-center gap-2 text-xs font-bold text-[#10241D] cursor-pointer">
+          <div className="p-4 rounded-xl bg-[#E8F3ED] border border-[#DCE5DE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <label className="inline-flex items-center gap-2 text-xs font-bold text-[#17231D] cursor-pointer">
               <input
                 type="checkbox"
                 checked={paidNow}
                 onChange={(e) => setPaidNow(e.target.checked)}
-                className="w-4 h-4 rounded text-[#215C46] focus:ring-[#215C46]"
+                className="w-4 h-4 rounded text-[#176B4D] focus:ring-[#176B4D]"
               />
               Payée immédiatement (Espèces / Mobile Money)
             </label>
             <div className="text-right">
-              <span className="text-xs text-[#4A635A] mr-2">Total TTC :</span>
-              <span className="text-lg font-black text-[#215C46]">{formatFCFA(totalTtc)}</span>
+              <span className="text-xs text-[#65736B] mr-2">Total TTC :</span>
+              <span className="text-lg font-black text-[#176B4D]">{formatFCFA(totalTtc)}</span>
             </div>
           </div>
 
@@ -271,15 +271,15 @@ export function FastInvoiceModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-[#D9E7E3] text-xs font-bold text-[#4A635A] hover:bg-[#F7FAF8] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl border border-[#DCE5DE] text-xs font-bold text-[#65736B] hover:bg-[#F7F9F7] cursor-pointer"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#215C46] hover:bg-[#123A2C] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#176B4D] hover:bg-[#104B38] text-white text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:-translate-y-0.5"
             >
-              <CheckCircle2 className="w-4 h-4 text-[#D9E7E3]" />
+              <CheckCircle2 className="w-4 h-4 text-[#E8F3ED]" />
               Générer la facture FAKTELIO
             </button>
           </div>
